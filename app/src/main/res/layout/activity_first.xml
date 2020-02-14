@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FirstActivity">
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/dl_first"
+        android:background="@android:color/transparent">
+        <RelativeLayout
+            android:id="@+id/rl_first_insideDL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorwhite"
+            android:gravity="center_horizontal"
+            android:paddingTop="5dp">
+            <include
+                layout="@layout/water_tanker_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:popupTheme="@style/AppTheme"
+                app:layout_constraintTop_toTopOf="parent"/>
+           <androidx.viewpager.widget.ViewPager
+                android:id="@+id/vp_first"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/tabs"
+                android:layout_below="@+id/water_tanker_toolbar"
+                android:layout_marginBottom="60dp" />
+        </RelativeLayout>
+        <LinearLayout
+                android:id="@+id/firstdrawerlay"
+                android:layout_width="290dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="@color/colorGreyLight"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false" android:orientation="horizontal"
+                android:weightSum="4">
+
+                <LinearLayout
+                    android:id="@+id/lv_first_drawer_firstLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="left"
+                    android:gravity="left"
+                    android:layout_weight="3">
+
+
+                        <TextView
+                            android:id="@+id/tv_first_drawer_fullName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginLeft="-10dp"
+                            android:layout_gravity="center"
+                            android:text="Robert Percival"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/tv_first_drawer_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="robert123"
+                        android:layout_gravity="center"
+                        android:gravity="center_horizontal"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginLeft="-10dp"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+                    android:layout_gravity="right"
+                    android:gravity="right">
+                   <androidx.appcompat.widget.SwitchCompat
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_centerInParent="true"
+                       android:id="@+id/switch1"
+                       android:layout_marginTop="30dp"
+                       android:layout_marginRight="20dp"
+                       ></androidx.appcompat.widget.SwitchCompat>
+                    <!--<Switch
+                        android:id="@+id/switch1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginRight="20dp"
+                         />-->
+                </RelativeLayout>
+
+            </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:background="@color/colordark_grey"
+                        android:visibility="visible"
+                        />
+
+
+
+
+            <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="left"
+                        android:gravity="left"
+
+                        >
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/trip_menu"
+                            android:layout_marginTop="16dp"
+                            android:layout_gravity="left"/>
+                        <TextView
+                            android:id="@+id/tv_drawer_tripText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_gravity="left"
+                            android:text="Trip"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp"/>
+
+
+
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:background="@color/colordark_grey"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="left"
+                        android:gravity="left"
+
+                        >
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/language_menu"
+                            android:layout_marginTop="16dp"
+                            android:layout_gravity="left"/>
+                    <TextView
+                        android:id="@+id/tv_drawer_language"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="left"
+                        android:text="Language"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                      <androidx.appcompat.widget.SwitchCompat
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:id="@+id/switch2"
+                          android:layout_marginLeft="30dp"
+                          android:thumb="@drawable/thumb2"
+                          app:track="@drawable/track"
+
+                          >
+                          android:textOn="Hindi"
+                          android:textOff="English"
+                          app:showText="true"
+
+                      </androidx.appcompat.widget.SwitchCompat>
+
+
+
+                   <!--     <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_weight="1"
+                            android:layout_gravity="right"
+                            android:gravity="right"
+                            android:layout_marginLeft="25dp">
+
+                        </LinearLayout>
+-->
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:background="@color/colordark_grey"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="left"
+                        android:gravity="left"
+
+                        >
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/logout_menu"
+                            android:layout_marginTop="16dp"
+                            android:layout_gravity="left"/>
+                    <TextView
+                        android:id="@+id/tv_drawer_logout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="LogOut"
+                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="left"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginRight="30dp"
+                        android:background="@color/colordark_grey"
+                        android:visibility="visible" />
+
+
+            </LinearLayout>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

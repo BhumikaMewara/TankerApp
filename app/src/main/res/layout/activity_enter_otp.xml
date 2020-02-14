@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EnterOTP">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="60dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/grey"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/rl_rqst_det_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorwhite"
+            android:gravity="center_horizontal"
+            android:paddingTop="5dp"
+            android:orientation="vertical">
+            <include
+                layout="@layout/toolbar_with_bk_arrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:popupTheme="@style/AppTheme"
+                app:layout_constraintTop_toTopOf="parent"/>
+            <ScrollView
+                    android:id="@+id/scrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorGreyLight">
+
+                    <LinearLayout
+                        android:id="@+id/vp_first"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+                        <ImageView
+                            android:id="@+id/iv_enterOtp_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="50dp"
+                            android:src="@mipmap/ic_launcher"/>
+
+                        <TextView
+                            android:id="@+id/tv_enterOtp_msgTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Enter Code"
+                            android:textColor="@color/colorblack"
+                            android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/tv_enterOtp_msg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Please ask the customer to "
+                            android:textColor="@color/colorblack"
+                            android:textSize="12sp"/>
+                        <LinearLayout
+                            android:id="@+id/lv_white_bg"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:orientation="vertical"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginBottom="30dp"
+                            android:layout_marginLeft="40dp"
+                            android:layout_marginRight="40dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_rect_round_corners">
+                            <EditText
+                                android:id="@+id/ed_enterOtp_otp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:hint="dasdasdasd"
+                                android:gravity="center"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="10dp"/>
+                            <LinearLayout
+                                android:id="@+id/lh_enterOtp_verify"
+                                android:layout_width="200dp"
+                                android:layout_height="50dp"
+                                android:orientation="horizontal"
+                                android:layout_below="@+id/ed_enterOtp_otp"
+                                android:layout_marginTop="20dp"
+                                android:gravity="center"
+                                android:layout_gravity="center"
+                                android:background="@drawable/bg_green_rect_round_corners"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginRight="20dp"
+                                android:layout_marginBottom="2dp">
+                                <TextView
+                                    android:id="@+id/tv_enterOtp_verifyText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/colorwhite"
+                                    android:textSize="16sp"
+                                    android:foregroundGravity="center"
+                                    android:text="Verify"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginRight="40dp"
+                            >
+                            <TextView
+                                android:id="@+id/tv_enterOtp_resendText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Resend OTP"
+                                android:layout_marginRight="10dp"
+                                android:layout_gravity="right"/>
+                        </LinearLayout>
+
+
+
+                    </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
