@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Notification">
+
+    <RelativeLayout
+        android:id="@+id/title_noti_layout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rv_notification"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentTop="true"
+    android:layout_marginTop="20dp"
+    android:scrollbars="vertical"/>
+        <TextView
+            android:id="@+id/noNotificationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No Notificaton "
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorblack"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+    <ProgressBar
+        android:id="@+id/pb_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+</FrameLayout>

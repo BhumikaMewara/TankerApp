@@ -32,7 +32,7 @@
                 app:popupTheme="@style/AppTheme"
                 app:layout_constraintTop_toTopOf="parent"/>
             <ScrollView
-                android:id="@+id/scrollView"
+                android:id="@+id/sv_booking_det"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -83,13 +83,13 @@
                             android:layout_marginTop="20dp"
                             android:src="@drawable/phone_icon"/>
                     </RelativeLayout>
-                    <view
+                <!--    <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
 
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_estimated"
@@ -122,13 +122,13 @@
 
                         </LinearLayout>
                     </RelativeLayout>
-                    <view
+                   <!-- <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_pickup"
                         android:layout_width="match_parent"
@@ -159,13 +159,13 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
                     </RelativeLayout>
-                    <view
+                  <!--  <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_drop"
                         android:layout_width="match_parent"
@@ -195,13 +195,13 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
                     </RelativeLayout>
-                    <view
+                 <!--   <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_controller"
                         android:layout_width="match_parent"
@@ -231,13 +231,13 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
                     </RelativeLayout>
-                    <view
+                <!--    <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_customer"
                         android:layout_width="match_parent"
@@ -267,13 +267,13 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
                     </RelativeLayout>
-                    <view
+                   <!-- <view
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:textColor="@color/colordark_grey"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"/>-->
                     <RelativeLayout
                         android:id="@+id/rl_booking_det_message"
                         android:layout_width="match_parent"
