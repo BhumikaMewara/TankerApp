@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="MissingDefaultResource">
+
+<!--    <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >-->
+
+        <!-- Colored rectangle-->
+        <item>
+            <shape android:shape="rectangle">
+                <size
+                    android:width="120dp"
+                    android:height="40dp" />
+                <solid android:color="@color/grey" />
+            </shape>
+        </item>
+
+    <item
+        android:right="-100dp"
+        android:left="100dp"
+        android:top="-100dp"
+        android:bottom="-50dp">
+        <rotate
+            android:fromDegrees="135">
+            <shape android:shape="rectangle">
+                <solid android:color="@color/colorGreyLight" />
+            </shape>
+        </rotate>
+    </item>
+
+
+
+
+
+</layer-list>

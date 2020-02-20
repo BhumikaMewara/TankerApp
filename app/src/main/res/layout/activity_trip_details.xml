@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TripDetails">
+<include
+    layout="@layout/water_tanker_toolbar"
+    android:id="@+id/trip_details"/>
+
+<RelativeLayout
+    android:id="@+id/rl_trip_details_relativeView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/trip_details"
+    android:background="@color/green1"
+    android:padding="10dp">
+    <TextView
+        android:id="@+id/tv_trip_details_totalTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Trip :"
+        android:textColor="@color/greenLight"
+        android:textSize="20sp"
+        android:padding="5dp"
+        ></TextView>
+
+    <TextView
+        android:id="@+id/tv_trip_details_totalKM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total KM :"
+        android:textColor="@color/greenLight"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_below="@+id/tv_trip_details_totalTrip"
+        ></TextView>
+    <TextView
+        android:id="@+id/tv_trip_details_totalTrip_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" "
+        android:textColor="@color/colorblack"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/tv_trip_details_totalTrip"
+        ></TextView>
+
+    <TextView
+        android:id="@+id/tv_trip_details_totalKM_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" "
+        android:textColor="@color/colorblack"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/tv_trip_details_totalTrip_value"
+        android:layout_toRightOf="@+id/tv_trip_details_totalKM"
+        ></TextView>
+
+
+
+</RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/rl_trip_details_relativeView"
+        android:background="@drawable/gradient_background_main"
+
+        >
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_trip_details"
+        android:textColor="@color/colorblack"
+        android:textSize="20sp"
+        android:layout_marginTop="35dp"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:text="@string/no_booking"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/rv_trip_details"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pb_trip_details"
+            android:visibility="gone"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+</RelativeLayout>

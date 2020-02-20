@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "31543893111",
+    "firebase_url": "https://water-tanker-tracker.firebaseio.com",
+    "project_id": "water-tanker-tracker",
+    "storage_bucket": "water-tanker-tracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31543893111:android:296bd6f40e99a3d6dc7a72",
+        "android_client_info": {
+          "package_name": "com.kookyapps.gpstankertracking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31543893111-b2bjn7susk3k78af2dr6gu0ruorg27l9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kookyapps.gpstankertracking",
+            "certificate_hash": "66738c550a05bd4fa7c821af2e12542ec2202ea2"
+          }
+        },
+        {
+          "client_id": "31543893111-jbaa9d2movab3bgi5rbjd1q2af1s5mh7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB0qAhs3ula07lSJHuLj-GFJXifUPW9_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31543893111-jbaa9d2movab3bgi5rbjd1q2af1s5mh7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

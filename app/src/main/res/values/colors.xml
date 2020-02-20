@@ -6,11 +6,26 @@
     <color name="colorGreyLight">#E6E5E5</color>
     <color name="colorwhite">#FAFAFA</color>
     <color name="colorblack">#000000</color>
-    <color name="adsdas">#ebf3ee</color>
+    <color name="green1">#ebf3ee</color>
     <color name="greenLight">#51d380</color>
     <color name="greenDark">#27b45a</color>
     <color name="grey">#f1f1f1 </color>
-    <color name="colordark_grey">#A9A9A9</color>
+    <color name="colordark_grey">#B4B4B4</color>
+
+
+
+
+<!--
+Lucky sir's project colors (LSPC)
+
+    <color name="Green1">#EBF3EE</color>
+    <color name="Green2">#51d380</color>
+    <color name="Green3">#27b45a</color>
+    <color name="LightGray">#F1F1F1</color>
+    <color name="White">#FFFFFF</color>
+    <color name="Black">#000000</color>
+    <color name="GrayGradient">#F2F2F2</color>
+    <color name="DarkGray">#B4B4B4</color>-->
 
 
 
