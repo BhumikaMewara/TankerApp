@@ -14,8 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.kookyapps.gpstankertracking.BookingDetails;
+import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Modal.TripDetailsModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;

@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 
 public class SplashActivity extends AppCompatActivity {

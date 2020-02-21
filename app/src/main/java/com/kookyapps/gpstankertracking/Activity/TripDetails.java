@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,14 +8,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.kookyapps.gpstankertracking.Adapters.TripDetailsAdapter;
 import com.kookyapps.gpstankertracking.Modal.TripDetailsModal;
+import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 
 import java.util.ArrayList;

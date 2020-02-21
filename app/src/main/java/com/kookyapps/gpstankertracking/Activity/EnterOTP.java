@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.kookyapps.gpstankertracking.Activity.BookingDetails;
+import com.kookyapps.gpstankertracking.R;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener {
 

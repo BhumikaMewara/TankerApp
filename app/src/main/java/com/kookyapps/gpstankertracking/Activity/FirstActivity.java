@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.gson.JsonParseException;
+import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
@@ -81,7 +81,7 @@ public void initViews(){
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(this,MainActivity.class);
+        Intent i = new Intent(this, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TASK );
         startActivity(i);
         finish();

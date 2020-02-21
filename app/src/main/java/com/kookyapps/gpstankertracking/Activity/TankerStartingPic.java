@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.kookyapps.gpstankertracking.R;
 
 public class TankerStartingPic extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,7 +44,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         Intent i ;
         switch (view.getId()){
             case R.id.ib_tnkr_strt_capture:
-                i = new Intent(TankerStartingPic.this,EnterOTP.class);
+                i = new Intent(TankerStartingPic.this, EnterOTP.class);
                 startActivity(i);
                 finish();
 

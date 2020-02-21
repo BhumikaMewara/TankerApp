@@ -1,4 +1,4 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.kookyapps.gpstankertracking.Adapters.NotificationsAdapter;
 import com.kookyapps.gpstankertracking.Modal.NotificationModal;
+import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 
 import java.util.ArrayList;

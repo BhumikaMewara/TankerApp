@@ -13,16 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SplashActivity"></activity>
-        <activity android:name=".TripDetails" />
-        <activity android:name=".TripComplete" />
-        <activity android:name=".BookingDetails" />
-        <activity android:name=".EnterOTP" />
-        <activity android:name=".TankerStartingPic" />
-        <activity android:name=".RequestDetails" />
-        <activity android:name=".Notifications" />
-        <activity android:name=".FirstActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.SplashActivity"></activity>
+        <activity android:name=".Activity.TripDetails" />
+        <activity android:name=".Activity.TripComplete" />
+        <activity android:name=".Activity.BookingDetails" />
+        <activity android:name=".Activity.EnterOTP" />
+        <activity android:name=".Activity.TankerStartingPic" />
+        <activity android:name=".Activity.RequestDetails" />
+        <activity android:name=".Activity.Notifications" />
+        <activity android:name=".Activity.FirstActivity" />
+        <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

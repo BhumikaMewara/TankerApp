@@ -5,5 +5,6 @@ public class URLs {
     public static final String SIGN_IN_URL="signin";
     public static final String SIGN_OUT_URL="signout";
     public static final String TRIP_DETAILS="trips";
+    public static final String BOOKING_BY_ID="booking/:id";
 
 }

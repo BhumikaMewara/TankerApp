@@ -1,10 +1,9 @@
-package com.kookyapps.gpstankertracking;
+package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -13,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
@@ -24,7 +24,6 @@ import com.kookyapps.gpstankertracking.Utils.URLs;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
