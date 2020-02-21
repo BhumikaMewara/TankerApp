@@ -4,6 +4,7 @@ public class Constants {
     public static final String ONGOING_CALL="Ongoing";
     public static final String PENDING_CALL="Pending";
     public static final String COMPLETED_CALL="Completed";
+
     public static final String ABORTED_CALL="Aborted";
     public static final String COMPLETED_PAGE_TITLE="Completed Booking Status";
     public static final String PENDING_PAGE_TITLE="Pending Booking Status";
@@ -22,4 +23,7 @@ public class Constants {
 
 
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
+
+
+    public static final String TRIP_DETAILS="Trip Details";
 }

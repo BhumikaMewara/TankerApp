@@ -7,13 +7,13 @@
     tools:context=".TripDetails">
 <include
     layout="@layout/water_tanker_toolbar"
-    android:id="@+id/trip_details"/>
+    android:id="@+id/trip_details_toolbar"/>
 
 <RelativeLayout
     android:id="@+id/rl_trip_details_relativeView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/trip_details"
+    android:layout_below="@+id/trip_details_toolbar"
     android:background="@color/green1"
     android:padding="10dp">
     <TextView
@@ -75,7 +75,7 @@
         <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_trip_details"
+        android:id="@+id/tv_trip_details_nodata"
         android:textColor="@color/colorblack"
         android:textSize="20sp"
         android:layout_marginTop="35dp"

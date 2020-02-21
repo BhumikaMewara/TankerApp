@@ -5,6 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Notifications">
-
+    <include
+        layout="@layout/toolbar_with_bk_arrow"
+        android:id="@+id/include_notification"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/include_notification"
+        android:background="@drawable/gradient_background_main">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/tv_notificationitem_nodata"
+            android:text="No Notifications Found"
+            android:gravity="center"
+            android:textColor="@color/colorblack"
+            android:visibility="gone"
+            android:textSize="18dp"
+            android:layout_marginTop="35dp"
+            />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/pg_notification"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/rv_notification"
+            android:visibility="gone"
+            android:layout_marginTop="35dp"/>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

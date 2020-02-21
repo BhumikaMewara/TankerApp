@@ -4,11 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/water_tanker_toolbar">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <RelativeLayout
-            android:layout_width="match_parent"
+            android:id="@+id/rl_water_tanker_toolbar_menu"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="25dp"
@@ -16,26 +18,31 @@
                 android:layout_marginLeft="20dp"
                 android:id="@+id/toolbarmenu"
                 android:src="@drawable/ham"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/toolbartitle"
-                android:text="Booking"
-                android:textSize="22dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:textColor="@color/colorblack"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"/>
-
-            <ImageView
-                android:id="@+id/iv_booking_notification"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginLeft="71dp"
-                android:layout_marginRight="20dp"
-                android:layout_toRightOf="@id/toolbartitle"
-                android:src="@drawable/notification_booking_list" />
         </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_water_tanker_toolbartitle"
+            android:text=""
+            android:textSize="22dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/colorblack"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_water_tanker_toolbar_menu_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true">
+        <ImageView
+            android:id="@+id/iv_booking_notification"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/notification_booking_list" />
     </RelativeLayout>
+        </RelativeLayout>
+
 </androidx.appcompat.widget.Toolbar>

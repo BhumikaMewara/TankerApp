@@ -45,6 +45,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_first);
         initViews();
 
+
         toolBarImgMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,7 +63,7 @@ public void initViews(){
     logut=                   (TextView)       findViewById(R.id.tv_drawer_logout);
     toolBarImgMenu =         (ImageView)      findViewById(R.id.toolbarmenu);
     toolBarImgNotification=  (ImageView)      findViewById(R.id.iv_booking_notification);
-    toolBarTitle =           (TextView)       findViewById(R.id.toolbartitle);
+    //toolBarTitle =           (TextView)       findViewById(R.id.toolbartitle);
     navdrawer=            (DrawerLayout)   findViewById(R.id.dl_first) ;
     actionBarDrawerToggle = new ActionBarDrawerToggle(this,navdrawer,R.string.drawer_open,R.string.drawer_close);
     r=                       (RelativeLayout) findViewById(R.id.rl_first_insideDL);
