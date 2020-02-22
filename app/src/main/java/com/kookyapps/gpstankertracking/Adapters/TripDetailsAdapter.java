@@ -18,7 +18,7 @@ import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Modal.TripDetailsModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
-
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -28,6 +28,8 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.
     ArrayList<TripDetailsModal> bookinglist;
     Context context;
     String init_type;
+    BottomSheetDialog abortsheet;
+
     public TripDetailsAdapter(Context context,ArrayList<TripDetailsModal> bookinglist,String init_type){
         this.bookinglist = bookinglist;
         this.context = context;
@@ -52,6 +54,7 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.
             ongoingaction = (LinearLayout)view.findViewById(R.id.ll_trip_details_ongoing);
             ongoingView = (RelativeLayout)view.findViewById(R.id.rl_trip_details_ongoing_view);
             ongoingView.setOnClickListener(this);
+
             /*ongoingAbort = (RelativeLayout)view.findViewById(R.id.rl_trip_details_ongoing_abort);
             ongoingAbort.setOnClickListener(this);*/
             bookingview = (RelativeLayout)view.findViewById(R.id.rl_trip_details_view);
@@ -65,31 +68,12 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.
             switch (view.getId()) {
                 case R.id.rl_trip_details_ongoing_view:
                     break;
-                /*case R.id.rl_trip_details_ongoing_abort:
-                    abortsheet = new BottomSheetDialog(context);
-                    View sheetView = LayoutInflater.from(context).inflate(R.layout.activity_abort_dialog,null);
-                    abortsheet.setContentView(sheetView);
-                    abort_delete = (TextView)sheetView.findViewById(R.id.tv_abortdialog_delete);
-                    abort_cancel = (TextView)sheetView.findViewById(R.id.tv_abortdialog_cancel);
-                    abort_delete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
 
-                        }
-                    });
-                    abort_cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            abortsheet.dismiss();
-                        }
-                    });
-                    abortsheet.show();
-                    break;*/
                 case R.id.rl_trip_details_view:
                     intent = new Intent(context, BookingDetails.class);
                     intent.putExtra("init_type",init_type);
                     context.startActivity(intent);
-                    /* if(init_type.equals(Constants.PENDING_CALL)){
+                     /*if(init_type.equals(Constants.PENDING_CALL)){
 
                         abortsheet = new BottomSheetDialog(context);
                         View sheetView2 = LayoutInflater.from(context).inflate(R.layout.activity_abort_dialog,null);

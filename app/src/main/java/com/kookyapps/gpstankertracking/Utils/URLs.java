@@ -6,5 +6,8 @@ public class URLs {
     public static final String SIGN_OUT_URL="signout";
     public static final String TRIP_DETAILS="trips";
     public static final String BOOKING_BY_ID="booking/:id";
+    public static final String NOTIFICATION_LIST="notification";
+    public static final String BOOKING_LIST="booking-list";
+    public static final String REQUEST_LIST="pending-booking-list";
 
 }

@@ -4,6 +4,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -19,10 +21,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 
 import org.json.JSONException;
@@ -38,6 +42,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     RelativeLayout r ;
     TextView fullname,username,trip,language,logut,toolBarTitle;
     ImageView tripImg,languageImg,logoutImg,flagImg,toolBarImgMenu,toolBarImgNotification;
+    static String notificationCount;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,5 +159,27 @@ public void initViews(){
         }
     };
 
+    /*public static void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SharedPrefUtil.getStringPreferences(context, Constants.SHARED_PREF_NOTICATION_TAG,"notification_count");
+        if(Integer.parseInt(notificationCount)!=count || isStarted) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                bottomnavigation.setCount(1, String.valueOf(count));
+            } else {
+                bottomnavigation.setCount(1, "9+");
+            }
+            SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+        }
+        Fragment frg = fragmentManager.findFragmentById(R.id.firstviewpager);
+        if(frg instanceof NotificationsFragment){
+            ((NotificationsFragment) frg).reloadNotification();
+        }
+    }
 
+    public static void clearNotificationCount(){
+        bottomnavigation.clearCount(1);
+    }
+*/
 }

@@ -11,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 public class GETAPIRequest {
 
-    public void request(final Context context, final FetchDataListener listener, final String ApiURL) throws JSONException {
+    public void request(final Context context, final FetchDataListener listener, final String ApiURL, HeadersUtil headparam, JsonObject jsonBodyObj) throws JSONException {
         if (listener != null) {
             listener.onFetchStart();
         }

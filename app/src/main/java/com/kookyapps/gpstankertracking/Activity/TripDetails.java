@@ -21,10 +21,10 @@ import java.util.ArrayList;
 
 public class TripDetails extends AppCompatActivity implements View.OnClickListener {
 
-    ImageView toolbarmenu ;
+    ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
     TextView nodata,pageTitle;
-    RecyclerView trip_details;
+    RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
     RelativeLayout menu ,menunotifications ;
@@ -35,14 +35,14 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
         initViews();
-
+        createTrip();
     }
     public void initViews(){
-        tripDetProgressBar = findViewById(R.id.pb_trip_details);
+        tripDetProgressBar = (ProgressBar) findViewById(R.id.pb_trip_details);
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
         pageTitle=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-        trip_details=(RecyclerView)findViewById(R.id.rv_trip_details);
+        trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
         menunotifications=(RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu_notification);
         menu=(RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu);
         menunotifications.setOnClickListener(this);
@@ -61,7 +61,9 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
                 break;
             case R.id.rl_water_tanker_toolbar_menu:
-
+                Intent intent;
+                intent = new Intent(TripDetails.this,Notifications.class);
+                startActivity(intent);
                 break;
 
         }
@@ -112,11 +114,11 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         }else{
             tripDetProgressBar.setVisibility(View.GONE);
             nodata.setVisibility(View.GONE);
-            trip_details.setVisibility(View.VISIBLE);
+            trip_details_listView.setVisibility(View.VISIBLE);
             adapter = new TripDetailsAdapter(TripDetails.this, tripDetailList, Constants.TRIP_DETAILS);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            trip_details.setLayoutManager(mLayoutManager);
-            trip_details.setAdapter(adapter);
+            trip_details_listView.setLayoutManager(mLayoutManager);
+            trip_details_listView.setAdapter(adapter);
         }
     }
     public void tripDetailsListApiCalling(){

@@ -11,6 +11,7 @@ import com.kookyapps.gpstankertracking.Modal.NotificationModal;
 import com.kookyapps.gpstankertracking.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +23,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     ArrayList<NotificationModal> notificationlist;
     Context context;
+    private boolean isLoadingAdded = false;
 
     public NotificationsAdapter(Context context,ArrayList<NotificationModal> notificationlist){
         this.context = context;
@@ -63,5 +65,21 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     break;
             }
         }
+
     }
+    public void add(NotificationModal r) {
+        notificationlist.add(r);
+        notifyItemInserted(notificationlist.size() - 1);
+    }
+    public void addAll(List<NotificationModal> moveResults) {
+        for (NotificationModal result : moveResults) {
+            add(result);
+        }
+    }
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        add(new NotificationModal());
+    }
+
+
 }
