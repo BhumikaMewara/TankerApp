@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
@@ -21,6 +22,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
     TextView title,message,verify,resend;
     ImageView msg_icon ;
     LinearLayout verifyLayout;
+    RelativeLayout back,noti;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
         otpcode=        (EditText)findViewById(R.id.ed_enterOtp_otp);
         verifyLayout=   (LinearLayout)findViewById(R.id.lh_enterOtp_verify);
         resend=         (TextView)findViewById(R.id.tv_enterOtp_resendText);
+        back=           (RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
+        back.setOnClickListener(this);
+        noti=           (RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
+        noti.setOnClickListener(this);
         SpannableString content = new SpannableString("Resend OTP");
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         resend.setText(content);
@@ -57,8 +64,16 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener 
         Intent i ;
         switch (view.getId()){
             case R.id.lh_enterOtp_verify:
-                i = new Intent(this, BookingDetails.class);
+                i = new Intent(this, TripComplete.class);
+
                 startActivity(i);
+            case R.id.rl_toolbarmenu_backimglayout:
+                onBackPressed();
+                break;
+            case R.id.rl_toolbar_with_back_notification:
+                i = new Intent(this,Notifications.class);
+                startActivity(i);
+                break;
         }
     }
     @Override

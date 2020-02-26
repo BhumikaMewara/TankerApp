@@ -24,22 +24,58 @@
                 android:background="@android:color/transparent"
                 app:popupTheme="@style/AppTheme"
                 app:layout_constraintTop_toTopOf="parent"/>
+            <RelativeLayout
+                android:id="@+id/rl_first_booking_requestList"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/water_tanker_toolbar"
+                >
+
+                <Button
+                    android:id="@+id/btn_first_rqstbtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="requestList"
+                    android:padding="3dp"
+                    android:textColor="@color/colorwhite"
+                    android:layout_toLeftOf="@+id/firstactivity_divider1"
+                    android:background="@drawable/bg_requestlist"
+                    android:textSize="12sp"/>
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/firstactivity_divider1"/>
+                <Button
+                    android:id="@+id/btn_first_bookingbtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_bookinglist"
+                    android:text="bookingList"
+                    android:layout_toRightOf="@+id/firstactivity_divider1"
+                    android:textColor="@color/colorwhite"
+                    android:textSize="12sp"/>
+            </RelativeLayout>
+
            <androidx.viewpager.widget.ViewPager
                 android:id="@+id/vp_first"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/tabs"
-                android:layout_below="@+id/water_tanker_toolbar"
+                android:layout_below="@+id/rl_first_booking_requestList"
                 android:layout_marginBottom="60dp" />
         </RelativeLayout>
+
+
         <LinearLayout
-                android:id="@+id/firstdrawerlay"
-                android:layout_width="290dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                android:background="@color/colorGreyLight"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+            android:id="@+id/firstdrawerlay"
+            android:layout_width="290dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/colorGreyLight"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -57,18 +93,18 @@
                     android:layout_weight="3">
 
 
-                        <TextView
-                            android:id="@+id/tv_first_drawer_fullName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginStart="-10dp"
-                            android:layout_gravity="center"
-                            android:text="Robert Percival"
-                            android:gravity="center"
-                            android:textStyle="bold"
-                            android:textSize="20sp"
-                            android:textColor="@android:color/black" />
+                    <TextView
+                        android:id="@+id/tv_first_drawer_fullName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="-10dp"
+                        android:layout_gravity="center"
+                        android:text="Robert Percival"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="@android:color/black" />
 
                     <TextView
                         android:id="@+id/tv_first_drawer_username"
@@ -91,14 +127,14 @@
                     android:layout_weight="1"
                     android:layout_gravity="end"
                     android:gravity="end">
-                   <androidx.appcompat.widget.SwitchCompat
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_centerInParent="true"
-                       android:id="@+id/switch1"
-                       android:layout_marginTop="30dp"
-                       android:layout_marginEnd="20dp"
-                       ></androidx.appcompat.widget.SwitchCompat>
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/switch1"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginEnd="20dp"
+                        ></androidx.appcompat.widget.SwitchCompat>
                     <!--<Switch
                         android:id="@+id/switch1"
                         android:layout_width="wrap_content"
@@ -109,168 +145,168 @@
                 </RelativeLayout>
 
             </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@color/colordark_grey"
-                        android:visibility="visible"
-                        />
-
-
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colordark_grey"
+                android:visibility="visible"
+                />
 
             <LinearLayout
                 android:id="@+id/lh_first_triplayout"
-                        android:layout_width="140dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_gravity="start"
-                        android:gravity="start"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="start"
+                android:gravity="start"
 
-                        >
-                        <ImageView
-                            android:id="@+id/iv_first_tripitem"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:src="@drawable/trip_menu"
-                            android:layout_marginTop="16dp"
-                            android:layout_gravity="start"/>
-                        <TextView
-                            android:id="@+id/tv_drawer_tripText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_gravity="start"
-                            android:text="Trip"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp"/>
+                >
+                <ImageView
+                    android:id="@+id/iv_first_tripitem"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/trip_menu"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="start"/>
+                <TextView
+                    android:id="@+id/tv_drawer_tripText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="start"
+                    android:text="Trip"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
 
-
-
-                    </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:background="@color/colordark_grey"
-                        android:visibility="visible" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_gravity="start"
-                        android:gravity="start"
-
-                        >
-                        <ImageView
-                            android:id="@+id/iv_first_languageitem"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:src="@drawable/language_menu"
-                            android:layout_marginTop="16dp"
-                            android:layout_gravity="start"/>
-                    <TextView
-                        android:id="@+id/tv_drawer_language"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_gravity="start"
-                        android:text="Language"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-
-                      <androidx.appcompat.widget.SwitchCompat
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/switch2"
-                          android:layout_marginStart="30dp"
-                          android:thumb="@drawable/thumb2"
-                          app:track="@drawable/track"
-
-                          >
-                          android:textOn="Hindi"
-                          android:textOff="English"
-                          app:showText="true"
-
-                      </androidx.appcompat.widget.SwitchCompat>
-
-
-
-                   <!--     <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_weight="1"
-                            android:layout_gravity="right"
-                            android:gravity="right"
-                            android:layout_marginLeft="25dp">
-
-                        </LinearLayout>
--->
-                    </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:background="@color/colordark_grey"
-                        android:visibility="visible" />
-
-                    <LinearLayout
-                        android:id="@+id/lh_first_logoutLayout"
-                        android:layout_width="140dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_gravity="start"
-                        android:gravity="start"
-
-                        >
-                        <ImageView
-                            android:id="@+id/iv_first_logoutitem"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:src="@drawable/logout_menu"
-                            android:layout_marginTop="16dp"
-                            android:layout_gravity="start"/>
-                    <TextView
-                        android:id="@+id/tv_drawer_logout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="LogOut"
-                        android:layout_marginStart="5dp"
-                        android:layout_gravity="start"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-                    </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:layout_marginLeft="30dp"
-                        android:layout_marginRight="30dp"
-                        android:background="@color/colordark_grey"
-                        android:visibility="visible" />
 
 
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/colordark_grey"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="start"
+                android:gravity="start"
+
+                >
+                <ImageView
+                    android:id="@+id/iv_first_languageitem"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/language_menu"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="start"/>
+                <TextView
+                    android:id="@+id/tv_drawer_language"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="start"
+                    android:text="Language"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/switch2"
+                    android:layout_marginStart="30dp"
+                    android:thumb="@drawable/thumb2"
+                    app:track="@drawable/track"
+
+                    >
+                    android:textOn="Hindi"
+                    android:textOff="English"
+                    app:showText="true"
+
+                </androidx.appcompat.widget.SwitchCompat>
+
+
+
+                <!--     <LinearLayout
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:orientation="horizontal"
+                         android:layout_weight="1"
+                         android:layout_gravity="right"
+                         android:gravity="right"
+                         android:layout_marginLeft="25dp">
+
+                     </LinearLayout>
+    -->
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/colordark_grey"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/lh_first_logoutLayout"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="start"
+                android:gravity="start"
+
+                >
+                <ImageView
+                    android:id="@+id/iv_first_logoutitem"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/logout_menu"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="start"/>
+                <TextView
+                    android:id="@+id/tv_drawer_logout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="LogOut"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="start"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@color/colordark_grey"
+                android:visibility="visible" />
+
+
+        </LinearLayout>
+
+
+
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

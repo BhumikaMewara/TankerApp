@@ -2,9 +2,30 @@ package com.kookyapps.gpstankertracking.Modal;
 
 public class TripDetailsModal {
     String bookingid,distance,fromlocation,tolocation,fromtime,totime;
+    String fromlatitude,fromlongitude, tolatitude, tologitude;
+
+
+    public String getFromlatitude() { return this.fromlatitude; }
+
+    public void setFromlatitude(String fromlatitude) { this.fromlatitude = fromlatitude; }
+
+    public String getFromlongitude() { return this.fromlongitude; }
+
+    public void setFromlongitude(String fromlongitude) { this.fromlongitude = fromlongitude; }
+
+    public String getTolatitude() { return this.tolatitude; }
+
+    public void setTolatitude(String tolatitude) { this.tolatitude = tolatitude; }
+
+    public String getTologitude() { return this.tologitude; }
+
+    public void setTologitude(String tologitude) { this.tologitude = tologitude; }
+
+
+
 
     public String getBookingid() {
-        return bookingid;
+        return this.bookingid;
     }
 
     public void setBookingid(String bookingid) {
@@ -12,7 +33,7 @@ public class TripDetailsModal {
     }
 
     public String getDistance() {
-        return distance;
+        return this.distance;
     }
 
     public void setDistance(String distance) {
@@ -20,7 +41,7 @@ public class TripDetailsModal {
     }
 
     public String getFromlocation() {
-        return fromlocation;
+        return this.fromlocation;
     }
 
     public void setFromlocation(String fromlocation) {
@@ -28,7 +49,7 @@ public class TripDetailsModal {
     }
 
     public String getTolocation() {
-        return tolocation;
+        return this.tolocation;
     }
 
     public void setTolocation(String tolocation) {
@@ -36,7 +57,7 @@ public class TripDetailsModal {
     }
 
     public String getFromtime() {
-        return fromtime;
+        return this.fromtime;
     }
 
     public void setFromtime(String fromtime) {
@@ -44,7 +65,7 @@ public class TripDetailsModal {
     }
 
     public String getTotime() {
-        return totime;
+        return this.totime;
     }
 
     public void setTotime(String totime) {

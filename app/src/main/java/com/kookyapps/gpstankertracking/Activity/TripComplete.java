@@ -28,7 +28,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     TextView bookingid,distance,pickup,drop,drivername,contact_no,message,pagetitle;
     //ImageView calltous;
     ImageView menunotification;
-    RelativeLayout menuback;
+    RelativeLayout back,noti,bottom;
     String init_type,bkngid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,39 +38,43 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
 
     }
     public void initViews(){
-            init_type = getIntent().getExtras().getString("init_type");
+
             pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
-            bookingid = (TextView) findViewById(R.id.tv_bookingdetail_bookingid);
-            distance = (TextView) findViewById(R.id.tv_bookingdetail_distance);
-            pickup = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
-            drop = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
-            drivername = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
-            contact_no = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
-            message = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
-            /*calltous = (ImageView) findViewById(R.id.iv_bookingdetail_bookingid_call);
-            calltous.setOnClickListener(this);*/
-            menuback = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
-            menuback.setOnClickListener(this);
-            menunotification = (ImageView) findViewById(R.id.iv_tb_with_bck_arrow_notification);
-            menunotification.setOnClickListener(this);
-            if (init_type.equals(Constants.COMPLETED_CALL)) {
-                pagetitle.setText("Completed Booking Details");
-            } else if (init_type.equals(Constants.ABORTED_CALL)) {
-                pagetitle.setText("Aborted Booking Details");
-            }
+            back = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
+            noti=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
+            bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
+            distance = (TextView) findViewById(R.id.tv_tripcomplete_distance);
+            pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
+            drop = (TextView) findViewById(R.id.tv_tripcomplete_drop);
+            drivername = (TextView) findViewById(R.id.tv_tripcomplete_drivername);
+            contact_no = (TextView) findViewById(R.id.tv_tripcomplete_contact);
+            message = (TextView) findViewById(R.id.tv_tripcomplete_message);
+            bottom=(RelativeLayout)findViewById(R.id.rl_bottomLayout_text);
+            back.setOnClickListener(this);
+            noti.setOnClickListener(this);
+            bottom.setOnClickListener(this);
+            pagetitle.setText("Trip Complete");
+
+
+
+
+
     }
     @Override
     public void onClick(View view) {
+        Intent i;
         switch (view.getId()){
             case R.id.rl_toolbar_with_back_backLayout:
                 onBackPressed();
                 break;
             case R.id.iv_tb_with_bck_arrow_notification:
-                Intent intent;
-                intent = new Intent(TripComplete.this,Notifications.class);
-                startActivity(intent);
+                i = new Intent(TripComplete.this,Notifications.class);
+                startActivity(i);
                 break;
-            case R.id.iv_bookingdetail_bookingid_call:
+            case R.id.rl_bottomLayout_text:
+                i=new Intent(this,FirstActivity.class);
+                startActivity(i);
+                finish();
                 break;
         }
     }
@@ -123,12 +127,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                             RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);
                         }
 
-                        /*FirebaseAuth.getInstance().signOut();
-                        SessionManagement.logout(bookingdetailsApiListner, BookingDetails.this);
-                        Intent i = new Intent(BookingDetails.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(i);
-                        Toast.makeText(BookingDetails.this, "You are now logout", Toast.LENGTH_SHORT).show();*/
                         finish();
                     }else {
                         RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);

@@ -135,6 +135,7 @@
                 android:layout_marginLeft="25dp"
                 android:paddingTop="5dp"
                 android:textSize="12sp"
+                android:inputType="textWebPassword"
                 android:layout_marginRight="25dp"/>
         </LinearLayout>
     </LinearLayout>

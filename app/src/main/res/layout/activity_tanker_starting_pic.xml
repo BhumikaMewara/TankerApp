@@ -11,7 +11,8 @@
         android:background="@color/colorblack"
         android:orientation="vertical">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/ll_tanker_starting_pic_retake"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:orientation="horizontal"
@@ -47,7 +48,8 @@
                 android:id="@+id/iv_tankr_strt_image_clicked"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:srcCompat="@android:drawable/btn_star_big_on" />
+                    android:layout_centerInParent="true"
+                    android:visibility="visible"/>
 
 
             <RelativeLayout
@@ -61,7 +63,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginRight="10dp">
+                    android:layout_marginRight="10dp"
+                    android:visibility="gone">
                     <TextView
                         android:id="@+id/tv_tankr_strt_lat"
                         android:layout_width="wrap_content"
@@ -71,7 +74,8 @@
 
                         android:text="paritosj"
                         android:textColor="@color/colorblack"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        />
                     <TextView
                         android:id="@+id/tv_tankr_strt_lon"
                         android:layout_width="wrap_content"
@@ -96,7 +100,8 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -129,6 +134,7 @@
                             android:text="24January 2020"
                             android:layout_marginLeft="2dp"
                             android:layout_weight="1"
+
                             android:textColor="@color/colorblack"></TextView>
                     </LinearLayout>
 

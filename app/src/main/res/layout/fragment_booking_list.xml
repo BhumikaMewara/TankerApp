@@ -4,14 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.BookingList">
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
         android:id="@+id/rv_fg_bookinglist"/>
-
     <TextView
         android:id="@+id/tv_bookinglist_nodata"
         android:layout_width="match_parent"
@@ -19,12 +16,8 @@
         android:text="No Bookings Found"
         android:gravity="center"
         android:layout_gravity="center"/>
-
     <include
         layout="@layout/progress_indicator"
         android:id="@+id/fg_booking_progresbar"
         android:visibility="gone"/>
-
-
-
 </FrameLayout>

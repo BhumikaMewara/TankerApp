@@ -7,239 +7,284 @@
     android:layout_height="match_parent"
     tools:context=".Activity.TripComplete">
 
+    <RelativeLayout
+        android:id="@+id/rl_trip_complete_mainlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:id="@+id/rl_trip_complete_toolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <include
+                layout="@layout/toolbar_with_bk_arrow"
+                android:id="@+id/id_trip_complete_toolbar"/>
+        </RelativeLayout>
 
-
-    <include
-        layout="@+id/water_tanker_toolbar"
-        android:id="@+id/trip_complete_toolbar"
-        />
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/gradient_background_main"
-        android:layout_below="@+id/include_bookingdetails"
+        android:layout_below="@+id/rl_trip_complete_toolbarLayout"
         >
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rl_bookingdetail_main"
+            android:layout_height="match_parent"
+            android:id="@+id/rl_tripcomplete_main"
             android:layout_marginTop="45dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:background="@color/colorwhite"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_booking_id_title"
+                android:id="@+id/tv_tripcomplete_booking_id_title"
                 android:text="Booking ID"
                 android:textColor="@color/greenLight"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="15dp"
                 android:textSize="13dp"/>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_bookingid"
+                android:id="@+id/tv_tripcomplete_bookingid"
                 android:text="123456789"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
                 android:layout_marginTop="5dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_booking_id_title"
-                android:layout_below="@+id/tv_bookingdetail_booking_id_title"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_booking_id_title"
+                android:layout_below="@+id/tv_tripcomplete_booking_id_title"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:id="@+id/bookingdetail_underline1"
+                android:id="@+id/tripcomplete_underline1"
                 android:background="@color/colordark_grey"
                 android:layout_marginTop="5dp"
-                android:layout_below="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/iv_bookingdetail_bookingid_call"/>
+                android:layout_below="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+               />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_distance_title"
-                android:layout_below="@+id/bookingdetail_underline1"
+                android:id="@+id/tv_tripcomplete_distance_title"
+                android:layout_below="@+id/tripcomplete_underline1"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Estimated Distance"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_distance"
-                android:layout_below="@+id/tv_bookingdetail_distance_title"
+                android:id="@+id/tv_tripcomplete_distance"
+                android:layout_below="@+id/tv_tripcomplete_distance_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="15 KM"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
-                android:id="@+id/bookingdetail_underline2"
-                android:layout_below="@id/tv_bookingdetail_distance"
+                android:id="@+id/tripcomplete_underline2"
+                android:layout_below="@id/tv_tripcomplete_distance"
                 android:background="@color/colordark_grey"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@id/bookingdetail_underline1"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@id/tripcomplete_underline1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_pickup_title"
-                android:layout_below="@+id/bookingdetail_underline2"
+                android:id="@+id/tv_tripcomplete_pickup_title"
+                android:layout_below="@+id/tripcomplete_underline2"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Pickup point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_pickup"
-                android:layout_below="@+id/tv_bookingdetail_pickup_title"
+                android:id="@+id/tv_tripcomplete_pickup"
+                android:layout_below="@+id/tv_tripcomplete_pickup_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="398/A-2, Shubham tower, 3rd 'C' road, Sardarpura, Jodhpur, Rajasthan 342003"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
-                android:id="@+id/bookingdetail_underline3"
-                android:layout_below="@id/tv_bookingdetail_pickup"
+                android:id="@+id/tripcomplete_underline3"
+                android:layout_below="@id/tv_tripcomplete_pickup"
                 android:background="@color/colordark_grey"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@id/bookingdetail_underline1"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@id/tripcomplete_underline1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_drop_title"
-                android:layout_below="@+id/bookingdetail_underline3"
+                android:id="@+id/tv_tripcomplete_drop_title"
+                android:layout_below="@+id/tripcomplete_underline3"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Drop Point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_drop"
-                android:layout_below="@+id/tv_bookingdetail_drop_title"
+                android:id="@+id/tv_tripcomplete_drop"
+                android:layout_below="@+id/tv_tripcomplete_drop_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="115-117, Summer Nagar, Boranada, Jodhpur, Rajasthan 3420112"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
-                android:id="@+id/bookingdetail_underline4"
-                android:layout_below="@id/tv_bookingdetail_drop"
+                android:id="@+id/tripcomplete_underline4"
+                android:layout_below="@id/tv_tripcomplete_drop"
                 android:background="@color/colordark_grey"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@id/bookingdetail_underline1"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@id/tripcomplete_underline1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_drivername_title"
-                android:layout_below="@+id/bookingdetail_underline4"
+                android:id="@+id/tv_tripcomplete_drivername_title"
+                android:layout_below="@+id/tripcomplete_underline4"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Driver's Name"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_drivername"
-                android:layout_below="@+id/tv_bookingdetail_drivername_title"
+                android:id="@+id/tv_tripcomplete_drivername"
+                android:layout_below="@+id/tv_tripcomplete_drivername_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Max Pitter"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
-                android:id="@+id/bookingdetail_underline5"
-                android:layout_below="@id/tv_bookingdetail_drivername"
+                android:id="@+id/tripcomplete_underline5"
+                android:layout_below="@id/tv_tripcomplete_drivername"
                 android:background="@color/colordark_grey"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@id/bookingdetail_underline1"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@id/tripcomplete_underline1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_contact_title"
-                android:layout_below="@+id/bookingdetail_underline5"
+                android:id="@+id/tv_tripcomplete_contact_title"
+                android:layout_below="@+id/tripcomplete_underline5"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Contact No."
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_contact"
-                android:layout_below="@+id/tv_bookingdetail_contact_title"
+                android:id="@+id/tv_tripcomplete_contact"
+                android:layout_below="@+id/tv_tripcomplete_contact_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="1234567890"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"
-                android:id="@+id/bookingdetail_underline6"
-                android:layout_below="@id/tv_bookingdetail_contact"
+                android:id="@+id/tripcomplete_underline6"
+                android:layout_below="@id/tv_tripcomplete_contact"
                 android:background="@color/colordark_grey"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@id/bookingdetail_underline1"/>
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@id/tripcomplete_underline1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_message_title"
-                android:layout_below="@+id/bookingdetail_underline6"
+                android:id="@+id/tv_tripcomplete_message_title"
+                android:layout_below="@+id/tripcomplete_underline6"
                 android:layout_marginTop="10dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Message"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tv_bookingdetail_message"
-                android:layout_below="@+id/tv_bookingdetail_message_title"
+                android:id="@+id/tv_tripcomplete_message"
+                android:layout_below="@+id/tv_tripcomplete_message_title"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="13dp"
-                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                android:layout_alignEnd="@+id/bookingdetail_underline1"
+                android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
+                android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry."/>
         </RelativeLayout>
     </ScrollView>
 
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/rl_bottomLayout_text"
+        android:background="@color/greenLight"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <TextView
+            android:id="@+id/tv_bottomlayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Back to home"
+            android:layout_toLeftOf="@+id/rl_bottomLayout_icon"
+            android:textColor="@color/colorwhite"
+            android:textSize="13dp"
+            android:gravity="center"/>
+        <RelativeLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/rl_bottomLayout_icon"
+            android:layout_alignParentRight="true"
+            android:background="@color/greenDark">
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/forwordarrow"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>
+
+</RelativeLayout>
 </RelativeLayout>

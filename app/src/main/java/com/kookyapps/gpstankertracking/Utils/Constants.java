@@ -4,7 +4,12 @@ public class Constants {
     public static final String ONGOING_CALL="Ongoing";
     public static final String PENDING_CALL="Pending";
     public static final String COMPLETED_CALL="Completed";
+    public static final String REQUEST_DETAILS= "request_details";
+    public static final String BOOKING_START= "booking_details";
+    public static final String TRIP_DETAILS= "trip_details";
 
+    public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
+    public static final String CAPTURE_IMAGE = "tanker_img";
     public static final String SHARED_PREF_NOTICATION_TAG = "pref_notification";
     public static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     public static final String SHARED_NOTIFICATION_UPDATE_KEY  = "notification_update";
@@ -29,5 +34,5 @@ public class Constants {
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
 
 
-    public static final String TRIP_DETAILS="Trip Details";
+
 }

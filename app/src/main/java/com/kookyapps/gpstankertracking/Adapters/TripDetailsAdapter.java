@@ -15,31 +15,65 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
+import com.kookyapps.gpstankertracking.Activity.RequestDetails;
+import com.kookyapps.gpstankertracking.Activity.TripDetails;
 import com.kookyapps.gpstankertracking.Modal.TripDetailsModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.TripDetViewHolder> {
-    ArrayList<TripDetailsModal> bookinglist;
+public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context context;
-    String init_type;
     BottomSheetDialog abortsheet;
+    private List<TripDetailsModal> tripList;
+    TripDetails activity;
+    private String init_type;
+    private static final int ITEM=0;
+    private static final int LOADING=1;
+    private boolean isLoadingAdded = false;
 
-    public TripDetailsAdapter(Context context,ArrayList<TripDetailsModal> bookinglist,String init_type){
-        this.bookinglist = bookinglist;
+
+
+
+    public TripDetailsAdapter(Context context, TripDetails activity,String init_type) {
         this.context = context;
+        this.activity = activity;
         this.init_type = init_type;
+        this.tripList = new ArrayList<TripDetailsModal>();
+    }
+
+
+    /*public TripDetailsAdapter(Context context){
+        this.context = context;
+        this.tripList = new ArrayList<>();
+    }
+    public TripDetailsAdapter(Context context,ArrayList<TripDetailsModal> bookinglist,String init_type){
+        this.tripList = bookinglist;
+        this.context = context;
+    }
+*/
+    protected class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 
     public class TripDetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView bookingid,distance,fromlocation,fromtime,tolocation,totime,bookingactiontext;
         RelativeLayout ongoingView,ongoingAbort,bookingview;
         LinearLayout ongoingaction;
+        ConstraintLayout itemlayout;
+
+
+
+
+
 
         public TripDetViewHolder(View view) {
             super(view);
@@ -50,57 +84,30 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.
             fromtime = (TextView)view.findViewById(R.id.tv_trip_details_fromtime);
             tolocation = (TextView)view.findViewById(R.id.tv_trip_details_tolocation);
             totime = (TextView)view.findViewById(R.id.tv_trip_details_totime);
-            bookingactiontext = (TextView)view.findViewById(R.id.tv_trip_details_viewaction);
-            ongoingaction = (LinearLayout)view.findViewById(R.id.ll_trip_details_ongoing);
-            ongoingView = (RelativeLayout)view.findViewById(R.id.rl_trip_details_ongoing_view);
-            ongoingView.setOnClickListener(this);
+            itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);
 
-            /*ongoingAbort = (RelativeLayout)view.findViewById(R.id.rl_trip_details_ongoing_abort);
-            ongoingAbort.setOnClickListener(this);*/
-            bookingview = (RelativeLayout)view.findViewById(R.id.rl_trip_details_view);
-            bookingview.setOnClickListener(this);
+            bookingactiontext=(TextView)view.findViewById(R.id.tv_bookingitem_viewaction) ;
+            bookingview = (RelativeLayout) view.findViewById(R.id.rl_bookingitem_view);
+
+
+//            bookingview.setOnClickListener(this);
+  //          bookingactiontext.setOnClickListener(this);
+
+
 
         }
 
         @Override
         public void onClick(View view) {
-            Intent intent;
+           /* Intent i;
             switch (view.getId()) {
-                case R.id.rl_trip_details_ongoing_view:
+                case R.id.cl_triplist_itemlayout:
+                    i = new Intent(context, RequestDetails.class);
+                    i.putExtra("init_type", init_type);
+                    i.putExtra("booking_id", current.getBookingid());
+                    context.startActivity(i)
                     break;
-
-                case R.id.rl_trip_details_view:
-                    intent = new Intent(context, BookingDetails.class);
-                    intent.putExtra("init_type",init_type);
-                    context.startActivity(intent);
-                     /*if(init_type.equals(Constants.PENDING_CALL)){
-
-                        abortsheet = new BottomSheetDialog(context);
-                        View sheetView2 = LayoutInflater.from(context).inflate(R.layout.activity_abort_dialog,null);
-                        abortsheet.setContentView(sheetView2);
-                        abort_delete = (TextView)sheetView2.findViewById(R.id.tv_abortdialog_delete);
-                        abort_cancel = (TextView)sheetView2.findViewById(R.id.tv_abortdialog_cancel);
-                        abort_delete.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-
-                            }
-                        });
-                        abort_cancel.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                abortsheet.dismiss();
-                            }
-                        });
-
-                        abortsheet.show();
-                    }else{
-                        intent = new Intent(context, BookingDetails.class);
-                        intent.putExtra("init_type",init_type);
-                        context.startActivity(intent);
-                    }*/
-                    break;
-            }
+            }*/
         }
 
 
@@ -108,49 +115,100 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<TripDetailsAdapter.
 
     @Override
     public int getItemCount() {
-        return bookinglist.size();
+        return tripList==null?0:tripList.size();
     }
+
     @NonNull
     @Override
-    public TripDetViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip_details_single_item_list,parent,false);
-        return new TripDetViewHolder(itemView);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        switch (viewType){
+            case ITEM:
+                viewHolder = new TripDetViewHolder(inflater.inflate(R.layout.trip_details_single_item_list,parent,false));
+                break;
+            case LOADING:
+                View v = inflater.inflate(R.layout.item_progress,parent,false);
+                viewHolder = new LoadingViewHolder(v);
+                break;
+        }
+        return viewHolder;
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull TripDetViewHolder holder, int position) {
-        if(init_type.equals(Constants.ONGOING_CALL)){
-            holder.ongoingaction.setVisibility(View.VISIBLE);
-            holder.bookingview.setVisibility(View.GONE);
-        }else{
-            if(init_type.equals(Constants.PENDING_CALL)){
-                holder.bookingactiontext.setText("Abort");
-            }else{
-                holder.bookingactiontext.setText("View");
-            }
-            holder.ongoingaction.setVisibility(View.GONE);
-            holder.bookingview.setVisibility(View.VISIBLE);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        final TripDetailsModal current = tripList.get(position);
+
+        switch (getItemViewType(position)){
+
+
+
+            case ITEM:
+                final TripDetViewHolder mVH = (TripDetViewHolder) holder;
+                mVH.bookingid.setText(tripList.get(position).getBookingid());
+                mVH.distance.setText(tripList.get(position).getDistance());
+                mVH.fromtime.setText(tripList.get(position).getFromtime());
+                mVH.totime.setText(tripList.get(position).getTotime());
+                mVH.fromlocation.setText(tripList.get(position).getFromlocation());
+                mVH.tolocation.setText(tripList.get(position).getTolocation());
+                mVH.itemlayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent i = new Intent(context, RequestDetails.class);
+                        i.putExtra("init_type", init_type);
+                        i.putExtra("booking_id", current.getBookingid());
+                        context.startActivity(i);
+                    }
+                });
+                break;
+            case LOADING:
+                break;
         }
-        holder.bookingid.setText(bookinglist.get(position).getBookingid());
-        holder.distance.setText(bookinglist.get(position).getDistance());
-        holder.fromtime.setText(bookinglist.get(position).getFromtime());
-        holder.totime.setText(bookinglist.get(position).getTotime());
-        holder.fromlocation.setText(styleLocation(bookinglist.get(position).getFromlocation()));
-        holder.tolocation.setText(styleLocation(bookinglist.get(position).getTolocation()));
+    }
+
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position==tripList.size()-1&&isLoadingAdded)?LOADING:ITEM ;
+    }
+    public void add(TripDetailsModal r) {
+        tripList.add(r);
+        notifyItemInserted(tripList.size() - 1);
+    }
+
+
+    public void addAll(List<TripDetailsModal> moveResults) {
+        for (TripDetailsModal result : moveResults) {
+            add(result);
+        }
+    }
+
+    public void remove(TripDetailsModal r){
+        int position = tripList.indexOf(r);
+        if(position>-1){
+            tripList.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
 
 
-
-
-    private SpannableStringBuilder styleLocation(String location){
-        int index = location.indexOf(",");
-        final SpannableStringBuilder sb = new SpannableStringBuilder(location);
-        final StyleSpan bss = new StyleSpan(Typeface.BOLD);
-        sb.setSpan(new AbsoluteSizeSpan(12,true),0,index, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        sb.setSpan(new AbsoluteSizeSpan(10,true),index+1,location.length(),Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        sb.setSpan(bss,0,index, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        return sb;
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        add(new TripDetailsModal());
     }
+    public void removeLoadingFooter() {
+        isLoadingAdded = false;
+        int position = tripList.size() - 1;
+        TripDetailsModal result = getItem(position);
+        if (result != null) {
+            tripList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+    public TripDetailsModal getItem(int position) {
+        return tripList.get(position);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.kookyapps.gpstankertracking.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,15 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.gson.JsonObject;
-import com.kookyapps.gpstankertracking.Activity.FirstActivity;
-import com.kookyapps.gpstankertracking.Adapters.BookingListAdapter;
 import com.kookyapps.gpstankertracking.Adapters.RequestListAdapter;
-import com.kookyapps.gpstankertracking.Modal.BookingListModel;
-import com.kookyapps.gpstankertracking.Modal.RequestListModel;
+import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
@@ -30,7 +27,6 @@ import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.PaginationScrollListener;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
-import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 
 import org.json.JSONArray;
@@ -46,49 +42,44 @@ import java.util.List;
 public class RequestList extends Fragment {
 
     RecyclerView recyclerView;
-    ProgressBar progressBar;
+    RelativeLayout progressBar;
     TextView noRequest;
-
+    Context context;
+    ArrayList<BookingListModal> requestlist;
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
-    private int totalNotificationCount;
     private final int PAGE_START  = 1;
     private int TOTAL_PAGES = 1;
-    private static int page_size = 15;
-    private boolean isLoading = false;
-    private boolean isLastPage = false;
+    private static int page_size = 7;
+    private int totaltxnCount;
     private int currentPage = PAGE_START;
-    boolean mIsVisibleToUser;
-    private String requestCount;
+    private boolean isLastPage = false;
+    private boolean isLoading = false;
+    boolean isListNull = true;
 
-
-    public RequestList() {
+    public RequestList(Context context) {
         // Required empty public constructor
+        this.context = context;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root =inflater.inflate(R.layout.fragment_request_list, container, false);
-
-        recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_bookinglist);
-        progressBar = (ProgressBar)root.findViewById(R.id.fg_booking_progresbar);
-        noRequest=(TextView)root.findViewById(R.id.tv_bookinglist_nodata);
-
-        mAdapter = new RequestListAdapter(getActivity(),getActivity());
+        recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_reqstlist);
+        progressBar = (RelativeLayout) root.findViewById(R.id.fg_request_progresbar);
+        noRequest=(TextView)root.findViewById(R.id.tv_requestlist_nodata);
+        mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_DETAILS);
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-
         recyclerView.addOnScrollListener(new PaginationScrollListener(mLayoutManager) {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
                 currentPage += 1;
-
                 // mocking network delay for API call
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -97,7 +88,6 @@ public class RequestList extends Fragment {
                     }
                 }, 1000);
             }
-
             @Override
             public int getTotalPageCount() {
                 return TOTAL_PAGES;
@@ -113,19 +103,16 @@ public class RequestList extends Fragment {
                 return isLoading;
             }
         });
-
-
-        bookinglistApiCalling();
-
+        requestlistApiCalling();
         return root;
     }
 
 
-    private void bookinglistApiCalling(){
+    private void requestlistApiCalling(){
         JSONObject jsonBodyObj = new JSONObject();
         try{
             GETAPIRequest getapiRequest=new GETAPIRequest();
-            String url = URLs.BASE_URL+URLs.REQUEST_LIST+"page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
+            String url = URLs.BASE_URL+URLs.REQUEST_LIST+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
             Log.i("url", String.valueOf(url));
             Log.i("Request", String.valueOf(getapiRequest));
             String token = SessionManagement.getUserToken(getContext());
@@ -139,56 +126,59 @@ public class RequestList extends Fragment {
 
     FetchDataListener fetchListener=new FetchDataListener() {
         @Override
-        public void onFetchComplete(JSONObject mydata) {
+        public void onFetchComplete(JSONObject data) {
             //RequestQueueService.cancelProgressDialog();
             try {
-                if (mydata != null) {
-                    if (mydata.getInt("error")==0) {
-                        JSONArray array = mydata.getJSONArray("data");
-                        if (array.isNull(0)){
-                            //SharedPrefUtil.setPreferences(getContext(), Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-                            requestCount = String.valueOf(0);
-                            totalNotificationCount = 0;
-                            TOTAL_PAGES= 0;
-
-                            noRequest.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                            progressBar.setVisibility(View.GONE);
-
-                        }else {
-                            requestCount = mydata.getString("unread_count");
-                            totalNotificationCount = mydata.getInt("total");
-                            if (totalNotificationCount > page_size) {
-                                if (totalNotificationCount % page_size == 0) {
-                                    TOTAL_PAGES = totalNotificationCount / page_size;
-                                } else {
-                                    TOTAL_PAGES = (totalNotificationCount / page_size) + 1;
-                                }
+                if (data != null) {
+                    if (data.getInt("error")==0) {
+                        ArrayList<BookingListModal> tripList=new ArrayList<>();
+                        JSONArray array = data.getJSONArray("data");
+                        totaltxnCount = data.getInt("total");
+                        if (totaltxnCount > page_size) {
+                            if (totaltxnCount % page_size == 0) {
+                                TOTAL_PAGES = totaltxnCount / page_size;
+                            } else {
+                                TOTAL_PAGES = (totaltxnCount / page_size) + 1;
                             }
                         }
-                        Log.d("Total_Pages",String.valueOf(TOTAL_PAGES));
-                        List<RequestListModel>modalList=new ArrayList<RequestListModel>();
-
-
-                        /*SharedPrefUtil.setPreferences(getContext(), Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-                        FirstActivity.setNotificationCount(Integer.parseInt(notificationCount),false);
-                        List<NotificationModel> modalList = new ArrayList<NotificationModel>();*/
-
-                        if (array!=null){
-                            for (int i =0 ;i<array.length();i++){
+                        if(array!=null) {
+                            isListNull = false;
+                            for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
-                                RequestListModel rmod = new RequestListModel();
-                                rmod.setBookingid(jsonObject.getString("id"));
-                                modalList.add(rmod);
-                                Log.i("Mod", rmod.toString());
+                                BookingListModal tdmod = new BookingListModal();
+                                tdmod.setBookingid(jsonObject.getString("_id"));
+                                JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
+                                if (dropPoint != null) {
+                                    tdmod.setTolocation(dropPoint.getString("location"));
+                                    Log.i("dropPoint", "");
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }
+                                JSONObject pickup = jsonObject.getJSONObject("pickup_point");
+                                if (pickup != null) {
+                                    tdmod.setFromlocation(pickup.getString("location"));
+
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }
+                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                if (distance != null) {
+                                    tdmod.setDistance(distance.getString("text"));
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }*/
+                                tdmod.setDistance("15 KMS");
+
+                                tripList.add(tdmod);
                             }
                         }
-                        //setNotification
-                        Log.d("request", mydata.toString());
-                        progressBar.setVisibility(View.GONE);
-                        mAdapter.addAll(modalList);
-                        if (currentPage < TOTAL_PAGES) mAdapter.addLoadingFooter();
-                        else isLastPage = true;
+                        Log.d("RequestList:", data.toString());
+                        setRecyclerView();
+                        mAdapter.addAll(tripList);
+                        if (currentPage < TOTAL_PAGES)
+                            mAdapter.addLoadingFooter();
+                        else
+                            isLastPage = true;
                     }
                 }
 
@@ -217,7 +207,7 @@ public class RequestList extends Fragment {
         JSONObject jsonBodyObj = new JSONObject();
         try{
             GETAPIRequest getapiRequest=new GETAPIRequest();
-            String url = URLs.BASE_URL+URLs.REQUEST_LIST+"page_size="+page_size+"&page="+currentPage;
+            String url = URLs.BASE_URL+URLs.REQUEST_LIST+"?page_size="+page_size+"&page="+currentPage;
             Log.i("url", String.valueOf(url));
             Log.i("Request", String.valueOf(getapiRequest));
             String token = SessionManagement.getUserToken(getContext());
@@ -236,20 +226,39 @@ public class RequestList extends Fragment {
                 if (mydata != null) {
                     if (mydata.getInt("error")==0) {
                         JSONArray array = mydata.getJSONArray("data");
-                        List<RequestListModel> modalList = new ArrayList<RequestListModel>();
-
-                        if (array!=null){
-                            for (int i =0 ;i<array.length();i++){
+                        List<BookingListModal> modalList = new ArrayList<BookingListModal>();
+                        if(array!=null) {
+                            for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
-                                RequestListModel rmod = new RequestListModel();
-                                rmod.setBookingid(jsonObject.getString("id"));
-                                modalList.add(rmod);
-                                Log.i("Mod", rmod.toString());
+                                BookingListModal tdmod = new BookingListModal();
+                                tdmod.setBookingid(jsonObject.getString("_id"));
+                                JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
+                                if (dropPoint != null) {
+                                    tdmod.setTolocation(dropPoint.getString("location"));
+                                    Log.i("dropPoint", "");
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }
+                                JSONObject pickup = jsonObject.getJSONObject("pickup_point");
+                                if (pickup != null) {
+                                    tdmod.setFromlocation(pickup.getString("location"));
+
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }
+                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                if (distance != null) {
+                                    tdmod.setDistance(distance.getString("text"));
+                                } else {
+                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                }*/
+                                tdmod.setDistance("15 KMS");
+                                modalList.add(tdmod);
                             }
-                        }//setNotification
+                        }
+                        Log.d("RequestList:", mydata.toString());
                         mAdapter.removeLoadingFooter();
                         isLoading = false;
-                        Log.d("Notify", mydata.toString());
                         mAdapter.addAll(modalList);
                         if (currentPage < TOTAL_PAGES) mAdapter.addLoadingFooter();
                         else isLastPage = true;
@@ -276,4 +285,15 @@ public class RequestList extends Fragment {
     };
 
 
+    public void setRecyclerView(){
+        if(isListNull){
+            progressBar.setVisibility(View.GONE);
+            noRequest.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }else{
+            progressBar.setVisibility(View.GONE);
+            noRequest.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 }

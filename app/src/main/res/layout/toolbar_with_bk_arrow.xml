@@ -11,38 +11,48 @@
             android:id="@+id/rl_toolbar_with_back_backLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ImageView
+            <RelativeLayout
+                android:id="@+id/rl_toolbarmenu_backimglayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+                <ImageView
                 android:id="@+id/toolbarmenu_backarrowImg"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginLeft="20dp"
-                android:foregroundGravity="center"
-                android:src="@drawable/back_arrow" />
-        </RelativeLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tb_with_bck_arrow_title"
-            android:text="Reques Details"
-            android:textSize="22dp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:textColor="@color/colorblack"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"/>
-        <RelativeLayout
-            android:id="@+id/rl_toolbar_with_back_notification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/tb_with_bck_arrow_title">
+                android:layout_marginLeft="15dp"
 
-            <ImageView
-                android:id="@+id/iv_tb_with_bck_arrow_notification"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginLeft="71dp"
-                android:layout_marginRight="20dp"
-                android:src="@drawable/notification_booking_list" />
+                android:src="@drawable/back_arrow" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_toolbarmenu_textTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tb_with_bck_arrow_title"
+                    android:text="Request Details"
+                    android:textSize="22dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/colorblack" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_toolbar_with_back_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/rl_toolbarmenu_textTitle">
+                <ImageView
+                    android:id="@+id/iv_tb_with_bck_arrow_notification"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginLeft="71dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/notification_drawable" />
+            </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
 </androidx.appcompat.widget.Toolbar>

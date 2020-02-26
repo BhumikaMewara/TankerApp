@@ -10,21 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
+        android:visibility="gone"
         android:id="@+id/rv_fg_reqstlist"/>
 
 
 
     <TextView
-        android:id="@+id/tv_bookinglist_nodata"
+        android:id="@+id/tv_requestlist_nodata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="No data in RequestList Found"
         android:gravity="center"
+        android:visibility="gone"
         android:layout_gravity="center"/>
 
     <include
         layout="@layout/progress_indicator"
         android:id="@+id/fg_request_progresbar"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
 </FrameLayout>
