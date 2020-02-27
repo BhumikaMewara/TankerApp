@@ -1,6 +1,7 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -108,6 +110,7 @@ public void initViews(){
             if(position==0){
                 rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                 bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
+
             }else{
                 rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
                 bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
@@ -134,10 +137,72 @@ public void initViews(){
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(this, MainActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TASK );
-        startActivity(i);
-        finish();
+        {
+
+            // Create the object of
+            // AlertDialog Builder class
+            AlertDialog.Builder builder
+                    = new AlertDialog
+                    .Builder(FirstActivity.this);
+
+            // Set the message show for the Alert time
+            builder.setMessage("Do you want to exit ?");
+
+            // Set Alert Title
+            builder.setTitle("Alert !");
+
+            // Set Cancelable false
+            // for when the user clicks on the outside
+            // the Dialog Box then it will remain show
+            builder.setCancelable(false);
+
+            // Set the positive button with yes name
+            // OnClickListener method is use of
+            // DialogInterface interface.
+
+            builder
+                    .setPositiveButton(
+                            "Yes",
+                            new DialogInterface
+                                    .OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which)
+                                {
+
+                                    // When the user click yes button
+                                    // then app will close
+                                    finish();
+                                }
+                            });
+
+            // Set the Negative button with No name
+            // OnClickListener method is use
+            // of DialogInterface interface.
+            builder
+                    .setNegativeButton(
+                            "No",
+                            new DialogInterface
+                                    .OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which)
+                                {
+
+                                    // If user click no
+                                    // then dialog box is canceled.
+                                    dialog.cancel();
+                                }
+                            });
+
+            // Create the Alert dialog
+            AlertDialog alertDialog = builder.create();
+
+            // Show the Alert Dialog box
+            alertDialog.show();
+        }
     }
 
     @Override
@@ -213,29 +278,6 @@ public void initViews(){
         }
     };
 
-    /*public static void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SharedPrefUtil.getStringPreferences(context, Constants.SHARED_PREF_NOTICATION_TAG,"notification_count");
-        if(Integer.parseInt(notificationCount)!=count || isStarted) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                bottomnavigation.setCount(1, String.valueOf(count));
-            } else {
-                bottomnavigation.setCount(1, "9+");
-            }
-            SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-        }
-        Fragment frg = fragmentManager.findFragmentById(R.id.firstviewpager);
-        if(frg instanceof NotificationsFragment){
-            ((NotificationsFragment) frg).reloadNotification();
-        }
-    }
-
-    public static void clearNotificationCount(){
-        bottomnavigation.clearCount(1);
-    }
-*/
 
 
 }

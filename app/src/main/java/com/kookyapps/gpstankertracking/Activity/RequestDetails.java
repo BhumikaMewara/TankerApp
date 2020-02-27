@@ -105,9 +105,17 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 case R.id.iv_bookingdetail_bookingid_call:
                     break;
                 case R.id.rl_result_details_bottomLayout:
+                    if (init_type.equals(Constants.REQUEST_DETAILS)){
+                        intent= new Intent(this,FirstActivity.class);
 
-                    intent= new Intent(this, TankerStartingPic.class);
-                    startActivity(intent);
+                        startActivity(intent);
+                    }else if (init_type.equals(Constants.BOOKING_START)){
+
+                        intent= new Intent(this, TankerStartingPic.class);
+                        startActivity(intent);
+                    }
+
+
             }
         }
 

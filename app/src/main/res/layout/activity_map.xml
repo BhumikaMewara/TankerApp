@@ -203,22 +203,24 @@
                     android:layout_marginTop="3dp"
                     android:background="@color/colorwhite">
                     <ImageView
+                        android:id="@+id/iv_map_seemore_image"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:padding="3dp"
                         android:layout_centerVertical="true"
                         android:layout_toLeftOf="@+id/firstactivity_divider1"
-                        android:src="@drawable/see_more_map"></ImageView>
+                        android:src="@drawable/see_fewer_map"></ImageView>
                     <View
                         android:layout_width="3dp"
                         android:layout_height="10dp"
                         android:layout_centerHorizontal="true"
                         android:id="@+id/firstactivity_divider1"/>
                     <TextView
+                        android:id="@+id/tv_map_seemore_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="3dp"
-                        android:text="See More"
+                        android:text="See Less"
                         android:layout_centerVertical="true"
                         android:textColor="@color/greenDark"
                         android:layout_toRightOf="@+id/firstactivity_divider1"></TextView>

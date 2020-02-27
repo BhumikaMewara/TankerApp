@@ -131,6 +131,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
                         Intent i = new Intent(context, RequestDetails.class);
                         i.putExtra("init_type", init_type);
                         i.putExtra("booking_id", current.getBookingid());
+
                         context.startActivity(i);
                     }
                 });

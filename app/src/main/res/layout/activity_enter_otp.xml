@@ -74,7 +74,7 @@
                             android:layout_marginRight="40dp"
                             android:layout_gravity="center"
                             android:background="@drawable/bg_rect_round_corners">
-                            <EditText
+                            <!--<EditText
                                 android:id="@+id/ed_enterOtp_otp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -82,6 +82,85 @@
                                 android:gravity="center"
                                 android:layout_gravity="center"
                                 android:layout_marginTop="10dp"/>
+                            -->
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:layout_marginTop="5dp"
+                                android:paddingTop="5dp">
+                                <EditText
+                                    android:id="@+id/editText_one"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    android:nextFocusRight="@+id/editText_two">
+                                    <requestFocus/>
+                                </EditText>
+                                <EditText
+                                    android:id="@+id/editText_two"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    android:nextFocusRight="@+id/editText_three">
+                                    <!--<requestFocus/>-->
+                                </EditText>
+                                <EditText
+                                    android:id="@+id/editText_three"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    android:nextFocusRight="@+id/editText_four">
+                                    <!--<requestFocus/>-->
+                                </EditText>
+                                <EditText
+                                    android:id="@+id/editText_four"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    android:nextFocusRight="@+id/editText_fifth">
+                                   <!-- <requestFocus/>-->
+                                </EditText>
+                                <EditText
+                                    android:id="@+id/editText_fifth"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    android:nextFocusRight="@+id/editText_sixth">
+                               <!-- <requestFocus/>-->
+                                </EditText>
+
+                                <EditText
+                                    android:id="@+id/editText_sixth"
+                                    android:layout_width="40sp"
+                                    android:layout_height="42sp"
+                                    android:inputType="number"
+                                    android:maxLength="1"
+                                    android:gravity="center"
+                                    />
+
+
+                            </LinearLayout>
+
+
+
+
+
+
+
+
                             <LinearLayout
                                 android:id="@+id/lh_enterOtp_verify"
                                 android:layout_width="200dp"

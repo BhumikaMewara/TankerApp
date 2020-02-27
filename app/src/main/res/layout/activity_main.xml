@@ -18,25 +18,36 @@
 
         android:background="@color/grey">
 
+
+
+
+
+        <RelativeLayout
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="@color/grey">
+        <RelativeLayout
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="@drawable/group">
+
+
+
         <TextView
             android:id="@+id/tv_main_signInTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:text="SIGN IN"
+            android:layout_marginLeft="30dp"
+            android:layout_centerVertical="true"
             android:textColor="@color/greenLight"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="10dp"
-            android:background="@drawable/rect_for_loginpage_text_bg"
             />
-        <ImageView
-            android:id="@+id/iv_main_loginTitle"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
 
-            android:src="@drawable/rect_for_loginpage_text_bg"/>
+    </RelativeLayout>
+        </RelativeLayout>
+
+
 
     </LinearLayout>
 

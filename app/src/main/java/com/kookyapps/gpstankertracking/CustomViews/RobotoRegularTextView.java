@@ -16,7 +16,7 @@ public class RobotoRegularTextView extends AppCompatTextView {
     public RobotoRegularTextView(Context context) {
         super(context);
         this.context = context;
-        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto);
+        Typeface tfs = ResourcesCompat.getFont(context,R.font.roboto);
         setTypeface(tfs);
     }
 
@@ -30,7 +30,7 @@ public class RobotoRegularTextView extends AppCompatTextView {
     public RobotoRegularTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        Typeface tfs = ResourcesCompat.getFont(context,R.font.roboto);
+        Typeface tfs = ResourcesCompat.getFont(context,R.font.roboto_italic);
         setTypeface(tfs);
     }
 }

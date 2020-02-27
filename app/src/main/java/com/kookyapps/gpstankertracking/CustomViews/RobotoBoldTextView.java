@@ -14,21 +14,21 @@ public class RobotoBoldTextView extends AppCompatTextView {
     public RobotoBoldTextView(Context context) {
         super(context);
         this.context = context;
-        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_boldfont);
+        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_bold);
         setTypeface(tfs);
     }
 
     public RobotoBoldTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_boldfont);
+        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_bold);
         setTypeface(tfs);
     }
 
     public RobotoBoldTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_boldfont);
+        Typeface tfs = ResourcesCompat.getFont(context, R.font.roboto_bolditalic);
         setTypeface(tfs);
     }
 }

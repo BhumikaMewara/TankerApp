@@ -118,7 +118,7 @@ public class RequestList extends Fragment {
             String token = SessionManagement.getUserToken(getContext());
             HeadersUtil headparam = new HeadersUtil(token);
             getapiRequest.request(getActivity().getApplicationContext(),fetchListener,url,headparam,jsonBodyObj);
-        }catch (Exception e){
+            }catch (Exception e){
             e.printStackTrace();
         }
     }
