@@ -15,7 +15,8 @@
                 android:id="@+id/rl_toolbarmenu_backimglayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center">
+                android:gravity="center"
+                android:layout_centerVertical="true">
                 <ImageView
                 android:id="@+id/toolbarmenu_backarrowImg"
                 android:layout_width="25dp"
@@ -42,9 +43,10 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_toolbar_with_back_notification"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/rl_toolbarmenu_textTitle">
+                android:layout_toRightOf="@id/rl_toolbarmenu_textTitle"
+                android:layout_centerVertical="true">
                 <ImageView
                     android:id="@+id/iv_tb_with_bck_arrow_notification"
                     android:layout_width="35dp"

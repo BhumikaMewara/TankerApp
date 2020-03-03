@@ -168,7 +168,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@+id/bookingdetail_underline1"
-                android:text="Driver's Name"
+                android:text="Controller's Name"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView

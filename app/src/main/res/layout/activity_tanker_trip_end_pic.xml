@@ -4,27 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.TankerStartingPic">
+    tools:context=".Activity.TankerTripEndPic">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorblack"
         android:orientation="vertical">
         <LinearLayout
-            android:id="@+id/ll_tanker_starting_pic_retake"
+            android:id="@+id/ll_tanker_end_trip_pic_retake"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:orientation="horizontal"
             android:padding="15dp">
             <ImageView
-                android:id="@+id/iv_tnkr_strt_retake"
+                android:id="@+id/iv_tanker_end_trip_pic_retake"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginLeft="10dp"
                 android:src="@drawable/retake_camera"/>
             <TextView
-                android:id="@+id/tv_tankr_strt_retakeTxt"
+                android:id="@+id/tv_tanker_end_trip_pic_retakeTxt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -37,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/colorblack"
+            android:background="@color/colorwhite"
             android:weightSum="3">
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -45,53 +46,53 @@
                 android:orientation="vertical"
                 android:layout_weight="0.5">
                 <ImageView
-                android:id="@+id/iv_tankr_strt_image_clicked"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                    android:id="@+id/iv_tanker_end_trip_pic_image_clicked"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_centerInParent="true"
                     android:visibility="visible"/>
 
 
-            <RelativeLayout
-                android:id="@+id/rl_tankr_strt_latLon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="20dp">
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/rl_tanker_end_trip_pic_latLon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginRight="10dp"
-                    android:visibility="gone">
-                    <TextView
-                        android:id="@+id/tv_tankr_strt_lat"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="20dp">
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
+                        android:orientation="vertical"
+                        android:layout_marginRight="10dp"
+                        android:visibility="gone">
+                        <TextView
+                            android:id="@+id/tv_tanker_end_trip_pic_lat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentBottom="true"
 
-                        android:text="paritosj"
-                        android:textColor="@color/colorblack"
-                        android:textSize="14sp"
-                        />
-                    <TextView
-                        android:id="@+id/tv_tankr_strt_lon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:textColor="@color/colorblack"
-                        android:text="sadad"/>
+                            android:text="paritosj"
+                            android:textColor="@color/colorblack"
+                            android:textSize="14sp"
+                            />
+                        <TextView
+                            android:id="@+id/tv_tanker_end_trip_pic_lon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentBottom="true"
+                            android:textColor="@color/colorblack"
+                            android:text="sadad"/>
 
-                </LinearLayout>
-            </RelativeLayout>
+                    </LinearLayout>
+                </RelativeLayout>
 
 
 
                 <RelativeLayout
-                    android:id="@+id/rl_tankr_strt_dateTime"
+                    android:id="@+id/rl_tanker_end_trip_pic_dateTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -102,41 +103,41 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:visibility="gone">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="3"
-                        android:layout_marginLeft="10dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentTop="true"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3"
+                            android:layout_marginLeft="10dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentTop="true"
 
-                        android:gravity="center">
+                            android:gravity="center">
 
-                        <ImageView
-                            android:id="@+id/iv_tankr_strt_calender"
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:layout_weight="1"
-                            android:src="@mipmap/ic_launcher"></ImageView>
+                            <ImageView
+                                android:id="@+id/iv_tanker_end_trip_pic_calender"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_weight="1"
+                                android:src="@mipmap/ic_launcher"></ImageView>
                             <TextView
-                                android:id="@+id/tv_tankr_strt_day"
+                                android:id="@+id/tv_tanker_end_trip_pic_day"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Firday ,"
                                 android:layout_marginLeft="5dp"
                                 android:layout_weight="1"
                                 android:textColor="@color/colorblack"></TextView>
-                        <TextView
-                            android:id="@+id/tv_tankr_strt_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="24January 2020"
-                            android:layout_marginLeft="2dp"
-                            android:layout_weight="1"
+                            <TextView
+                                android:id="@+id/tv_tanker_end_trip_pic_date"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="24January 2020"
+                                android:layout_marginLeft="2dp"
+                                android:layout_weight="1"
 
-                            android:textColor="@color/colorblack"></TextView>
-                    </LinearLayout>
+                                android:textColor="@color/colorblack"></TextView>
+                        </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -148,13 +149,13 @@
                             android:layout_alignParentBottom="true"
                             android:gravity="center">
                             <ImageView
-                                android:id="@+id/iv_tankr_strt_clock"
+                                android:id="@+id/iv_tanker_end_trip_pic_clock"
                                 android:layout_width="10dp"
                                 android:layout_height="10dp"
                                 android:src="@mipmap/ic_launcher"
                                 android:layout_weight="1"></ImageView>
                             <TextView
-                                android:id="@+id/tv_tankr_strt_time_value"
+                                android:id="@+id/tv_tanker_end_trip_pic_time_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="4:00"
@@ -162,7 +163,7 @@
                                 android:layout_weight="1"
                                 android:textColor="@color/colorblack"></TextView>
                             <TextView
-                                android:id="@+id/tv_tankr_strt_time_ampm"
+                                android:id="@+id/tv_tanker_end_trip_pic_time_ampm"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="PM"
@@ -186,16 +187,20 @@
                 >
                 <ImageButton
                     android:id="@+id/ib_tnkr_strt_capture"
-                   android:layout_width="50dp"
-                   android:layout_height="50dp"
-                   android:src="@drawable/camera_capture_circle"
-                   android:layout_gravity="center"
-                   android:layout_marginBottom="30dp"
-                   android:layout_alignParentBottom="true"
-                   android:layout_centerInParent="true"
-                   android:background="@android:color/transparent">
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/camera_capture_circle"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="30dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/transparent">
                 </ImageButton>
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
+
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

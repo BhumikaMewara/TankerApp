@@ -39,6 +39,8 @@ import com.kookyapps.gpstankertracking.fragment.RequestList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static androidx.viewpager.widget.PagerAdapter.POSITION_NONE;
+
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
 
     DrawerLayout navdrawer;
@@ -54,14 +56,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     static FragmentManager fragmentManager;
     ViewPagerAdapter adapter;
     final String [] tabTitle = {"Request List","Booking List"};
+    Bundle b;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-        initViews();
 
+
+
+
+        initViews();
+        setCurrentTab();
         toolBarImgMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,6 +107,8 @@ public void initViews(){
     setupViewPager(viewPager);
 
     viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -106,8 +116,13 @@ public void initViews(){
         @Override
         public void onPageSelected(int position) {
             //highLightCurrentTab(position);
+
             pagetitle.setText(tabTitle[position]);
             if(position==0){
+
+
+
+
                 rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                 bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
 
@@ -120,8 +135,28 @@ public void initViews(){
         public void onPageScrollStateChanged(int state) {
 
         }
-    });
 
+    });
+    }
+    private void setCurrentTab(){
+        b= getIntent().getExtras();
+        if(b != null){
+            int currentTab = b.getInt("curretTab", 0);
+            viewPager.setCurrentItem(currentTab);
+            if(currentTab==0){
+
+
+                rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
+                bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
+
+            }else{
+                rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
+                bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
+            }
+        } else {
+            rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
+            bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
+        }
     }
 
     private  void setupViewPager(ViewPager viewPager){
@@ -129,6 +164,7 @@ public void initViews(){
         adapter.addFragment(new RequestList(FirstActivity.this));
         adapter.addFragment(new BookingList(FirstActivity.this));
         viewPager.setAdapter(adapter);
+
     }
 
     public void drawerMenu (View view ){

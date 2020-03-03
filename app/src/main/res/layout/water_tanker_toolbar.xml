@@ -11,13 +11,15 @@
         <RelativeLayout
             android:id="@+id/rl_water_tanker_toolbar_menu"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            >
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginLeft="20dp"
                 android:id="@+id/toolbarmenu"
-                android:src="@drawable/ham"/>
+                android:src="@drawable/ham" />
         </RelativeLayout>
         <TextView
             android:layout_width="wrap_content"
@@ -35,7 +37,8 @@
         android:id="@+id/rl_water_tanker_toolbar_menu_notification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true">
         <ImageView
             android:id="@+id/iv_booking_notification"
             android:layout_width="25dp"

@@ -13,14 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Map;
 
-/**
- * Created by Belal on 10/24/2017.
- */
-
-public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
+public class VolleyMultipartRequest extends Request<NetworkResponse> {
 
     private final String twoHyphens = "--";
     private final String lineEnd = "\r\n";
@@ -31,12 +26,13 @@ public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
     private Map<String, String> mHeaders;
 
 
-    public VolleyMultipartRequest2(int method, String url,
-                                   Response.Listener<NetworkResponse> listener,
-                                   Response.ErrorListener errorListener) {
+    public VolleyMultipartRequest(int method, String url,
+                                  Response.Listener<NetworkResponse> listener,
+                                  Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         this.mListener = listener;
         this.mErrorListener = errorListener;
+
     }
 
     @Override
@@ -62,7 +58,7 @@ public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
             }
 
             // populate data byte payload
-            Map<String, ArrayList<DataPart>> data = getByteData();
+            Map<String, DataPart> data = getByteData();
             if (data != null && data.size() > 0) {
                 dataParse(dos, data);
             }
@@ -83,7 +79,7 @@ public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
      * @return Map1 data part label with data byte
      * @throws AuthFailureError
      */
-    protected Map<String, ArrayList<DataPart>> getByteData() throws AuthFailureError {
+    protected Map<String, DataPart> getByteData() throws AuthFailureError {
         return null;
     }
 
@@ -133,11 +129,9 @@ public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
      * @param data             loop through data
      * @throws IOException
      */
-    private void dataParse(DataOutputStream dataOutputStream, Map<String, ArrayList<DataPart>> data) throws IOException {
-        for (Map.Entry<String, ArrayList<DataPart>> entry : data.entrySet()) {
-            for(DataPart data1:entry.getValue()) {
-                buildDataPart(dataOutputStream, data1, entry.getKey());
-            }
+    private void dataParse(DataOutputStream dataOutputStream, Map<String, DataPart> data) throws IOException {
+        for (Map.Entry<String, DataPart> entry : data.entrySet()) {
+            buildDataPart(dataOutputStream, entry.getValue(), entry.getKey());
         }
     }
 
@@ -200,10 +194,10 @@ public class VolleyMultipartRequest2 extends Request<NetworkResponse> {
         public DataPart() {
         }
 
-        public DataPart(String name, byte[] data, String contentType) {
+        public DataPart(String name, byte[] data,String type) {
             fileName = name;
             content = data;
-            type = contentType;
+            this.type = type;
         }
 
         String getFileName() {

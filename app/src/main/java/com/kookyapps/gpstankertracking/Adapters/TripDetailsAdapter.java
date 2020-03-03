@@ -65,7 +65,7 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public class TripDetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView bookingid,distance,fromlocation,fromtime,tolocation,totime,bookingactiontext;
+        TextView bookingid,distance,fromlocation,fromtime,tolocation,totime,bookingactiontext,from_address,to_address;
         RelativeLayout ongoingView,ongoingAbort,bookingview;
         LinearLayout ongoingaction;
         ConstraintLayout itemlayout;
@@ -79,10 +79,10 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(view);
 
             bookingid = (TextView)view.findViewById(R.id.tv_trip_details_bookingid);
-            distance = (TextView)view.findViewById(R.id.tv_trip_details_distance);
-            fromlocation = (TextView)view.findViewById(R.id.tv_trip_details_fromlocation);
+            distance = (TextView)view.findViewById(R.id.tv_trip_details_distance1);
+            from_address = (TextView)view.findViewById(R.id.tv_trip_details_fromlocation);
             fromtime = (TextView)view.findViewById(R.id.tv_trip_details_fromtime);
-            tolocation = (TextView)view.findViewById(R.id.tv_trip_details_tolocation);
+            to_address = (TextView)view.findViewById(R.id.tv_trip_details_tolocation);
             totime = (TextView)view.findViewById(R.id.tv_trip_details_totime);
             itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);
 
@@ -140,6 +140,7 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final TripDetailsModal current = tripList.get(position);
 
+
         switch (getItemViewType(position)){
 
 
@@ -150,8 +151,8 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 mVH.distance.setText(tripList.get(position).getDistance());
                 mVH.fromtime.setText(tripList.get(position).getFromtime());
                 mVH.totime.setText(tripList.get(position).getTotime());
-                mVH.fromlocation.setText(tripList.get(position).getFromlocation());
-                mVH.tolocation.setText(tripList.get(position).getTolocation());
+                mVH.from_address.setText(tripList.get(position).getFromlocation());
+                mVH.to_address.setText(tripList.get(position).getTolocation());
                 mVH.itemlayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

@@ -12,12 +12,28 @@ public class SessionManagement {
     private static final String USER_TOKEN = "token";
     private static final String LANGUAGE= "language";
     private static final String NAME = "name";
+    private static final String BOOKING = "booking";
+
+
+
 
 
     public static boolean checkSignIn(Context con){
         if(SharedPrefUtil.hasKey(con,Constants.SHARED_PREF_LOGIN_TAG,IS_LOGGEDIN)){
             return SharedPrefUtil.getBooleanPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,IS_LOGGEDIN);
         }else{
+            return false;
+        }
+    }
+
+    public static boolean isOngoing(Context con){
+        if (SharedPrefUtil.hasKey(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING)){
+//            return SharedPrefUtil.getBooleanPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING);
+            if (SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING).equals("")){
+                return false;
+            }
+            return true;
+        }else {
             return false;
         }
     }
@@ -31,6 +47,18 @@ public class SessionManagement {
         SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,USER_TOKEN,token);
         SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,LANGUAGE,language);
     }
+
+    public static void setOngoingBooking(Context con, String id){
+        SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING,id);
+    }
+
+    public static String getOngoingBooking(Context con){
+       return SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING);
+    }
+
+
+
+
 
     public static void logout(FetchDataListener fetchDataListener, Context con){
         SharedPrefUtil.deletePreference(con,Constants.SHARED_PREF_LOGIN_TAG);

@@ -164,24 +164,54 @@ public void bookinglistApiCalling(){
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
+                                    tdmod.setToaddress(dropPoint.getString("address"));
+                                    JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates",getActivity());
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
                                     Log.i("dropPoint", "");
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data found in drop_point", getActivity());
                                 }
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
+                                    tdmod.setFromaddress(pickup.getString("address"));
+                                    JSONObject geometry = pickup.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        } else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
+                                        }
+
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
+                                    Log.i("pickupPoint", "pickup");
 
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-                                tdmod.setDistance("15 KMS");
+                                    RequestQueueService.showAlert("Error! no data found in distance", getActivity());
+                                }
+
 
                                 tripList.add(tdmod);
                             }
@@ -250,24 +280,52 @@ public void bookinglistApiCalling(){
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
+                                    tdmod.setToaddress(dropPoint.getString("address"));
+                                    JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates",getActivity());
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
                                     Log.i("dropPoint", "");
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data found in drop_point", getActivity());
                                 }
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
+                                    tdmod.setFromaddress(pickup.getString("address"));
+                                    JSONObject geometry = pickup.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        } else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
+                                        }
 
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-                                tdmod.setDistance("15 KMS");
+                                }
+
                                 modalList.add(tdmod);
                             }
                         }

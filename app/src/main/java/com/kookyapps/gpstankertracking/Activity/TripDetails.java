@@ -49,7 +49,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     DrawerLayout navdrawer;
     ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
-    TextView nodata,pageTitle,trip,language,logutText;
+    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm;
     RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
@@ -84,6 +84,8 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
     public void initViews(){
         tripDetProgressBar = (ProgressBar) findViewById(R.id.pb_trip_details);
+        total_trip=(TextView)findViewById(R.id.tv_trip_details_totalTrip_value) ;
+        totalKm=(TextView)findViewById(R.id.tv_trip_details_totalKM_value);
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
@@ -225,57 +227,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         }
     };
 
-     /*public void createTrip(){
-         TripDetailsModal data1 = new TripDetailsModal();
-         TripDetailsModal data2 = new TripDetailsModal();
-         TripDetailsModal data3 = new TripDetailsModal();
 
-         data1.setBookingid("1234567890");
-         data1.setDistance("15 KM");
-         data1.setFromlocation("Boranada, Summer Nagar, 115");
-         data1.setFromtime("Saturday, 24 January, 04:20 PM");
-         data1.setTolocation("Chopasani Housing Board, Shree Krishna Nagar, 161");
-         data1.setTotime("Saturday, 24 January, 04:40 PM");
-
-         data2.setBookingid("1234567891");
-         data2.setDistance("16 KM");
-         data2.setFromlocation("Koranada, Summer Nagar, 115");
-         data2.setFromtime("Katurday, 24 January, 04:20 PM");
-         data2.setTolocation("Khopasani Housing Board, Shree Krishna Nagar, 161");
-         data2.setTotime("Katurday, 24 January, 04:40 PM");
-
-         data3.setBookingid("1234567892");
-         data3.setDistance("17 KM");
-         data3.setFromlocation("Moranada, Summer Nagar, 115");
-         data3.setFromtime("Maturday, 24 January, 04:20 PM");
-         data3.setTolocation("Mhopasani Housing Board, Shree Krishna Nagar, 161");
-         data3.setTotime("Maturday, 24 January, 04:40 PM");
-
-         tripDetailList = new ArrayList<>();
-         tripDetailList.add(data1);
-         tripDetailList.add(data2);
-         tripDetailList.add(data3);
-         setRecyclerView();
-     }
-     */
-
-
-
-    /*public void setRecyclerView(){
-        if(tripDetailList==null){
-            tripDetProgressBar.setVisibility(View.GONE);
-            nodata.setVisibility(View.VISIBLE);
-            tripDetProgressBar.setVisibility(View.GONE);
-        }else{
-            tripDetProgressBar.setVisibility(View.GONE);
-            nodata.setVisibility(View.GONE);
-            trip_details_listView.setVisibility(View.VISIBLE);
-            adapter = new TripDetailsAdapter(TripDetails.this, tripDetailList, Constants.TRIP_DETAILS);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            trip_details_listView.setLayoutManager(mLayoutManager);
-            trip_details_listView.setAdapter(adapter);
-        }
-    }*/
     public void tripDetailsListApiCalling(){
 
         JSONObject jsonBodyObj = new JSONObject();
@@ -300,6 +252,11 @@ FetchDataListener tripListener= new FetchDataListener() {
         try {
             if (data != null) {
                 if (data.getInt("error")==0) {
+                    TripDetailsModal tdmod = new TripDetailsModal();
+                    tdmod.setTotaltrip(data.getString("total"));
+                    total_trip.setText(tdmod.getTotaltrip());
+                    tdmod.setTotal_distance(data.getString("total_distance"));
+                    totalKm.setText(tdmod.getTotal_distance());
 
 
                     ArrayList<TripDetailsModal> tripList=new ArrayList<>();
@@ -317,30 +274,58 @@ FetchDataListener tripListener= new FetchDataListener() {
                         isListNull = false;
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject jsonObject = (JSONObject) array.get(i);
-                            TripDetailsModal tdmod = new TripDetailsModal();
+
                             tdmod.setBookingid(jsonObject.getString("_id"));
                             JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                             if (dropPoint != null) {
                                 tdmod.setTolocation(dropPoint.getString("location"));
+                                tdmod.setTo_address(dropPoint.getString("address"));
+
+                                JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                if (geometry!=null){
+                                    geometry.getString("type");
+                                    JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                    if (coordinates!=null) {
+                                        coordinates.getString(0);//lon
+                                        coordinates.getString(1);//lat
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no value in coordinates", TripDetails.this);
+                                    }
+                                }else {
+                                    RequestQueueService.showAlert("Error! no value in drop geometry", TripDetails.this);
+                                }
 
                             } else {
-                                RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                RequestQueueService.showAlert("Error! no for for drop_point found", TripDetails.this);
                             }
                             JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                             if (pickup != null) {
-                                tdmod.setFromlocation(pickup.getString("location"));
 
+
+                                tdmod.setFromlocation(pickup.getString("location"));
+                                tdmod.setFrom_address(pickup.getString("address"));
+                                JSONObject geometry=pickup.getJSONObject("geometry");
+                                if (geometry!=null){
+                                    geometry.getString("type");
+                                    JSONArray coordinates=geometry.getJSONArray("coordinates");
+                                    if (coordinates!=null){
+                                    coordinates.getString(0);//lon
+                                    coordinates.getString(1);//lat
+                                    }else{
+                                        RequestQueueService.showAlert("no value in coordonates",TripDetails.this);
+                                    }
+                                }else {
+                                    RequestQueueService.showAlert("no value in geometry",TripDetails.this);
+                                }
                             } else {
-                                RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                RequestQueueService.showAlert("Error! no value found in pickup", TripDetails.this);
                             }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                            JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-                            tdmod.setDistance("15 KMS");
-
+                                    RequestQueueService.showAlert("Error! no data in distance  found", TripDetails.this);
+                                }
                             tripList.add(tdmod);
                         }
                     }
@@ -403,6 +388,21 @@ FetchDataListener tripListener= new FetchDataListener() {
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
+                                    tdmod.setTo_address(dropPoint.getString("address"));
+
+                                    JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                    if (geometry!=null){
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates!=null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else {
+                                            RequestQueueService.showAlert("Error! no value in coordinates", TripDetails.this);
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no value in drop geometry", TripDetails.this);
+                                    }
                                     Log.i("dropPoint", "");
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", TripDetails.this);
@@ -410,17 +410,31 @@ FetchDataListener tripListener= new FetchDataListener() {
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
+                                    tdmod.setFrom_address(pickup.getString("address"));
+                                    JSONObject geometry=pickup.getJSONObject("geometry");
+                                    if (geometry!=null){
+                                        geometry.getString("type");
+                                        JSONArray coordinates=geometry.getJSONArray("coordinates");
+                                        if (coordinates!=null){
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else{
+                                            RequestQueueService.showAlert("no value in coordonates",TripDetails.this);
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("no value in geometry",TripDetails.this);
+                                    }
 
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", TripDetails.this);
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-                                tdmod.setDistance("15 KMS");
+                                    RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                }
+
                                 modalList.add(tdmod);
                             }
                         }

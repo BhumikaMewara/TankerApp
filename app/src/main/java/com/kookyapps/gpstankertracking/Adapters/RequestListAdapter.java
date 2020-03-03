@@ -49,7 +49,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public class BookingViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView bookingid, distance, fromlocation, fromtime, tolocation, totime, bookingactiontext;
+        TextView bookingid, distance, fromlocation, fromtime, tolocation, totime, bookingactiontext,fromaddress,toaddress;
         RelativeLayout bookingview;
         ConstraintLayout itemlayout;
 
@@ -61,9 +61,9 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
             super(view);
             bookingid = (TextView) view.findViewById(R.id.tv_bookingitem_bookingid);
             distance = (TextView) view.findViewById(R.id.tv_bookingitem_distance);
-            fromlocation = (TextView) view.findViewById(R.id.tv_bookingitem_fromlocation);
+            fromaddress = (TextView) view.findViewById(R.id.tv_bookingitem_fromlocation);
             fromtime = (TextView) view.findViewById(R.id.tv_bookingitem_fromtime);
-            tolocation = (TextView) view.findViewById(R.id.tv_bookingitem_tolocation);
+            toaddress = (TextView) view.findViewById(R.id.tv_bookingitem_tolocation);
             totime = (TextView) view.findViewById(R.id.tv_bookingitem_totime);
             bookingactiontext=(TextView)view.findViewById(R.id.tv_bookingitem_viewaction) ;
             /*itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);
@@ -123,8 +123,8 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
                 mVH.distance.setText(requestlist.get(position).getDistance());
                 mVH.fromtime.setText(requestlist.get(position).getFromtime());
                 mVH.totime.setText(requestlist.get(position).getTotime());
-                mVH.fromlocation.setText(requestlist.get(position).getFromlocation());
-                mVH.tolocation.setText(requestlist.get(position).getTolocation());
+                mVH.fromaddress.setText(requestlist.get(position).getFromaddress());
+                mVH.toaddress.setText(requestlist.get(position).getToaddress());
                 mVH.bookingactiontext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

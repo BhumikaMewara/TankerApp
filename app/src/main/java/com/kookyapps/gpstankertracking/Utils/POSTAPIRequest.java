@@ -100,7 +100,7 @@ public class POSTAPIRequest {
                     if (response.getInt("error") == 0) {
                         listener.onFetchComplete(response);
                     } else {
-                        listener.onFetchFailure(response.getString("errorCode"));
+                        listener.onFetchFailure(response.getString("message"));
                     }
 
                 } catch (JSONException e) {
@@ -118,7 +118,7 @@ public class POSTAPIRequest {
                     String errorMessage = "";
                     try {
                         JSONObject errorJson = new JSONObject(volley_error.getMessage().toString());
-                        if (errorJson.has("error")) errorMessage = errorJson.getString("errorCode");
+                        if (errorJson.has("error")) errorMessage = errorJson.getString("message");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

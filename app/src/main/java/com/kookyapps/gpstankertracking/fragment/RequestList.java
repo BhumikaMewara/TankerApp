@@ -150,16 +150,47 @@ public class RequestList extends Fragment {
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
+                                    tdmod.setToaddress(dropPoint.getString("address"));
+                                    JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates",getActivity());
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
                                     Log.i("dropPoint", "");
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data in  drop_point", getActivity());
                                 }
+
+
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
+                                    tdmod.setFromaddress(pickup.getString("address"));
+                                    JSONObject geometry = pickup.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        } else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
+                                        }
+
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
 
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data in pick_up ", getActivity());
                                 }
                                 /*JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
@@ -167,7 +198,7 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", getActivity());
                                 }*/
-                                tdmod.setDistance("15 KMS");
+
 
                                 tripList.add(tdmod);
                             }
@@ -235,16 +266,48 @@ public class RequestList extends Fragment {
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
+                                    tdmod.setToaddress(dropPoint.getString("address"));
+                                    JSONObject geometry = dropPoint.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        }else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates",getActivity());
+                                        }
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
+
                                     Log.i("dropPoint", "");
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data in  drop_point", getActivity());
                                 }
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
 
+                                    tdmod.setFromaddress(pickup.getString("address"));
+
+                                    JSONObject geometry = pickup.getJSONObject("geometry");
+                                    if (geometry!=null) {
+                                        geometry.getString("type");
+                                        JSONArray coordinates = geometry.getJSONArray("coordinates");
+                                        if (coordinates != null) {
+                                            coordinates.getString(0);//lon
+                                            coordinates.getString(1);//lat
+                                        } else {
+                                            RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
+                                        }
+
+                                    }else {
+                                        RequestQueueService.showAlert("Error! no data in geometry",getActivity());
+                                    }
+
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
+                                    RequestQueueService.showAlert("Error! no data in pick_up", getActivity());
                                 }
                                 /*JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {

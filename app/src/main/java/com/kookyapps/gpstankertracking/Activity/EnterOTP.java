@@ -3,6 +3,7 @@ package com.kookyapps.gpstankertracking.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -14,9 +15,32 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
+import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Utils.Constants;
+import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
+import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
+import com.kookyapps.gpstankertracking.Utils.URLs;
+import com.kookyapps.gpstankertracking.Utils.Utils;
+import com.kookyapps.gpstankertracking.Utils.VolleyMultipartRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener, TextWatcher {
 
@@ -25,12 +49,23 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     ImageView msg_icon;
     LinearLayout verifyLayout;
     RelativeLayout back, noti;
+    String imageencoded ,bkngid,OTP;
+    BookingListModal blmod;
+    Bitmap leftbit;
+    String init_type;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_otp);
+        Intent i = getIntent();
+        Bundle b = i.getExtras();
+        imageencoded = b.getString("Bitmap");
+        blmod = b.getParcelable("Bookingdata");
+        leftbit = Utils.decodeBase64(imageencoded);
+
         initView();
 
 //
@@ -72,6 +107,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         editText_one.addTextChangedListener(this);
 
 
+
     }
 
     @Override
@@ -79,9 +115,12 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         Intent i;
         switch (view.getId()) {
             case R.id.lh_enterOtp_verify:
-                i = new Intent(this, TripComplete.class);
+                verifyLayout.setClickable(false);
+                validateOTP();
+                uploadBitmap();
+                /*   i = new Intent(this, TripComplete.class);
 
-                startActivity(i);
+                startActivity(i);*/
             case R.id.rl_toolbarmenu_backimglayout:
                 onBackPressed();
                 break;
@@ -127,5 +166,149 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
             }
 
         }
+
+
+
+private  void validateOTP(){
+       if (editText_one.getText().equals("")){
+           editText_six.setError("entry the otp correctly");
+       }else if (editText_two.getText().equals("")){
+           editText_six.setError("entry the otp correctly");
+       }else if (editText_three.getText().equals("")){
+           editText_six.setError("entry the otp correctly");
+       }else if (editText_four.getText().equals("")){
+           editText_six.setError("entry the otp correctly");
+       }else if (editText_five.getText().equals("")){
+           editText_six.setError("entry the otp correctly");
+       }else if (editText_six.getText().equals("")){
+        editText_six.setError("entry the otp correctly");
+       }
+
+
+
+
+}
+
+    private void uploadBitmap() {
+        OTP = String.valueOf(editText_one.getText())+ String.valueOf(editText_two.getText())+String.valueOf(editText_three.getText())+ String.valueOf(editText_four.getText())+String.valueOf(editText_five.getText())+ String.valueOf(editText_six.getText());
+        String url = URLs.BASE_URL + URLs.BOOKING_END+blmod.getBookingid();
+        //url = "http://13.233.54.144:8080/api/user/document";
+        //our custom volley request
+       /* JSONObject params = new JSONObject();
+        try {
+            params.put("id", blmod.getBookingid());
+            params.put("lat", currentlatlng.latitude);
+            params.put("lng",currentlatlng.longitude);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }*/
+
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST,url
+                ,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        try {
+                            JSONObject obj = new JSONObject(new String(response.data));
+                            if(obj!=null){
+                                if(obj.getInt("error")==0){
+                                    SessionManagement.setOngoingBooking(EnterOTP.this,blmod.getBookingid());
+                                    Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+                                    SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_BOOKING_TAG);
+                                    Intent intent = new Intent(EnterOTP.this,TripComplete.class);
+                                    intent.putExtra("Bookingdata",blmod);
+                                    intent.putExtra("init_type", init_type);
+
+
+                                    startActivity(intent);
+                                    finish();
+                                }else{
+                                    RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
+                                    verifyLayout.setClickable(true);
+                                    //   requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                                }
+                            }else{
+                                RequestQueueService.showAlert("Error! No data fetched", EnterOTP.this);
+                                verifyLayout.setClickable(true);
+                                //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+
+                            }
+                        } catch (JSONException e) {
+                            RequestQueueService.showAlert("Something went wrong", EnterOTP.this);
+                            e.printStackTrace();
+                            verifyLayout.setClickable(true);
+                            //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        error.printStackTrace();
+                        verifyLayout.setClickable(true);
+                        //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                    }
+                }) {
+
+            /*
+             * If you want to add more parameters with the image
+             * you can do it here
+             * here we have only one parameter with the image
+             * which is tags
+             * */
+           /* @Override
+            protected java.util.Map1<String, String> getParams() throws AuthFailureError {
+                java.util.Map1<String, String> params = new HashMap<>();
+                return params;
+            }*/
+
+            @Override
+            public java.util.Map<String, String> getHeaders() throws AuthFailureError {
+                java.util.Map<String, String> params = new HashMap<>();
+                //params.put("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGE5NTQ0M2QzY2U5NTU3MTRhNWY2MzQiLCJleHAiOjE1ODExODM0MjUsImlhdCI6MTU3ODU5MTQyNX0.U7xvdz6ZIwhqj_gGSx3bSfaxvhKoFQyenGdyd3oopgY");
+                params.put("Authorization", "Bearer "+SessionManagement.getUserToken(EnterOTP.this));
+                return params;
+            }
+
+            /*
+             * Here we are passing image by renaming it with a unique name
+             * */
+            @Override
+            protected java.util.Map<String,DataPart> getByteData() {
+                //Map1<String, DataPart> params = new HashMap<>();
+                Map<String,DataPart> imageMap = new HashMap<>();
+                long imagename = System.currentTimeMillis();
+                String imagename1 = "bill";
+                DataPart dataPart= new DataPart(imagename1 + ".png", getFileDataFromDrawable(leftbit), "image/png");
+                imageMap.put("image",dataPart);
+                return imageMap;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("otp",OTP);
+                /*params.put("lat",String.valueOf( currentlatlng.latitude));
+                params.put("lng",String.valueOf(currentlatlng.longitude));*/
+                return params;
+            }
+        };
+
+        volleyMultipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        //adding the request to volley
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+    }
+
+    public byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
+
 
 }
