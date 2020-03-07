@@ -7,4 +7,26 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
+    <string name="booking_id_text">Booking ID</string>
+    <string name="estimated_distance">Estimated Distance</string>
+    <string name="pickup_point">Pickup Point</string>
+    <string name="drop_point">Drop Point</string>
+    <string name="controller_name">Controller Name</string>
+    <string name="customer_number">Customer Mobile</string>
+    <string name="message">Message</string>
+
+    <!-- Page Titles-->
+    <string name="trip_complete">Trip Complete</string>
+    <string name="trip_details">Trip Details</string>
+    <string name="enter_otp">Enter OTP</string>
+
+    <string name="enter_code">Enter Code</string>
+    <string name="otpscreen_msg">Please ask the customer to provide 6 digit verification code</string>
+    <string name="verify_txt">Verify</string>
+    <string name="resend_txt">ResendOTP</string>
+    <string name="backtohome"> go to booking list</string>
+    <string name="seemore">See More</string>
+
+
+
 </resources>

@@ -1,8 +1,11 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +23,9 @@ import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
+import com.kookyapps.gpstankertracking.fcm.Config;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,13 +35,15 @@ import java.util.ArrayList;
 
 public class TripComplete extends AppCompatActivity implements View.OnClickListener {
 
-    TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle;
+    TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText;
     //ImageView calltous;
     ImageView menunotification;
-    RelativeLayout back,noti,bottom;
+    RelativeLayout back,noti,bottom,notificationCountLayout;
     String init_type,bkngid,can_accept,can_end,can_start;
     BookingListModal blmod;
+    static String notificationCount;
     Bundle b;
+    BroadcastReceiver mRegistrationBroadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +59,9 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
             back = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
             noti=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
+            notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+            notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
+
             bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
             distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
             pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
@@ -63,11 +73,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             back.setOnClickListener(this);
             noti.setOnClickListener(this);
             bottom.setOnClickListener(this);
-            pagetitle.setText("Trip Complete");
-
-
-
-
+            pagetitle.setText(Constants.TRIP_COMPLETE_PAGE_TITLE);
 
     }
     @Override
@@ -75,7 +81,10 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         Intent i;
         switch (view.getId()){
             case R.id.rl_toolbar_with_back_backLayout:
-                onBackPressed();
+                back.setClickable(false);
+                i=new Intent(TripComplete.this,FirstActivity.class);
+                startActivity(i);
+                finish();
                 break;
             case R.id.iv_tb_with_bck_arrow_notification:
                 i = new Intent(TripComplete.this,Notifications.class);
@@ -326,6 +335,70 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         }
 
     };
+
+
+
+
+
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(TripComplete.this);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notificationCountText.setText(String.valueOf(count));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
+        }
+    }
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+    public void clearNotificationCount(){
+        notificationCountText.setText("");
+        notificationCountLayout.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
+        String viewCount =notificationCountText.getText().toString();
+        boolean b1 = String.valueOf("sharedCount")!=viewCount;
+
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notificationCountText.setText(String.valueOf(sharedCount));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
 
 }
 

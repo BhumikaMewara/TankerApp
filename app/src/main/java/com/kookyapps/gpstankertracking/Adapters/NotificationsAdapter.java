@@ -1,29 +1,31 @@
 package com.kookyapps.gpstankertracking.Adapters;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.kookyapps.gpstankertracking.Activity.Notifications;
+import com.kookyapps.gpstankertracking.Activity.RequestDetails;
 import com.kookyapps.gpstankertracking.Modal.NotificationModal;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     ArrayList<NotificationModal> notificationlist;
     Context context;
-
+    private String init_type;
 
     private static final int ITEM = 0;
     private static final int LOADING = 1;
     private boolean isLoadingAdded = false;
+
 
    /* public NotificationsAdapter(Context context,ArrayList<NotificationModal> notificationlist){
         this.context = context;
@@ -38,9 +40,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.context = context;
         this.notificationlist = new ArrayList<>();
     }
-    public NotificationsAdapter(Context context,ArrayList<NotificationModal> notificationlist){
+    public NotificationsAdapter(Context context,String init_type){
         this.context = context;
-        this.notificationlist = notificationlist;
+        this.init_type = init_type;
+        this.notificationlist = new ArrayList<NotificationModal>();
     }
 
     protected class LoadingViewHolder extends RecyclerView.ViewHolder {
@@ -65,8 +68,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
             switch (view.getId()) {
                 case R.id.rl_notificationitem_layout:
                     notificationlayout.setClickable(false);
+
                     if(context instanceof Notifications)
                         ((Notifications)context).readNotificationApiCall(notificationlist.get(getAdapterPosition()).getNotifiactionid());
+
+
                     break;
             }
         }
@@ -99,31 +105,50 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        final NotificationModal current = notificationlist.get(position);
+
         switch (getItemViewType(position)) {
             case ITEM:
                 final NotificationViewHolder mVH = (NotificationViewHolder) holder;
                 mVH.notificationheading.setText(notificationlist.get(position).getTitle());
                 mVH.notificationmsg.setText(notificationlist.get(position).getText());
-                if(notificationlist.get(position).getIsread().equals("0"))
+//                String type = notificationlist.get(position).getNotificationtype();
+//                if (type.equals("BOOKING_REQUEST"))
+
+               /* if(notificationlist.get(position).getIsread().equals("0")){
                     mVH.notificationlayout.setBackground(context.getDrawable(R.drawable.notification_read_background));
-                else
+                }
+                else {
                     mVH.notificationlayout.setBackground(context.getDrawable(R.drawable.notification_unread_background));
+                }*/
+
+                mVH.notificationlayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        String type = current.getNotificationtype(), detail_init_type;
+                        if(type.equals("BOOKING_REQUEST")) {
+                            detail_init_type = Constants.REQUEST_DETAILS;
+                        } else {
+                            detail_init_type = Constants.BOOKING_START;
+                        }
+                        Intent i = new Intent(context, RequestDetails.class);
+                        i.putExtra("init_type", detail_init_type);
+                        i.putExtra("booking_id", current.getBookingid());
+                        context.startActivity(i);
+                    }
+                });
+
                 break;
             case LOADING:
                 break;
         }
     }
 
-
-
-
     @Override
     public int getItemViewType(int position) {
         return (position == notificationlist.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
     }
-
-
-
 
     public void add(NotificationModal r) {
         notificationlist.add(r);
@@ -174,7 +199,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
 
-
+    public void clearNotifications(){
+    notificationlist.clear();
+        notifyDataSetChanged();
+    }
 
 }
 

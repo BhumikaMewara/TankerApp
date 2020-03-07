@@ -2,23 +2,29 @@ package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -28,11 +34,13 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +52,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.auth.FirebaseAuth;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
 
@@ -65,9 +74,14 @@ import com.github.nkzawa.socketio.client.Socket;*/
 
 
 
+import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
+import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
+import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.Utils.Utils;
+import com.kookyapps.gpstankertracking.fcm.Config;
 
 
 import java.net.URISyntaxException;
@@ -78,13 +92,16 @@ import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISS
 public class Map1 extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,com.google.android.gms.location.LocationListener{
 
     private GoogleMap mMap;
-    RelativeLayout notifications,bottom,seemore,details , redLayout;
-    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno;
+    LinearLayout tripLayout,logoutLayout,l;
+    RelativeLayout notifications,bottom,seemore,details , redLayout,toolbarNotiCountLayout,toolbarmenuLayout,r;
+    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText;
+    TextView fullname,username;
     ImageView seemoreImg ;
     Double toLat , toLong,fromLat,fromLong;
     Animation slideUp, slideDown;
     Boolean t = false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
     BookingListModal blmod;
+    static String notificationCount;
     ArrayList<String> allpermissionsrequired;
     private LocationManager locationManager;
     private GoogleApiClient mGoogleApiClient;
@@ -97,6 +114,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     private Socket socket;
     boolean cameraAccepted;
     String imageencoded,can_accept,can_end,can_start;
+    BroadcastReceiver mRegistrationBroadcastReceiver;
+    DrawerLayout navdrawer;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+
+
 
     /*{
         try{
@@ -130,7 +152,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
 
 
+
     }
+    public void drawerMenu (View view ){
+        navdrawer.openDrawer(Gravity.LEFT);
+    }
+
+
     public void initSocket(){
         try{
             socket = IO.socket(URLs.SOCKET_URL+ SessionManagement.getUserToken(this));
@@ -231,13 +259,73 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     //seemore.setVisibility(View.VISIBLE);
                     t = true;
                 }
-
-
+                break;
+            case R.id.lh_map_triplayout:
+                Log.i("trip","clicked");
+                i = new Intent(this, TripDetails.class);
+                startActivity(i);
 
                 break;
-
+            case R.id.lh_map_logoutLayout:
+                Log.i("logout","clicked");
+                logoutLayout.setClickable(false);
+                logutApiCalling();
+                break;
         }
     }
+
+    public void logutApiCalling() {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            POSTAPIRequest postapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.SIGN_OUT_URL;
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(postapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:",token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(Map1.this,logoutListner,url,headparam,jsonBodyObj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    FetchDataListener logoutListner = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                        FirebaseAuth.getInstance().signOut();
+                        SessionManagement.logout(logoutListner, Map1.this);
+                        Intent i = new Intent(Map1.this, MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
+                        Toast.makeText(Map1.this, "You are now logout", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+
+        }
+
+
+        @Override
+        public void onFetchFailure(String msg) {
+            logoutLayout.setClickable(true);
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
+
+
 
 
     private boolean checkPermission(){
@@ -247,10 +335,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},PERMISSION_REQUEST_CODE);
     }
-
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
         if(resultCode!=0) {
@@ -263,22 +347,18 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 intent.putExtra("init_type",Constants.TRIP_END_IMG);
                 startActivity(intent);
 //            }
-
-
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
-
-
-
     public void initViews(){
         notifications = (RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu_notification);
         notifications.setOnClickListener(this);
+        toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-        title.setText("Map1");
+        title.setText("Map");
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
@@ -295,14 +375,130 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         contanctno=(TextView)findViewById(R.id.tv_map_contact_text);
         contanctno.setText("+" +blmod.getPhone_country_code()+blmod.getPhone());
         distance=(TextView)findViewById(R.id.tv_map_distance);
+        navdrawer=(DrawerLayout)findViewById(R.id.dl_trip_details);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, navdrawer,
+                R.string.drawer_open, R.string.drawer_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+        };
+
+        navdrawer.setDrawerElevation(0f);
+        navdrawer.setScrimColor(Color.TRANSPARENT);
+        navdrawer.addDrawerListener(actionBarDrawerToggle);
+
+
+
+
+
         distance.setText(blmod.getDistance());
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fg_pickup_map);
+        toolbarmenuLayout=(RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu);
+        toolbarmenuLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerMenu(view);
+            }
+        });
+        l=(LinearLayout)findViewById(R.id.lv_map_drawer_firstLayout);
+        tripLayout=(LinearLayout) findViewById(R.id. lh_map_triplayout);
+        tripLayout.setOnClickListener(this);
+        logoutLayout=(LinearLayout)findViewById(R.id.lh_map_logoutLayout);
+        logoutLayout.setOnClickListener(this);
+        fullname=(TextView)findViewById(R.id.tv_map_drawer_fullName);
+        username=(TextView)findViewById(R.id.tv_map_drawer_username);
+
+        fullname.setText(SessionManagement.getName(Map1.this));
+        username.setText(SessionManagement.getUserId(Map1.this));
+
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_pickup_map);
         checkAndRequestPermissions(this,allpermissionsrequired);
 
-
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notificationCountText.setText(String.valueOf(noticount));
+            toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+        }
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(Map1.this));
+                    setNotificationCount(count+1,false);
+                }
+            }
+        };
 
     }
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(Map1.this);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notificationCountText.setText(String.valueOf(count));
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
+        }
+    }
+
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+    public void clearNotificationCount(){
+        notificationCountText.setText("");
+        toolbarNotiCountLayout.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
+        String viewCount =notificationCountText.getText().toString();
+        boolean b1 = String.valueOf("sharedCount")!=viewCount;
+
+
+
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notificationCountText.setText(String.valueOf(sharedCount));
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+
+
 
 
 
@@ -484,6 +680,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 @Override
                 public void run() {
                     JSONObject response = (JSONObject)args[0];
+                    try {
+                        Log.i("response","Booking Aborted "+response.getString("id"));
+                        SessionManagement.removeOngoingBooking(Map1.this);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
@@ -495,6 +698,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         socket.disconnect();
         socket.off("aborted:Booking");
     }
+
+
 
 
 }

@@ -10,7 +10,8 @@
     <RelativeLayout
         android:id="@+id/rl_trip_complete_mainlayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorGreyLight">
         <RelativeLayout
             android:id="@+id/rl_trip_complete_toolbarLayout"
             android:layout_width="match_parent"
@@ -22,11 +23,21 @@
         </RelativeLayout>
 
     <ScrollView
+        android:id="@+id/sv_tripcomplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_background_main"
         android:layout_below="@+id/rl_trip_complete_toolbarLayout"
+
         >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorGreyLight"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="20dp">
+
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,14 +46,14 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:paddingBottom="20dp"
             android:background="@color/colorwhite"
             >
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_tripcomplete_booking_id_title"
-                android:text="Booking ID"
+                android:text="@string/booking_id_text"
                 android:textColor="@color/greenLight"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="15dp"
@@ -75,7 +86,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Estimated Distance"
+                android:text="@string/estimated_distance"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -107,7 +118,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Pickup point"
+                android:text="@string/pickup_point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -139,7 +150,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Drop Point"
+                android:text="@string/drop_point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -171,7 +182,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Controller's Name"
+                android:text="@string/controller_name"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -203,7 +214,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Contact No."
+                android:text="@string/customer_number"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -235,7 +246,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_alignStart="@+id/tv_tripcomplete_bookingid"
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
-                android:text="Message"
+                android:text="@string/message"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
             <TextView
@@ -250,7 +261,48 @@
                 android:layout_alignEnd="@+id/tripcomplete_underline1"
                 android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry."/>
         </RelativeLayout>
+        </RelativeLayout>
     </ScrollView>
+
+        <RelativeLayout
+            android:id="@+id/trip_complete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sv_tripcomplete"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="@color/colorwhite"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+
+                >
+
+                <ImageView
+                    android:id="@+id/iv_tc"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/from_booking_list"
+                    android:layout_toLeftOf="@+id/tv_tc"
+                    android:scaleType="fitXY"
+                    android:layout_marginRight="10dp"
+                    android:layout_centerVertical="true"
+                    />
+                <TextView
+                    android:id="@+id/tv_tc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trip_complete"
+                    android:textColor="@color/colorblack"
+                    android:textSize="14sp"
+                    android:layout_centerInParent="true"
+
+                    />
+            </RelativeLayout>
+        </RelativeLayout>
+
 
 <RelativeLayout
     android:layout_width="match_parent"
@@ -266,7 +318,7 @@
             android:id="@+id/tv_bottomlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Back to home"
+            android:text="@string/backtohome"
             android:layout_toLeftOf="@+id/rl_bottomLayout_icon"
             android:textColor="@color/colorwhite"
             android:textSize="13dp"

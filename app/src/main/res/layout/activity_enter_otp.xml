@@ -109,7 +109,7 @@
                                     android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_three">
-                                    <!--<requestFocus/>-->
+
                                 </EditText>
                                 <EditText
                                     android:id="@+id/editText_three"
@@ -119,7 +119,7 @@
                                     android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_four">
-                                    <!--<requestFocus/>-->
+
                                 </EditText>
                                 <EditText
                                     android:id="@+id/editText_four"
@@ -129,7 +129,7 @@
                                     android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_fifth">
-                                   <!-- <requestFocus/>-->
+
                                 </EditText>
                                 <EditText
                                     android:id="@+id/editText_fifth"
@@ -139,7 +139,7 @@
                                     android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_sixth">
-                               <!-- <requestFocus/>-->
+
                                 </EditText>
 
                                 <EditText

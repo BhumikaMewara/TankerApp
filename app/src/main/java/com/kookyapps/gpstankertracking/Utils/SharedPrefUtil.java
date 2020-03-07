@@ -43,8 +43,15 @@ public class SharedPrefUtil {
 
     public static String getStringPreferences(Context con, String Tag, String key) {
         // save the data
+
         SharedPreferences preferences = con.getSharedPreferences(Tag, 0);
         return preferences.getString(key, "");
+    }
+    public static int getIntegerPreferences(Context con, String Tag, String key) {
+        // save the data
+
+        SharedPreferences preferences = con.getSharedPreferences(Tag, 0);
+        return preferences.getInt(key, 0);
     }
 
     public static Boolean getBooleanPreferences(Context con, String Tag, String key) {
@@ -83,5 +90,6 @@ public class SharedPrefUtil {
         else
             return false;
     }
+
 
 }

@@ -57,16 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         usernameImg=(ImageView)    findViewById(R.id.iv_main_usernameImg);
         passwordImg=(ImageView)    findViewById(R.id.iv_main_passwordImg);
         signIn=(LinearLayout)      findViewById(R.id.lh_main_signIn);
-
         signIn.setOnClickListener(this);
-
-    }
-
-
-    @Override
-    public void onBackPressed() {
-
-        super.onBackPressed();
     }
 
     @Override
@@ -74,16 +65,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent i;
         switch (view.getId()){
             case R.id.lh_main_signIn:
-
-        Log.i("info","Sign In clicked");
+            signIn.setClickable(false);
         username = usernameET.getText().toString();
         password = passwordET.getText().toString();
-                loginApiCalling();
-
+        loginApiCalling();
         break;
         }
     }
+    @Override
+    public void onBackPressed() {
 
+        super.onBackPressed();
+    }
     public void loginApiCalling(){
         JSONObject jsonBodyObj = new JSONObject();
 
@@ -97,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             POSTAPIRequest postapiRequest=new POSTAPIRequest();
             String url = URLs.BASE_URL+ URLs.SIGN_IN_URL;
             Log.i("url",String.valueOf(url));
-            //Log.i("token",String.valueOf(token));
+            Log.i("token",String.valueOf(token));
             Log.i("Request",username+", "+password );
             HeadersUtil headparam = new HeadersUtil();
             postapiRequest.request(this, loginApiListener,url,headparam,jsonBodyObj);
@@ -121,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     userdetail.getString("phone"),
                                     userdetail.getString("driver_name"),
                                     userdetail.getString("token"),
-                                    userdetail.getJSONObject("settings").getString("language"));
+                                    userdetail.getJSONObject("settings").getString("language"),
+                                    userdetail.getString("location"),"9");
 
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);
                             startActivity(i);

@@ -49,7 +49,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     DrawerLayout navdrawer;
     ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
-    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm;
+    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username;
     RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
@@ -89,11 +89,18 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
+        pageTitle.setText(Constants.TRIP_DETAILS_PAGE_TITLE);
         trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
         notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
         back.setOnClickListener(this);
         notification.setOnClickListener(this);
+        fullname=(TextView)findViewById(R.id.tv_tripdetails_drawer_fullName);
+        username=(TextView)findViewById(R.id.tv_tripdetails_drawer_username);
+
+
+        fullname.setText(SessionManagement.getName(TripDetails.this));
+        username.setText(SessionManagement.getUserId(TripDetails.this));
 
         trip=(TextView)findViewById(R.id.tv_tripdetails_tripText);
         language=(TextView)findViewById(R.id.tv_tripdetails_language);
@@ -166,7 +173,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
                 intent = new Intent(TripDetails.this,Notifications.class);
                 startActivity(intent);
                 break;
-            case R.id.rl_water_tanker_toolbar_menu:
+            case R.id.rl_toolbarmenu_backimglayout:
               onBackPressed();
                 break;
             case R.id.lh_tripdetails_logoutLayout:

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">पानी का टैंकर</string>
+    <string name="no_booking">No Bookings Found</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="booking_id_text">बुकिंग आईडी</string>
+    <string name="estimated_distance">अनुमानित दूरी</string>
+    <string name="pickup_point">पिक अप बिंदु</string>
+    <string name="drop_point">ड्रॉप बिंदु</string>
+    <string name="controller_name">नियंत्रक का नाम</string>
+    <string name="customer_number">ग्राहक का मोबाइल नंबर</string>
+    <string name="message">संदेश</string>
+
+    <!-- Page Titles-->
+    <string name="trip_complete">ट्रिप पूरी हुई</string>
+    <string name="trip_details">यात्रा विवरण</string>
+    <string name="enter_otp">OTP दर्ज करें</string>
+    <string name="enter_code">कोड दर्ज करें</string>
+    <string name="otpscreen_msg">कृपया ग्राहक को 6 अंकों का सत्यापन कोड प्रदान करने के लिए कहें</string>
+    <string name="verify_txt">सत्यापित करें</string>
+    <string name="resend_txt">पुनः भेजें</string>
+    <string name="backtohome"> बुकिंग सूची पर जाएं</string>
+
+    <string name="seemore">और देखें</string>
+
+
+    <!-- Trip Complete-->
+
+
+
+
+
+</resources>

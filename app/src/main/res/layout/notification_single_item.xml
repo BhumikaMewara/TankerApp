@@ -5,9 +5,9 @@
     android:padding="6dp"
     android:layout_marginLeft="3dp"
     android:layout_marginRight="3dp"
-    android:layout_marginBottom="5dp"
+
     android:id="@+id/rl_notificationitem_layout">
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+    <com.kookyapps.gpstankertracking.CustomViews.RobotoBoldTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv_notificationitem_heading"
@@ -25,5 +25,14 @@
         android:text="loremdfhsjfsfskjvsvnjdnvsdjkfjsklfjs"
         android:textSize="11dp"
         android:textColor="@color/colorblack"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGreyLight"
+        android:layout_below="@+id/tv_notificationitem_data"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"/>
 
 </RelativeLayout>

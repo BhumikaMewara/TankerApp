@@ -309,13 +309,13 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data in pick_up", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
+                                JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-                                tdmod.setDistance("15 KMS");
+                                }
+
                                 modalList.add(tdmod);
                             }
                         }

@@ -10,7 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoBar"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:configChanges="locale|orientation">
+
         <activity android:name=".Activity.TankerTripEndPic"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

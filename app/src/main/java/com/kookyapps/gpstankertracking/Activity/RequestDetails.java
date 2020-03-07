@@ -5,18 +5,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -41,9 +49,11 @@ import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.Utils.Utils;
 import com.kookyapps.gpstankertracking.Utils.VolleyMultipartRequest2;
+import com.kookyapps.gpstankertracking.fcm.Config;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +62,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
@@ -61,14 +72,16 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     TextView bookingid,distancetext,pickup,drop,controllername,contact_no,message,pagetitle,bottomtext;
     ImageView calltous;
     ImageView menunotification;
-    RelativeLayout menuback,bottom;
-    String init_type,bkngid;
+    RelativeLayout menuback,bottom,notificationLayout,toolbarNotiCountLayout;
+    String init_type,bkngid ;
+    static String notificationCount;
     BookingListModal blmod;
     ArrayList<String> imagearray;
     String imageencoded,can_accept,can_end,can_start;
     boolean cameraAccepted;
-
-
+    BroadcastReceiver mRegistrationBroadcastReceiver;
+    TextView notificationCountText;
+Button change;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +89,14 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         initViews();
         bookingByIdApiCalling();
 
+
+
+        /*Locale locale = new Locale("en");
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        tv.setText(R.string.greet);*/
     }
     public void initViews() {
         init_type = getIntent().getExtras().getString("init_type");
@@ -90,7 +111,12 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         contact_no = (TextView) findViewById(R.id.tv_bookingdetail_contact);
         message = (TextView) findViewById(R.id.tv_bookingdetail_message);
 
+        change=(Button)findViewById(R.id.btn_lng_change);
+        change.setOnClickListener(this);
 
+        toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+        notificationLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
+        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         calltous = (ImageView) findViewById(R.id.iv_bookingdetail_bookingid_call);
         calltous.setOnClickListener(this);
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
@@ -101,18 +127,25 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         bottom.setOnClickListener(this);
         bottomtext = (TextView) findViewById(R.id.tv_result_details_bottomlayout_text);
 
-//        if (init_type.equals(Constants.REQUEST_DETAILS)) {
-//            pagetitle.setText("Request Details");
-//            bottomtext.setText("ACCEPT");
-//
-//        } else if (init_type.equals(Constants.BOOKING_START)) {
-//            if (can_start.equals("true")){
-//            pagetitle.setText("Booking Details");
-//            bottomtext.setText("START");
-//            }else {
-//                bottomtext.setText("View Map");
-//            }
-//        }
+
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notificationCountText.setText(String.valueOf(noticount));
+            toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+        }
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(RequestDetails.this));
+                    setNotificationCount(count+1,false);
+                }
+            }
+        };
 
     }
 
@@ -122,20 +155,24 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         public void onClick(View view) {
         Intent intent;
         switch (view.getId()){
-                case R.id.rl_toolbar_with_back_backLayout:
+              case R.id.rl_toolbar_with_back_backLayout:
                     onBackPressed();
                     break;
-                case R.id.iv_tb_with_bck_arrow_notification:
 
-                    intent = new Intent(RequestDetails.this,Notifications.class);
-                    startActivity(intent);
-                    break;
-                case R.id.iv_bookingdetail_bookingid_call:
-                    break;
-                case R.id.rl_result_details_bottomLayout:
-                    if (init_type.equals(Constants.REQUEST_DETAILS)){
+              /*  Locale locale = new Locale("hi");
+                Locale.setDefault(locale);
+                Configuration config = new Configuration();
+                config.locale = locale;
+                getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();*/
+                        case R.id.iv_tb_with_bck_arrow_notification:
+                        intent = new Intent(RequestDetails.this,Notifications.class);
+                        startActivity(intent);
+                        break;
+                        case R.id.rl_result_details_bottomLayout:
+                        if (init_type.equals(Constants.REQUEST_DETAILS)){
                         bookingacceptedapiCalling();
-                    }else if (init_type.equals(Constants.BOOKING_START)) {
+                        }else if (init_type.equals(Constants.BOOKING_START)) {
                         if (can_start.equals("true")) {
                             if (checkPermission()) {
                                 cameraAccepted = true;
@@ -154,9 +191,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             intent.putExtra("Bookingdata",blmod);
                             startActivity(intent);
                         }
-                    }
-            }
+                        }
         }
+    }
 
 
     private void requestPermission(){
@@ -259,29 +296,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         }
 
     };
-
-
-
-
-
-
-   /* public byte[] getFileDataFromDrawable(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
-    }
-*/
-
-
-
-
-
-
-
-
-
-
-
     private void bookingByIdApiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
         try {
@@ -296,8 +310,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     FetchDataListener bookingdetailsApiListner = new FetchDataListener() {
@@ -320,24 +332,17 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 blmod.setMessage(data.getString("message"));
                                 message.setText(blmod.getMessage());
                             }
-
-
                             blmod.setPhone_country_code(data.getString("phone_country_code"));
                             blmod.setPhone(data.getString("phone"));
                             contact_no.setText("+" + blmod.getPhone_country_code() + blmod.getPhone());
                             blmod.setController_name(data.getString("controller_name"));
                             controllername.setText(blmod.getController_name());
                             blmod.setCan_accept(data.getString("can_accept"));
-
-
                             can_accept=String.valueOf(data.getBoolean("can_accept"));
-
                             blmod.setCan_start(data.getString("can_start"));
                             can_start= String.valueOf(data.getBoolean("can_start"));
                             blmod.setCan_end(data.getString("can_end"));
                             can_end=String.valueOf(data.getBoolean("can_end"));
-
-
                             JSONObject distance = data.getJSONObject("distance");
                             if (distance != null) {
                                 distance.getString("value");
@@ -346,8 +351,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in distance Found", RequestDetails.this);
                             }
-
-
                             JSONObject drop_point = data.getJSONObject("drop_point");
                             if (drop_point != null) {
                                 drop_point.getString("location");
@@ -368,7 +371,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in drop_point Found", RequestDetails.this);
                             }
-
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
                             {
                                 if (pickup_point != null) {
@@ -391,20 +393,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                     } else {
                                         RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this);
                                     }
-
-
                                 } else {
                                     RequestQueueService.showAlert("Error! No Data in pick_point Found", RequestDetails.this);
                                 }
                             }
-                            /*JSONObject controller = data.getJSONObject("controller");
-                            if (controller!=null){
-                                controller.getString("_id");
-                                controller.getString("name");
-                            }else {
-                                RequestQueueService.showAlert("Error! No data in controller found",RequestDetails.this);
-                            }*/
-
                             if (init_type.equals(Constants.REQUEST_DETAILS)) {
                                 pagetitle.setText("Request Details");
                                 bottomtext.setText("ACCEPT");
@@ -413,17 +405,17 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 if (can_start.equals("true")){
                                     pagetitle.setText("Booking Details");
                                     bottomtext.setText("START");
-                                }else {
+                                }else if(can_end.equals("true")){
                                     pagetitle.setText("Booking Details");
                                     bottomtext.setText("View Map");
+                                }else {
+                                    bottom.setVisibility(View.GONE);
                                 }
                             }
+
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
                         }
-
-
-                        // finish();
                     }
                     else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);
@@ -447,18 +439,76 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         }
 
     };
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(RequestDetails.this);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notificationCountText.setText(String.valueOf(count));
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(RequestDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(RequestDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
+        }
+    }
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(RequestDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+    public void clearNotificationCount(){
+        notificationCountText.setText("");
+        toolbarNotiCountLayout.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        boolean b1 = sharedCount!=viewCount;
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notificationCountText.setText(String.valueOf(sharedCount));
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+
+
+        /*Intent refresh = new Intent(this, AndroidLocalize.class);
+        finish();
+        startActivity(refresh);*/
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

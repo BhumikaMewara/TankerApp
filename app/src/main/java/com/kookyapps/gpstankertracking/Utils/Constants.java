@@ -7,6 +7,8 @@ public class Constants {
     public static final String COMPLETED_CALL="Completed";
     public static final String TRIP_END_IMG="trip_end_img";
 
+
+
     public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
     public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
@@ -24,13 +26,17 @@ public class Constants {
     public static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     public static final String SHARED_NOTIFICATION_UPDATE_KEY  = "notification_update";
 
+
+
+
     public static final String ABORTED_CALL="Aborted";
-    public static final String COMPLETED_PAGE_TITLE="Completed Booking Status";
-    public static final String PENDING_PAGE_TITLE="Pending Booking Status";
-    public static final String ONGOING_PAGE_TITLE="Ongoing Booking Status";
-    public static final String ABORTED_PAGE_TITLE="Aborted Booking Status";
-    public static final String BOOKINGFORM_PAGE_TITLE="Create Booking";
+
     public static final String NOTIFICATION_PAGE_TITLE="Notifications";
+    public static final String OTP_PAGE_TITLE="Enter OTP";
+    public static final String TRIP_COMPLETE_PAGE_TITLE="Trip Complete";
+    public static final String TRIP_DETAILS_PAGE_TITLE="Trip Details";
+
+
     public static final String TANKERDETAIL_PAGE_TITLE="Notifications";
     public static final String MAP_PAGE_TITLE="Map1";
 

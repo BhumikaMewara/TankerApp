@@ -1,14 +1,19 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,6 +39,7 @@ import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.Utils.Utils;
 import com.kookyapps.gpstankertracking.Utils.VolleyMultipartRequest;
+import com.kookyapps.gpstankertracking.fcm.Config;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,14 +51,16 @@ import java.util.Map;
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener, TextWatcher {
 
     EditText otpcode, editText_one, editText_two, editText_three, editText_four, editText_five, editText_six;
-    TextView title, message, verify, resend;
+    TextView title, message, verify, resend,pageTitle,notificationCountText;
     ImageView msg_icon;
     LinearLayout verifyLayout;
-    RelativeLayout back, noti;
+    RelativeLayout back, noti,notificationCountLayout;
     String imageencoded ,bkngid,OTP;
     BookingListModal blmod;
     Bitmap leftbit;
     String init_type;
+    static String notificationCount;
+    BroadcastReceiver mRegistrationBroadcastReceiver;
 
 
 
@@ -75,6 +83,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
 
     public void initView() {
         //otpcode=        (EditText)findViewById(R.id.ed_enterOtp_otp);
+        pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
+        pageTitle.setText(Constants.OTP_PAGE_TITLE);
         title = (TextView) findViewById(R.id.tv_enterOtp_msgTitle);
         message = (TextView) findViewById(R.id.tv_enterOtp_msg);
         message.setText("Please ask the customer to enter 6 digit verification code");
@@ -87,6 +97,9 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         back.setOnClickListener(this);
         noti = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
         noti.setOnClickListener(this);
+        notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
+
         SpannableString content = new SpannableString("Resend OTP");
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         resend.setText(content);
@@ -105,6 +118,25 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         editText_one.addTextChangedListener(this);
         editText_one.addTextChangedListener(this);
         editText_one.addTextChangedListener(this);
+
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notificationCountText.setText(String.valueOf(noticount));
+            notificationCountLayout.setVisibility(View.VISIBLE);
+        }
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(EnterOTP.this));
+                    setNotificationCount(count+1,false);
+                }
+            }
+        };
 
 
 
@@ -145,17 +177,25 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+        EditText e =(EditText)getCurrentFocus();
+        if (e != null && e.length() > 0){
+            View next = e.focusSearch(View.FOCUS_RIGHT); // or FOCUS_FORWARD
+            if (next != null)
+                next.requestFocus();
+        }
+
     }
 
     @Override
     public void afterTextChanged(Editable editable) {
-        if (editable.length() == 1) {
-            if (editText_one.length() == 1) {
+        /*if (editable.length() == 1) {
+
+         *//*if (editText_one.length() == 1) {
                 editText_two.requestFocus(); }
             if (editText_two.length() == 1) {
                     editText_three.requestFocus(); }
             if (editText_three.length() == 1) {
-                editText_four.requestFocus(); }
+                editText_four.requestFocus(); }*//*
         } else if (editable.length() == 0) {
                 if (editText_four.length() == 0) {
                     editText_three.requestFocus(); }
@@ -165,23 +205,24 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                     editText_one.requestFocus(); }
             }
 
-        }
+        }*/
 
+    }
 
 
 private  void validateOTP(){
        if (editText_one.getText().equals("")){
-           editText_six.setError("entry the otp correctly");
+           editText_six.setError("enter the otp correctly");
        }else if (editText_two.getText().equals("")){
-           editText_six.setError("entry the otp correctly");
+           editText_six.setError("enter the otp correctly");
        }else if (editText_three.getText().equals("")){
-           editText_six.setError("entry the otp correctly");
+           editText_six.setError("enter the otp correctly");
        }else if (editText_four.getText().equals("")){
-           editText_six.setError("entry the otp correctly");
+           editText_six.setError("enter the otp correctly");
        }else if (editText_five.getText().equals("")){
-           editText_six.setError("entry the otp correctly");
+           editText_six.setError("enter the otp correctly");
        }else if (editText_six.getText().equals("")){
-        editText_six.setError("entry the otp correctly");
+        editText_six.setError("enter the otp correctly");
        }
 
 
@@ -218,8 +259,6 @@ private  void validateOTP(){
                                     Intent intent = new Intent(EnterOTP.this,TripComplete.class);
                                     intent.putExtra("Bookingdata",blmod);
                                     intent.putExtra("init_type", init_type);
-
-
                                     startActivity(intent);
                                     finish();
                                 }else{
@@ -308,6 +347,69 @@ private  void validateOTP(){
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
+    }
+
+
+
+
+
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(EnterOTP.this);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notificationCountText.setText(String.valueOf(count));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
+        }
+    }
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+    public void clearNotificationCount(){
+        notificationCountText.setText("");
+        notificationCountLayout.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
+        String viewCount =notificationCountText.getText().toString();
+        boolean b1 = String.valueOf("sharedCount")!=viewCount;
+
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notificationCountText.setText(String.valueOf(sharedCount));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 

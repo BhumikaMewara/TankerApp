@@ -1,10 +1,15 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kookyapps.gpstankertracking.Adapters.NotificationsAdapter;
 import com.kookyapps.gpstankertracking.Modal.NotificationModal;
@@ -26,6 +32,8 @@ import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
+import com.kookyapps.gpstankertracking.fcm.Config;
+import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,64 +44,46 @@ import java.util.List;
 
 public class Notifications extends AppCompatActivity implements View.OnClickListener {
 
-
-  /*  ArrayList<NotificationModal> notlist;
     RecyclerView notificationlistview;
     NotificationsAdapter adapter;
-    String notificationCount;
-    LinearLayoutManager mLayoutManager;
-    private int totalNotificationCount;
-    private final int PAGE_START  = 1;
-    private int TOTAL_PAGES = 1;
-    private static int page_size = 10;
-    //private int page_no = 1;
-    private boolean isLoading = false;
-    private boolean isLastPage = false;
-    private int currentPage = PAGE_START;
-    boolean mIsVisibleToUser;
-    boolean isListNull = true;
-    ImageView menunotification;
+
     RelativeLayout menuback;
-    TextView pagetitle,nodatadialog;
-    ProgressBar notificationprogress;
-    private int totalBookingCount;
-*/
-
-
-
-
-    RecyclerView notificationlistview;
-    NotificationsAdapter adapter;
-
-    RelativeLayout menuback,menunotification;
     TextView pagetitle,nodata;
     ProgressBar notificationprogress;
 
+    RelativeLayout toolbar_notification,noticountlayout,menunotification;
+    BroadcastReceiver mRegistrationBroadcastReceiver;
+    TextView notiCount;
+    static String notificationCount;
+    static Context context;
+
     private final int PAGE_START  = 1;
     private int TOTAL_PAGES = 1;
-    private static int page_size = 7;
+    private static int page_size = 15   ;
     //private int page_no = 1;
     LinearLayoutManager mLayoutManager;
     private boolean isLoading = false;
     private boolean isLastPage = false;
     private int currentPage = PAGE_START;
     private int totalBookingCount;
-    boolean isListNull = true;
-
-
-
-
-
-
-
+    boolean isListNull = true,isPush=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
+        createNotificationData();
         initViews();
-
-
+        Intent intent = getIntent();
+        Bundle b = intent.getExtras();
+        isPush = false;
+        if(b!=null) {
+            if (b.containsKey("ispush")) {
+                if (b.getString("ispush").equals("1")) {
+                    isPush = true;
+                }
+            }
+        }
 
     }
 
@@ -107,19 +97,25 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         nodata.setVisibility(View.GONE);
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
+        context=this;
 
         menunotification = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
+        noticountlayout = (RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+        notiCount = (TextView)findViewById(R.id.tv_toolbar_notificationcount);
+
         pagetitle = (TextView)findViewById(R.id.tb_with_bck_arrow_title);
         pagetitle.setText(Constants.NOTIFICATION_PAGE_TITLE);
+
         notificationprogress = (ProgressBar)findViewById(R.id.pg_notification);
         notificationprogress.setVisibility(View.VISIBLE);
 
-        adapter = new NotificationsAdapter(Notifications.this);
+        adapter = new NotificationsAdapter(Notifications.this,Constants.REQUEST_DETAILS);
         mLayoutManager = new LinearLayoutManager(this);
         notificationlistview.setLayoutManager(mLayoutManager);
         notificationlistview.setItemAnimator(new DefaultItemAnimator());
         notificationlistview.setAdapter(adapter);
         notificationlistview.addOnScrollListener(new PaginationScrollListener(mLayoutManager) {
+
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
@@ -148,8 +144,37 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                 return isLoading;
             }
         });
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notiCount.setText(String.valueOf(noticount));
+            noticountlayout.setVisibility(View.VISIBLE);
+        }
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(Notifications.this));
+                    setNotificationCount(count+1,false);
+                }
+            }
+        };
+
+
         createNotificationData();
+
+
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
 
 
     @Override
@@ -164,46 +189,17 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(isPush){
+            Intent i = new Intent(this, FirstActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
+        }else {
+            super.onBackPressed();
+        }
     }
 
     public void createNotificationData(){
-       /* NotificationModal not1,not2,not3,not4,not5;
-        not1 = new NotificationModal();
-        not2 = new NotificationModal();
-        not3 = new NotificationModal();
-        not4 = new NotificationModal();
-        not5 = new NotificationModal();
-
-        not1.setNotifiactionid("1011");
-        not1.setNotificationheading("The Standard Lorem Ipsum passage, used since 1500s");
-        not1.setNotificationmsg("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut dolore magna aliqua");
-
-        not2.setNotifiactionid("1012");
-        not2.setNotificationheading("The Standard Lorem Ipsum passage, used since 1500s");
-        not2.setNotificationmsg("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut dolore magna aliqua");
-
-        not3.setNotifiactionid("1013");
-        not3.setNotificationheading("The Standard Lorem Ipsum passage, used since 1500s");
-        not3.setNotificationmsg("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut dolore magna aliqua");
-
-        not4.setNotifiactionid("1014");
-        not4.setNotificationheading("The Standard Lorem Ipsum passage, used since 1500s");
-        not4.setNotificationmsg("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut dolore magna aliqua");
-
-        not5.setNotifiactionid("1015");
-        not5.setNotificationheading("The Standard Lorem Ipsum passage, used since 1500s");
-        not5.setNotificationmsg("Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut dolore magna aliqua");
-
-        notlist = new ArrayList<>();
-        notlist.add(not1);
-        notlist.add(not2);
-        notlist.add(not3);
-        notlist.add(not4);
-        notlist.add(not5);
-
-        setRecyclerView();*/
-
 
         try{
             GETAPIRequest getapiRequest=new GETAPIRequest();
@@ -234,18 +230,25 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                             }
                         }
                         if(array!=null) {
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject jsonObject = (JSONObject) array.get(i);
-                                Log.i("Notification list", jsonObject.toString());
-                                NotificationModal bmod = new NotificationModal();
-                                bmod.setNotifiactionid(jsonObject.getString("_id"));
-                                bmod.setBookingid(jsonObject.getJSONObject("data").getString("booking_id"));
-                                bmod.setIsread("0");
-                                bmod.setTankerid(jsonObject.getString("tanker_id"));
-                                bmod.setText(jsonObject.getJSONObject("text").getString("en"));
-                                bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
-                                bmod.setNotificationtype(jsonObject.getString("type"));
-                                tmodalList.add(bmod);
+                            if (array.length() != 0) {
+                                for (int i = 0; i < array.length(); i++) {
+                                    JSONObject jsonObject = (JSONObject) array.get(i);
+                                    Log.i("Notification list", jsonObject.toString());
+                                    NotificationModal bmod = new NotificationModal();
+                                    bmod.setNotifiactionid(jsonObject.getString("_id"));
+                                    bmod.setBookingid(jsonObject.getJSONObject("data").getString("booking_id"));
+                                    bmod.setIsread("0");
+                                    bmod.setTankerid(jsonObject.getString("tanker_id"));
+                                    bmod.setNotificationtype(jsonObject.getString("type"));
+                                    bmod.setText(jsonObject.getJSONObject("text").getString("en"));
+                                    if (jsonObject.has("title")) {
+                                        bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
+                                    } else {
+                                        bmod.setTitle("No Title Recieved");
+                                    }
+                                    tmodalList.add(bmod);
+                                }
+                                isListNull = false;
                             }
                         }
                         Log.d("Notification List:",array.toString());
@@ -320,9 +323,9 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                                 bmod.setBookingid(jsonObject.getJSONObject("data").getString("booking_id"));
                                 bmod.setIsread("0");
                                 bmod.setTankerid(jsonObject.getString("tanker_id"));
+                                bmod.setNotificationtype(jsonObject.getString("type"));
                                 bmod.setText(jsonObject.getJSONObject("text").getString("en"));
                                 bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
-                                bmod.setNotificationtype(jsonObject.getString("type"));
                                 tmodalList.add(bmod);
                             }
                         }
@@ -390,6 +393,83 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
 
         }
     };
+    public void reloadNotification(){
+        if (SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes")) {
+            NotificationUtilsFcm.clearNotifications(this);
+            adapter.clearNotifications();
+            notificationprogress.setVisibility(View.VISIBLE);
+            SharedPrefUtil.setPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY, "no");
+            createNotificationData();
+        }
+    }
+
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(context);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notiCount.setText(String.valueOf(count));
+                noticountlayout.setVisibility(View.VISIBLE);
+            } else {
+                notiCount.setText("99+");
+                noticountlayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            /*boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");*/
+            reloadNotification();
+        }
+    }
+    public void clearNotificationCount(){
+        notiCount.setText("");
+        noticountlayout.setVisibility(View.GONE);
+    }
+
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+
+
+
+        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
+        String viewCount =notiCount.getText().toString();
+        boolean b1 = String.valueOf("sharedCount")!=viewCount;
+
+
+
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notiCount.setText(String.valueOf(sharedCount));
+                noticountlayout.setVisibility(View.VISIBLE);
+            } else {
+                notiCount.setText("99+");
+                noticountlayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
 
 
 

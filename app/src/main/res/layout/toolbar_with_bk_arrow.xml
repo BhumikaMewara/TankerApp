@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/toolbarmenu_backarrow">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    android:id="@+id/toolbarmenu_backarrow"
+    android:background="@color/colorwhite"
+    >
+
         <RelativeLayout
             android:id="@+id/rl_toolbar_with_back_backLayout"
             android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/tb_with_bck_arrow_title"
-                    android:text="Request Details"
+                    android:text="@string/trip_complete"
                     android:textSize="22dp"
                     android:textStyle="bold"
                     android:gravity="center"
@@ -43,18 +43,39 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_toolbar_with_back_notification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/rl_toolbarmenu_textTitle"
-                android:layout_centerVertical="true">
+                android:layout_width="45dp"
+                android:layout_height="47dp"
+                android:layout_alignParentRight="true"
+                >
                 <ImageView
                     android:id="@+id/iv_tb_with_bck_arrow_notification"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    android:layout_marginLeft="71dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginRight="10dp"
                     android:src="@drawable/notification_drawable" />
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:id="@+id/rl_toolbar_notificationcount"
+                    android:background="@drawable/tanker_online_icon"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="10dp">
+                    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tv_toolbar_notificationcount"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/colorwhite"
+                        android:textSize="8dp"/>
+                </RelativeLayout>
             </RelativeLayout>
         </RelativeLayout>
-    </RelativeLayout>
+
 </androidx.appcompat.widget.Toolbar>

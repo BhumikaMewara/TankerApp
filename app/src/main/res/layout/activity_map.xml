@@ -54,7 +54,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/tv_map_booking_id_title"
-                            android:text="Booking ID"
+                            android:text="@string/booking_id_text"
                             android:textColor="@color/greenLight"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="15dp"
@@ -140,7 +140,7 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
-                                android:text="Drop Point"
+                                android:text="@string/drop_point"
                                 android:layout_marginLeft="10dp"
                                 android:textColor="@color/greenLight"
                                 android:textSize="13dp"/>
@@ -176,7 +176,7 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
-                                android:text="Contact No."
+                                android:text="@string/customer_number"
                                 android:layout_marginLeft="10dp"
                                 android:textColor="@color/greenLight"
                                 android:textSize="13dp"/>
@@ -211,7 +211,7 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
-                                android:text="Estimated Distance"
+                                android:text="@string/estimated_distance"
                                 android:layout_marginLeft="10dp"
                                 android:textColor="@color/greenLight"
                                 android:textSize="13dp"/>
@@ -268,7 +268,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="3dp"
-                        android:text="See Less"
+                        android:text="@string/seemore"
                         android:layout_centerVertical="true"
                         android:textColor="@color/greenDark"
                         android:layout_toRightOf="@+id/firstactivity_divider1"></TextView>
