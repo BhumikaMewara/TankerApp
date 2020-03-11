@@ -19,6 +19,11 @@
     <string name="trip_complete">Trip Complete</string>
     <string name="trip_details">Trip Details</string>
     <string name="enter_otp">Enter OTP</string>
+    <string name="notifications">Notifications</string>
+    <string name="booking_list">Booking List</string>
+    <string name="request_list">Request List</string>
+    <string name="request_details">Request Deatils</string>
+    <string name="booking_details">Booking Deatils</string>
 
     <string name="enter_code">Enter Code</string>
     <string name="otpscreen_msg">Please ask the customer to provide 6 digit verification code</string>
@@ -26,7 +31,15 @@
     <string name="resend_txt">ResendOTP</string>
     <string name="backtohome"> go to booking list</string>
     <string name="seemore">See More</string>
+    <string name="seeless">See Less</string>
+    <string name="end_trip">End Trip</string>
 
 
+    <string name="accept">ACCEPT</string>
+    <string name="view_map">View Map</string>
+    <string name="start">START</string>
+
+
+    <string name="wrongOtp">enter the otp correctly</string>
 
 </resources>

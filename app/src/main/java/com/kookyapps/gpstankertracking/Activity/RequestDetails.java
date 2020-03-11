@@ -111,8 +111,7 @@ Button change;
         contact_no = (TextView) findViewById(R.id.tv_bookingdetail_contact);
         message = (TextView) findViewById(R.id.tv_bookingdetail_message);
 
-        change=(Button)findViewById(R.id.btn_lng_change);
-        change.setOnClickListener(this);
+
 
         toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         notificationLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
@@ -143,6 +142,20 @@ Button change;
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(RequestDetails.this));
                     setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(RequestDetails.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
                 }
             }
         };
@@ -398,16 +411,16 @@ Button change;
                                 }
                             }
                             if (init_type.equals(Constants.REQUEST_DETAILS)) {
-                                pagetitle.setText("Request Details");
-                                bottomtext.setText("ACCEPT");
+                                pagetitle.setText(getString(R.string.request_details));
+                                bottomtext.setText(getString(R.string.accept));
 
                             } else if (init_type.equals(Constants.BOOKING_START)) {
                                 if (can_start.equals("true")){
-                                    pagetitle.setText("Booking Details");
-                                    bottomtext.setText("START");
+                                    pagetitle.setText(getString(R.string.booking_details));
+                                    bottomtext.setText(getString(R.string.start));
                                 }else if(can_end.equals("true")){
-                                    pagetitle.setText("Booking Details");
-                                    bottomtext.setText("View Map");
+                                    pagetitle.setText(getString(R.string.booking_details));
+                                    bottomtext.setText(getString(R.string.view_map));
                                 }else {
                                     bottom.setVisibility(View.GONE);
                                 }

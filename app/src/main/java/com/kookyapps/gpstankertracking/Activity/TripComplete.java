@@ -73,7 +73,8 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             back.setOnClickListener(this);
             noti.setOnClickListener(this);
             bottom.setOnClickListener(this);
-            pagetitle.setText(Constants.TRIP_COMPLETE_PAGE_TITLE);
+            pagetitle.setText(R.string.trip_complete);
+
 
     }
     @Override
@@ -381,6 +382,9 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
+        //change the language when prompt
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notificationCountText.getText().toString();
         boolean b1 = String.valueOf("sharedCount")!=viewCount;

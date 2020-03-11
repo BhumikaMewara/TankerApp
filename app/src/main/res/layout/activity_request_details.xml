@@ -248,13 +248,7 @@
                 android:layout_alignEnd="@+id/bookingdetail_underline1"
                 android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry."/>
 
-            <Button
-                android:id="@+id/btn_lng_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="change language"
-                android:layout_below="@+id/tv_bookingdetail_message"
-                android:layout_centerHorizontal="true"/>
+
 
         </RelativeLayout>
     </ScrollView>

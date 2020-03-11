@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener, TextWatcher {
@@ -84,10 +86,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     public void initView() {
         //otpcode=        (EditText)findViewById(R.id.ed_enterOtp_otp);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pageTitle.setText(Constants.OTP_PAGE_TITLE);
+        pageTitle.setText(R.string.enter_otp);
+
         title = (TextView) findViewById(R.id.tv_enterOtp_msgTitle);
         message = (TextView) findViewById(R.id.tv_enterOtp_msg);
-        message.setText("Please ask the customer to enter 6 digit verification code");
         verify = (TextView) findViewById(R.id.tv_enterOtp_verifyText);
         msg_icon = (ImageView) findViewById(R.id.iv_enterOtp_message);
         otpcode = (EditText) findViewById(R.id.ed_enterOtp_otp);
@@ -100,9 +102,9 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
-        SpannableString content = new SpannableString("Resend OTP");
+        /*SpannableString content = new SpannableString("Resend OTP");
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        resend.setText(content);
+        resend.setText(content);*/
 
         verifyLayout.setOnClickListener(this);
         editText_one = (EditText) findViewById(R.id.editText_one);
@@ -134,6 +136,20 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(EnterOTP.this));
                     setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
                 }
             }
         };
@@ -212,17 +228,17 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
 
 private  void validateOTP(){
        if (editText_one.getText().equals("")){
-           editText_six.setError("enter the otp correctly");
+           editText_six.setError(getString(R.string.wrongOtp));
        }else if (editText_two.getText().equals("")){
-           editText_six.setError("enter the otp correctly");
+           editText_six.setError(getString(R.string.wrongOtp));
        }else if (editText_three.getText().equals("")){
-           editText_six.setError("enter the otp correctly");
+           editText_six.setError(getString(R.string.wrongOtp));
        }else if (editText_four.getText().equals("")){
-           editText_six.setError("enter the otp correctly");
+           editText_six.setError(getString(R.string.wrongOtp));
        }else if (editText_five.getText().equals("")){
-           editText_six.setError("enter the otp correctly");
+           editText_six.setError(getString(R.string.wrongOtp));
        }else if (editText_six.getText().equals("")){
-        editText_six.setError("enter the otp correctly");
+        editText_six.setError(getString(R.string.wrongOtp));
        }
 
 
@@ -394,6 +410,10 @@ private  void validateOTP(){
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
+        //change the language when prompt
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notificationCountText.getText().toString();
         boolean b1 = String.valueOf("sharedCount")!=viewCount;

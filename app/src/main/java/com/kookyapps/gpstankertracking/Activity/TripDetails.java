@@ -89,7 +89,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pageTitle.setText(Constants.TRIP_DETAILS_PAGE_TITLE);
+        pageTitle.setText(R.string.trip_details);
         trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
         notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
@@ -116,8 +116,6 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
         tripLayout.setOnClickListener(this);
         logout.setOnClickListener(this);
-
-
 
         adapter = new TripDetailsAdapter(this,TripDetails.this,Constants.TRIP_DETAILS);
 

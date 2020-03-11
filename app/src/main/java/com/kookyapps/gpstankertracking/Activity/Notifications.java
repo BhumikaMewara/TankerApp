@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -41,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Notifications extends AppCompatActivity implements View.OnClickListener {
 
@@ -104,7 +106,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         notiCount = (TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
         pagetitle = (TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pagetitle.setText(Constants.NOTIFICATION_PAGE_TITLE);
+        pagetitle.setText(R.string.notifications);
 
         notificationprogress = (ProgressBar)findViewById(R.id.pg_notification);
         notificationprogress.setVisibility(View.VISIBLE);
@@ -160,6 +162,20 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(Notifications.this));
                     setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
                 }
             }
         };
@@ -442,6 +458,9 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
+        //change the language of the the app when prompt
 
 
 

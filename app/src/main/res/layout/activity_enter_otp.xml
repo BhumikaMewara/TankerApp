@@ -52,7 +52,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="Enter Code"
+                            android:text="@string/enter_code"
                             android:textColor="@color/colorblack"
                             android:textSize="16sp" />
                         <TextView
@@ -60,7 +60,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="Please ask the customer to "
+                            android:text="@string/otpscreen_msg"
                             android:textColor="@color/colorblack"
                             android:textSize="12sp"/>
                         <LinearLayout
@@ -181,7 +181,7 @@
                                     android:textColor="@color/colorwhite"
                                     android:textSize="16sp"
                                     android:foregroundGravity="center"
-                                    android:text="Verify"/>
+                                    android:text="@string/verify_txt"/>
                             </LinearLayout>
                         </LinearLayout>
 
@@ -195,7 +195,7 @@
                                 android:id="@+id/tv_enterOtp_resendText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Resend OTP"
+                                android:text="@string/resend_txt"
                                 android:layout_marginRight="10dp"
                                 android:layout_gravity="right"/>
                         </LinearLayout>

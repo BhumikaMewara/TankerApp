@@ -46,7 +46,7 @@
                     <RelativeLayout
                         android:id="@+id/Map1_booking_id_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="70dp"
                         android:layout_marginTop="40dp"
                         android:layout_marginLeft="15dp"
                         android:background="@color/colorwhite">
@@ -77,6 +77,7 @@
                             android:id="@+id/map_underline1"
                             android:background="@color/colordark_grey"
                             android:layout_marginTop="5dp"
+                            android:layout_marginBottom="10dp"
                             android:layout_below="@+id/tv_map_bookingid_text"
                             android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                             android:layout_alignEnd="@+id/iv_bookingdetail_bookingid_call"/>
@@ -136,8 +137,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_drop_title"
-
-                                android:layout_marginTop="10dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
                                 android:text="@string/drop_point"
@@ -250,18 +249,21 @@
                     android:layout_below="@+id/rl_map_data"
                     android:layout_marginTop="3dp"
                     android:background="@color/colorwhite">
+
                     <ImageView
                         android:id="@+id/iv_map_seemore_image"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:padding="3dp"
                         android:layout_centerVertical="true"
+                        android:background="@color/colorwhite"
                         android:layout_toLeftOf="@+id/firstactivity_divider1"
                         android:src="@drawable/see_fewer_map"></ImageView>
                     <View
                         android:layout_width="3dp"
                         android:layout_height="10dp"
                         android:layout_centerHorizontal="true"
+                        android:background="@color/colorwhite"
                         android:id="@+id/firstactivity_divider1"/>
                     <TextView
                         android:id="@+id/tv_map_seemore_text"
@@ -271,7 +273,9 @@
                         android:text="@string/seemore"
                         android:layout_centerVertical="true"
                         android:textColor="@color/greenDark"
-                        android:layout_toRightOf="@+id/firstactivity_divider1"></TextView>
+                        android:layout_toRightOf="@+id/firstactivity_divider1"
+                        android:background="@color/colorwhite"></TextView>
+
                 </RelativeLayout>
             </RelativeLayout>
             <fragment
@@ -299,7 +303,7 @@
                         android:id="@+id/tv_map_bottomLayout_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="End Trip"
+                        android:text="@string/end_trip"
                         android:layout_toLeftOf="@+id/rl_map_bottomLayout_icon"
                         android:textColor="@color/colorwhite"
                         android:textSize="13dp"

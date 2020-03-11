@@ -70,8 +70,9 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     Button rqstbtn , bkngbtn;
     static FragmentManager fragmentManager;
     ViewPagerAdapter adapter;
-    final String [] tabTitle = {"Request List","Booking List"};
+     String [] tabTitle ;
     Bundle b;
+
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
     SwitchCompat switchCompat;
@@ -180,7 +181,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
         };
         pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-
         tripLayout.setOnClickListener(this);
         logoutLayout.setOnClickListener(this);
         rqstbtn.setOnClickListener(this);
@@ -196,13 +196,16 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onPageSelected(int position) {
                 //highLightCurrentTab(position);
-                pagetitle.setText(tabTitle[position]);
+
+                //pagetitle.setText(tabTitle[position]);
                 if(position==0){
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
+                    pagetitle.setText(getString(R.string.request_list));
                 }else{
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
+                    pagetitle.setText(getString(R.string.booking_list));
                 }
             }
             @Override
@@ -382,9 +385,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-        // clear the notification area when the app is opened
+
 
 
 

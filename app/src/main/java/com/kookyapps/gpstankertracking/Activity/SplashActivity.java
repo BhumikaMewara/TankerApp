@@ -22,6 +22,7 @@ public class SplashActivity extends AppCompatActivity {
         if (SessionManagement.checkSignIn(this)) {
 
             if (SessionManagement.isOngoing(this)){
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {

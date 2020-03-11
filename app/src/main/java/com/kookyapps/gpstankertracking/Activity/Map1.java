@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
@@ -35,10 +37,12 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -82,10 +86,12 @@ import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.Utils.Utils;
 import com.kookyapps.gpstankertracking.fcm.Config;
+import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
@@ -117,7 +123,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     BroadcastReceiver mRegistrationBroadcastReceiver;
     DrawerLayout navdrawer;
     ActionBarDrawerToggle actionBarDrawerToggle;
+    SwitchCompat switchCompat;
 
+    static boolean isTouched = true;
 
 
     /*{
@@ -150,13 +158,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
        initSocket();
        initViews();
 
-
-
-
     }
-    public void drawerMenu (View view ){
-        navdrawer.openDrawer(Gravity.LEFT);
-    }
+
 
 
     public void initSocket(){
@@ -215,7 +218,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
     }
 
-
+    public void drawerMenu (View view ){
+        navdrawer.openDrawer(Gravity.LEFT);
+    }
     @Override
     public void onClick(View view) {
         Intent i ;
@@ -245,13 +250,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 if (t) {
 
                     details.setVisibility(View.VISIBLE);
-                    seemoreText.setText("See Less");
+                    seemoreText.setText(getString(R.string.seeless));
                     seemoreImg.setImageResource(R.drawable.see_fewer_map);
                     details.animate().translationY(0);
 
                     t = false;
                 }else{
-                    seemoreText.setText("See More");
+                    seemoreText.setText(getString(R.string.seemore));
                     seemoreImg.setImageResource(R.drawable.see_more_map);
                     details.animate().translationY(-1000);
                     details.setVisibility(View.GONE);
@@ -358,7 +363,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-        title.setText("Map");
+        title.setText(R.string.title_activity_maps);
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
@@ -388,7 +393,31 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
 
-
+switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
+        switchCompat.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                isTouched = true;
+                return false;
+            }
+        });
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (isTouched) {
+                    isTouched = false;
+                    if (isChecked) {
+                        SessionManagement.setLanguage(Map1.this,Constants.HINDI_LANGUAGE);
+                    }
+                    else {
+                        SessionManagement.setLanguage(Map1.this,Constants.ENGLISH_LANGUAGE);
+                    }
+                    showlanguage();
+                }
+            }
+        });
 
 
 
@@ -430,6 +459,21 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(Map1.this));
                     setNotificationCount(count+1,false);
+                }
+                else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
                 }
             }
         };
@@ -476,6 +520,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
+
         // clear the notification area when the app is opened
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notificationCountText.getText().toString();
@@ -700,6 +747,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     }
 
 
-
+    public void showlanguage(){
+            /*SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_LANGUAGE_LANGUAGE_TAG,
+                    Constants.SHARED_LANGUAGE_CHANGED_KEY,"yes");*/
+        if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
+            // app is in foreground, broadcast the push message
+            Intent languageChange = new Intent(Config.LANGUAGE_CHANGE);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(languageChange);
+            Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }
