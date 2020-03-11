@@ -81,8 +81,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-
-
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
@@ -116,7 +114,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         navdrawer.setDrawerElevation(0f);
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
-
         r=(RelativeLayout)findViewById(R.id.rl_first_insideDL);
         l=(LinearLayout)findViewById(R.id.lv_first_drawer_firstLayout);
         tripLayout=(LinearLayout) findViewById(R.id. lh_first_triplayout);
@@ -137,38 +134,19 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
                 if (isTouched) {
-
                     isTouched = false;
-                    showlanguage("hi");
-
-
                     if (isChecked) {
-
-                        Locale locale = new Locale("hi");
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                        //Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();
                         SessionManagement.setLanguage(FirstActivity.this,Constants.HINDI_LANGUAGE);
-
                     }
                     else {
-                        Locale locale = new Locale("en");
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                         SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
                     }
-
+                    showlanguage();
                 }
             }
         });
-
         fullname.setText(SessionManagement.getName(FirstActivity.this));
         username.setText(SessionManagement.getUserId(FirstActivity.this));
-
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
             clearNotificationCount();
@@ -184,6 +162,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(FirstActivity.this));
                     setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
                 }
             }
         };
@@ -198,25 +190,16 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         setupViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
             @Override
             public void onPageSelected(int position) {
                 //highLightCurrentTab(position);
-
                 pagetitle.setText(tabTitle[position]);
                 if(position==0){
-
-
-
-
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
-
                 }else{
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
@@ -238,8 +221,17 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-
+        if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
+            switchCompat.setChecked(true);
+        }else{
+            switchCompat.setChecked(false);
+        }
     }
+
+
+
+
+
     private void setCurrentTab(){
         b= getIntent().getExtras();
         if(b != null){
@@ -390,6 +382,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
         // clear the notification area when the app is opened
 
 
@@ -488,21 +482,16 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public void showlanguage(String locale){
-
-
-
-            SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_LANGUAGE_LANGUAGE_TAG,
-                    Constants.SHARED_LANGUAGE_CHANGED_KEY,"yes");
+    public void showlanguage(){
+            /*SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_LANGUAGE_LANGUAGE_TAG,
+                    Constants.SHARED_LANGUAGE_CHANGED_KEY,"yes");*/
             if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
                 // app is in foreground, broadcast the push message
                 Intent languageChange = new Intent(Config.LANGUAGE_CHANGE);
-                languageChange.putExtra("message", locale);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(languageChange);
-                Toast.makeText(this, "language hasbeen changed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
             }
-
-
-
     }
+
+
 }

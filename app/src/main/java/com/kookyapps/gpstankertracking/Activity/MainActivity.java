@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     userdetail.getString("token"),
                                     userdetail.getJSONObject("settings").getString("language"),
                                     userdetail.getString("location"),"9");
-
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);
                             startActivity(i);
                             finish();
