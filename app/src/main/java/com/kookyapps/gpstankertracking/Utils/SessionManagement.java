@@ -105,6 +105,9 @@ public class SessionManagement {
     public static String getLanguage(Context con){
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE);
     }
+    public static void   setLanguage(Context con, String lang){
+         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE,lang);
+    }
     public static String getPhoneNo(Context con){
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,PHONE_NO);
     }

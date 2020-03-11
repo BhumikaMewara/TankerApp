@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -43,6 +45,7 @@ import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
+import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 import com.kookyapps.gpstankertracking.fragment.BookingList;
 import com.kookyapps.gpstankertracking.fragment.RequestList;
 
@@ -134,15 +137,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
                 if (isTouched) {
+
                     isTouched = false;
+                    showlanguage("hi");
+
+
                     if (isChecked) {
+
                         Locale locale = new Locale("hi");
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                         //Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();
-                        SessionManagement.getLanguage(FirstActivity.this);
+                        SessionManagement.setLanguage(FirstActivity.this,Constants.HINDI_LANGUAGE);
 
                     }
                     else {
@@ -151,8 +159,9 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                        SessionManagement.getLanguage(FirstActivity.this);
+                        SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
                     }
+
                 }
             }
         });
@@ -477,5 +486,23 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             // Show the Alert Dialog box
             alertDialog.show();
         }
+    }
+
+    public void showlanguage(String locale){
+
+
+
+            SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_LANGUAGE_LANGUAGE_TAG,
+                    Constants.SHARED_LANGUAGE_CHANGED_KEY,"yes");
+            if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
+                // app is in foreground, broadcast the push message
+                Intent languageChange = new Intent(Config.LANGUAGE_CHANGE);
+                languageChange.putExtra("message", locale);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(languageChange);
+                Toast.makeText(this, "language hasbeen changed", Toast.LENGTH_SHORT).show();
+            }
+
+
+
     }
 }
