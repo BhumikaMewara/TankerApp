@@ -170,12 +170,16 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        finish();
+                        startActivity(getIntent());
                     }else{
                         Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        finish();
+                        startActivity(getIntent());
                     }
                 }
             }
@@ -253,6 +257,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         } else {
             rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
             bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
+            pagetitle.setText(getString(R.string.request_list));
         }
     }
 
@@ -273,6 +278,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         Intent i ;
         switch (view.getId()){
             case R.id.lh_first_triplayout:
+                onBackPressed();
                 i = new Intent(this, TripDetails.class);
                 startActivity(i);
                 break;

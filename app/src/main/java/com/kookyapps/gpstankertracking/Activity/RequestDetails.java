@@ -118,7 +118,7 @@ Button change;
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         calltous = (ImageView) findViewById(R.id.iv_bookingdetail_bookingid_call);
         calltous.setOnClickListener(this);
-        menuback = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
+        menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
         menunotification = (ImageView) findViewById(R.id.iv_tb_with_bck_arrow_notification);
         menunotification.setOnClickListener(this);
@@ -168,7 +168,7 @@ Button change;
         public void onClick(View view) {
         Intent intent;
         switch (view.getId()){
-              case R.id.rl_toolbar_with_back_backLayout:
+              case R.id.rl_toolbarmenu_backimglayout:
                     onBackPressed();
                     break;
 
@@ -524,4 +524,10 @@ Button change;
         finish();
         startActivity(refresh);*/
     }
+
+
+   @Override
+   public void onBackPressed() {
+       super.onBackPressed();
+   }
 }

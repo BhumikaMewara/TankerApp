@@ -4,14 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
@@ -32,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class TripComplete extends AppCompatActivity implements View.OnClickListener {
 
@@ -57,12 +61,32 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
            // bkngid = getIntent().getExtras().getString("booking_id");
             blmod= (BookingListModal) getIntent().getExtras().get("Bookingdata");
             pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
-            back = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_backLayout);
+            back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
             noti=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
             notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
             notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
-            bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notificationCountText.setText(String.valueOf(noticount));
+            notificationCountLayout.setVisibility(View.VISIBLE);
+        }
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripComplete.this));
+                    setNotificationCount(count+1,false);
+                }
+            }
+        };
+
+
+        bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
             distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
             pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
             drop = (TextView) findViewById(R.id.tv_tripcomplete_drop);
@@ -73,7 +97,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             back.setOnClickListener(this);
             noti.setOnClickListener(this);
             bottom.setOnClickListener(this);
-            pagetitle.setText(R.string.trip_complete);
+            pagetitle.setText(getString(R.string.trip_complete));
 
 
     }
@@ -81,7 +105,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Intent i;
         switch (view.getId()){
-            case R.id.rl_toolbar_with_back_backLayout:
+            case R.id.rl_toolbarmenu_backimglayout:
                 back.setClickable(false);
                 i=new Intent(TripComplete.this,FirstActivity.class);
                 startActivity(i);
@@ -98,84 +122,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
-
-
-
-  /*  private void bookingByIdApiCalling() {
-        JSONObject jsonBodyObj = new JSONObject();
-        try {
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.BOOKING_BY_ID +bkngid ;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(TripComplete.this, bookingdetailsApiListner, url, headparam, jsonBodyObj);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    FetchDataListener bookingdetailsApiListner = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject mydata) {
-            try {
-                if (mydata != null) {
-                    if (mydata.getInt("error") == 0) {
-                        JSONObject data = mydata.getJSONObject("data");
-                        if (data!=null){
-                            data.getString("_id");
-                            data.getString("message");
-                            data.getString("phone_country_code");
-                            data.getString("phone");
-                            data.getString("controller_name");
-
-
-                            JSONObject distance=    data.getJSONObject("distance");
-                            {
-                                if (distance!=null){
-                                    distance.getString("value");
-                                    distance.getString("text");
-                                }
-                                else {
-                                    RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);
-                                }
-                            }
-
-                        }else {
-                            RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);
-                        }
-
-                        finish();
-                    }else {
-                        RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);
-                    }
-                }
-            } catch (JSONException e) {
-                RequestQueueService.showAlert("Error! No Data Found",TripComplete.this);
-                e.printStackTrace();
-            }
-
-        }
-
-        @Override
-        public void onFetchFailure(String msg) {
-            RequestQueueService.showAlert(msg,TripComplete.this);
-        }
-
-        @Override
-        public void onFetchStart() {
-
-        }
-
-    };
-*/
-
-
 
     private void bookingByIdApiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
@@ -292,21 +238,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                                     RequestQueueService.showAlert("Error! No Data in pick_point Found", TripComplete.this);
                                 }
                             }
-
-
-                           /* if (init_type.equals(Constants.REQUEST_DETAILS)) {
-                                pagetitle.setText("Request Details");
-                                bottomtext.setText("ACCEPT");
-
-                            } else if (init_type.equals(Constants.BOOKING_START)) {
-                                if (can_start.equals("true")){
-                                    pagetitle.setText("Booking Details");
-                                    bottomtext.setText("START");
-                                }else {
-                                    pagetitle.setText("Booking Details");
-                                    bottomtext.setText("View Map");
-                                }
-                            }*/
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", TripComplete.this);
                         }
@@ -334,11 +265,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         public void onFetchStart() {
 
         }
-
     };
-
-
-
 
 
     public void setNotificationCount(int count,boolean isStarted){

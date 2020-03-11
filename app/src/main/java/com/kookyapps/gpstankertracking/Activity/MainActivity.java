@@ -78,8 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             jsonBodyObj.put("username",username);
             jsonBodyObj.put("password",password);
             jsonBodyObj.put("device_type", "a");
-            String token = FirebaseInstanceId.getInstance().getToken();
-            Log.i("token",token);
+            String token= FirebaseInstanceId.getInstance().getToken();
+      //      String token = FirebaseInstanceId.getInstance().getToken();
+
             jsonBodyObj.put("device_token", token);
             POSTAPIRequest postapiRequest=new POSTAPIRequest();
             String url = URLs.BASE_URL+ URLs.SIGN_IN_URL;

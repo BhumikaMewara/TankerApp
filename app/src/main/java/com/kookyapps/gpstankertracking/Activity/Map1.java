@@ -467,12 +467,16 @@ switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        finish();
+                        startActivity(getIntent());
                     }else{
                         Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        finish();
+                        startActivity(getIntent());
                     }
                 }
             }

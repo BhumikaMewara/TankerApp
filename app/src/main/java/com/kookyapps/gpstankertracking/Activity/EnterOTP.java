@@ -260,8 +260,7 @@ private  void validateOTP(){
             e.printStackTrace();
         }*/
 
-        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST,url
-                ,
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST,url,
                 new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
@@ -278,6 +277,7 @@ private  void validateOTP(){
                                     startActivity(intent);
                                     finish();
                                 }else{
+
                                     RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
                                     verifyLayout.setClickable(true);
                                     //   requestLayout.setBackgroundResource(R.drawable.straight_corners);

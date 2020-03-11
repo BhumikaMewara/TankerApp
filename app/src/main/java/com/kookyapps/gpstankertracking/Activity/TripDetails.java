@@ -3,12 +3,16 @@ package com.kookyapps.gpstankertracking.Activity;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,7 +39,9 @@ import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.PaginationScrollListener;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
+import com.kookyapps.gpstankertracking.fcm.Config;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,18 +49,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TripDetails extends AppCompatActivity implements View.OnClickListener {
 
     DrawerLayout navdrawer;
     ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
-    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username;
+    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username,notificationCountText;
     RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
     Context context;
-    RelativeLayout notification ,back;
+    RelativeLayout notification ,back,notificationCountLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     LinearLayout l,logout,tripLayout;
     ArrayList<TripDetailsModal>tripDetailList;
@@ -69,6 +76,9 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     private boolean isLastPage = false;
     private boolean isLoading = false;
     boolean isListNull = true;
+    String init_type;
+    static String notificationCount;
+    BroadcastReceiver mRegistrationBroadcastReceiver;
 
 
     @Override
@@ -88,34 +98,52 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         totalKm=(TextView)findViewById(R.id.tv_trip_details_totalKM_value);
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
-        pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pageTitle.setText(R.string.trip_details);
-        trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
-        notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
         back.setOnClickListener(this);
+        pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
+        pageTitle.setText(getString(R.string.trip_details));
+        notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
         notification.setOnClickListener(this);
-        fullname=(TextView)findViewById(R.id.tv_tripdetails_drawer_fullName);
-        username=(TextView)findViewById(R.id.tv_tripdetails_drawer_username);
+        trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
+        notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
+        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
 
-        fullname.setText(SessionManagement.getName(TripDetails.this));
-        username.setText(SessionManagement.getUserId(TripDetails.this));
 
-        trip=(TextView)findViewById(R.id.tv_tripdetails_tripText);
-        language=(TextView)findViewById(R.id.tv_tripdetails_language);
+        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        if(noticount<=0){
+            clearNotificationCount();
+        }else{
+            notificationCountText.setText(String.valueOf(noticount));
+            notificationCountLayout.setVisibility(View.VISIBLE);
+        }
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripDetails.this));
+                    setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(TripDetails.this).equals(Constants.HINDI_LANGUAGE)){
+                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }else{
+                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                        Locale.setDefault(locale);
+                        Configuration config = new Configuration();
+                        config.locale = locale;
+                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                    }
+                }
+            }
+        };
 
-        logutText=(TextView)findViewById(R.id.tv_tripdetails_logout);
-        logout=(LinearLayout)findViewById(R.id.lh_tripdetails_logoutLayout);
 
-        navdrawer=            (DrawerLayout)   findViewById(R.id.dl_trip_details) ;
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this,navdrawer,R.string.drawer_open,R.string.drawer_close);
-
-        l=                       (LinearLayout)   findViewById(R.id.lv_tripdetails_drawer_firstLayout);
-        tripLayout =             (LinearLayout) findViewById(R.id. lh_tripdetails_triplayout);
-
-        tripLayout.setOnClickListener(this);
-        logout.setOnClickListener(this);
 
         adapter = new TripDetailsAdapter(this,TripDetails.this,Constants.TRIP_DETAILS);
 
@@ -154,13 +182,11 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             }
         });
        tripDetailsListApiCalling();
+
+
+
+
     }
-
-    public void drawerMenu (View view ){
-        navdrawer.openDrawer(Gravity.LEFT);
-    }
-
-
 
     @Override
     public void onClick(View view) {
@@ -174,63 +200,8 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             case R.id.rl_toolbarmenu_backimglayout:
               onBackPressed();
                 break;
-            case R.id.lh_tripdetails_logoutLayout:
-                logutApiCalling();
-                break;
-
-
         }
     }
-
-    public void logutApiCalling() {
-        JSONObject jsonBodyObj = new JSONObject();
-        try {
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.SIGN_OUT_URL;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(TripDetails.this,logoutListner,url,headparam,jsonBodyObj);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    FetchDataListener logoutListner = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject data) {
-            try {
-                if (data!=null){
-                    if (data.getInt("error") == 0) {
-                        FirebaseAuth.getInstance().signOut();
-                        SessionManagement.logout(logoutListner, TripDetails.this);
-                        Intent i = new Intent(TripDetails.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(i);
-                        Toast.makeText(TripDetails.this, "You are now logout", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }
-            } catch (JSONException e){
-                e.printStackTrace();
-            }
-
-        }
-
-
-        @Override
-        public void onFetchFailure(String msg) {
-            logout.setClickable(true);
-        }
-
-        @Override
-        public void onFetchStart() {
-
-        }
-    };
 
 
     public void tripDetailsListApiCalling(){
@@ -257,6 +228,7 @@ FetchDataListener tripListener= new FetchDataListener() {
         try {
             if (data != null) {
                 if (data.getInt("error")==0) {
+
                     TripDetailsModal tdmod = new TripDetailsModal();
                     tdmod.setTotaltrip(data.getString("total"));
                     total_trip.setText(tdmod.getTotaltrip());
@@ -381,14 +353,33 @@ FetchDataListener tripListener= new FetchDataListener() {
         public void onFetchComplete(JSONObject data) {
             try {
                 if (data != null) {
-
                     if (data.getInt("error")==0) {
+
+                        TripDetailsModal tdmod = new TripDetailsModal();
+                        tdmod.setTotaltrip(data.getString("total"));
+                        total_trip.setText(tdmod.getTotaltrip());
+                        tdmod.setTotal_distance(data.getString("total_distance"));
+                        totalKm.setText(tdmod.getTotal_distance());
+
+
+                        ArrayList<TripDetailsModal> tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");
-                        List<TripDetailsModal> modalList = new ArrayList<TripDetailsModal>();
+                        totaltxnCount = data.getInt("total");
+                        if (totaltxnCount > page_size) {
+                            if (totaltxnCount % page_size == 0) {
+                                TOTAL_PAGES = totaltxnCount / page_size;
+                            } else {
+                                TOTAL_PAGES = (totaltxnCount / page_size) + 1;
+                            }
+                        }
+
+
+
                         if(array!=null) {
+                            isListNull = false;
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
-                                TripDetailsModal tdmod = new TripDetailsModal();
+
                                 tdmod.setBookingid(jsonObject.getString("_id"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
@@ -408,12 +399,14 @@ FetchDataListener tripListener= new FetchDataListener() {
                                     }else {
                                         RequestQueueService.showAlert("Error! no value in drop geometry", TripDetails.this);
                                     }
-                                    Log.i("dropPoint", "");
+
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                    RequestQueueService.showAlert("Error! no for for drop_point found", TripDetails.this);
                                 }
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
+
+
                                     tdmod.setFromlocation(pickup.getString("location"));
                                     tdmod.setFrom_address(pickup.getString("address"));
                                     JSONObject geometry=pickup.getJSONObject("geometry");
@@ -429,24 +422,25 @@ FetchDataListener tripListener= new FetchDataListener() {
                                     }else {
                                         RequestQueueService.showAlert("no value in geometry",TripDetails.this);
                                     }
-
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                    RequestQueueService.showAlert("Error! no value found in pickup", TripDetails.this);
                                 }
                                 JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
-                                    RequestQueueService.showAlert("Error! no data found", TripDetails.this);
+                                    RequestQueueService.showAlert("Error! no data in distance  found", TripDetails.this);
                                 }
-
-                                modalList.add(tdmod);
+                                tripList.add(tdmod);
                             }
                         }
+
+
+
                         Log.d("RequestList:", data.toString());
                         adapter.removeLoadingFooter();
                         isLoading = false;
-                        adapter.addAll(modalList);
+                        adapter.addAll(tripList);
                         if (currentPage < TOTAL_PAGES) adapter.addLoadingFooter();
                         else isLastPage = true;
                     }
@@ -482,17 +476,72 @@ FetchDataListener tripListener= new FetchDataListener() {
             trip_details_listView.setVisibility(View.VISIBLE);
         }
     }
-
-
     @Override
     public void onBackPressed() {
-       Intent i=new Intent(this,FirstActivity.class);
-               i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TASK );
-               startActivity(i);
+       super.onBackPressed();
 
     }
 
+    public void setNotificationCount(int count,boolean isStarted){
+        notificationCount = SessionManagement.getNotificationCount(TripDetails.this);
+        if(Integer.parseInt(notificationCount)!=count) {
+            notificationCount = String.valueOf(count);
+            if (count <= 0) {
+                clearNotificationCount();
+            } else if (count < 100) {
+                notificationCountText.setText(String.valueOf(count));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+            SharedPrefUtil.setPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
+            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if(b2)
+                SharedPrefUtil.setPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
+        }
+    }
+    public void newNotification(){
+        Log.i("newNotification","Notification");
+        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        setNotificationCount(count+1,false);
+    }
+    public void clearNotificationCount(){
+        notificationCountText.setText("");
+        notificationCountLayout.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
+        //change the language when prompt
+        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
+        String viewCount =notificationCountText.getText().toString();
+        boolean b1 = String.valueOf("sharedCount")!=viewCount;
 
-
+        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if(b2){
+            newNotification();
+        }else if (b1){
+            if (sharedCount < 100 && sharedCount>0) {
+                notificationCountText.setText(String.valueOf(sharedCount));
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            } else {
+                notificationCountText.setText("99+");
+                notificationCountLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 }
