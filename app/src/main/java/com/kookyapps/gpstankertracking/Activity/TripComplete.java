@@ -48,6 +48,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     static String notificationCount;
     Bundle b;
     BroadcastReceiver mRegistrationBroadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

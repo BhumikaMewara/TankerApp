@@ -6,6 +6,6 @@
         <item android:drawable="@drawable/bell"
             android:left="30dp"
             android:right="30dp"
-            android:top="5dp"
-            android:bottom="10dp"/>
+            android:top="25dp"
+            android:bottom="25dp"/>
     </layer-list>

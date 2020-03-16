@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="20dp"
+    android:paddingBottom="60dp">
 
 
     <RelativeLayout
@@ -11,7 +13,8 @@
         android:layout_height="40dp"
         android:id="@+id/rl_bottomLayout_text"
         android:background="@color/greenLight"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
         <TextView
             android:id="@+id/tv_bottomlayout"
             android:layout_width="match_parent"
@@ -20,7 +23,8 @@
             android:layout_toLeftOf="@+id/rl_bottomLayout_icon"
             android:textColor="@color/colorwhite"
             android:textSize="13dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            />
         <RelativeLayout
             android:layout_width="40dp"
             android:layout_height="40dp"

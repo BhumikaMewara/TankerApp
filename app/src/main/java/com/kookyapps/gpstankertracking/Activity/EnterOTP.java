@@ -72,9 +72,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         setContentView(R.layout.activity_enter_otp);
         Intent i = getIntent();
         Bundle b = i.getExtras();
-        imageencoded = b.getString("Bitmap");
+imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
+    //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
-        leftbit = Utils.decodeBase64(imageencoded);
+       leftbit = Utils.decodeBase64(imageencoded);
 
         initView();
 

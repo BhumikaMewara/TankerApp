@@ -5,6 +5,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -18,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -54,6 +57,15 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.CALL_PHONE;
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.GET_ACCOUNTS;
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.SEND_SMS;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static androidx.viewpager.widget.PagerAdapter.POSITION_NONE;
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
@@ -71,8 +83,9 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     static FragmentManager fragmentManager;
     ViewPagerAdapter adapter;
      String [] tabTitle ;
+    Locale locale;
     Bundle b;
-
+    public static final int RequestPermissionCode = 7;
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
     SwitchCompat switchCompat;
@@ -82,6 +95,28 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+        toGetAllPermissions();
+        switchCompat=(SwitchCompat)findViewById(R.id.switch2);
+
+        if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
+            switchCompat.setChecked(true);
+            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+
+
+        }else{
+            switchCompat.setChecked(false);
+            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        }
+
+
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
@@ -121,31 +156,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         logoutLayout=(LinearLayout)findViewById(R.id.lh_first_logoutLayout);
         rqstbtn= (Button)findViewById(R.id.btn_first_rqstbtn);
         bkngbtn= (Button)findViewById(R.id.btn_first_bookingbtn);
-        switchCompat=(SwitchCompat)findViewById(R.id.switch2);
-        switchCompat.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                isTouched = true;
-                return false;
-            }
-        });
-        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isTouched) {
-                    isTouched = false;
-                    if (isChecked) {
-                        SessionManagement.setLanguage(FirstActivity.this,Constants.HINDI_LANGUAGE);
-                    }
-                    else {
-                        SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
-                    }
-                    showlanguage();
-                }
-            }
-        });
+
+
         fullname.setText(SessionManagement.getName(FirstActivity.this));
         username.setText(SessionManagement.getUserId(FirstActivity.this));
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -155,6 +167,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             notificationCountText.setText(String.valueOf(noticount));
             toolbarNotiCountLayout.setVisibility(View.VISIBLE);
         }
+
+
+
+
+
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -165,19 +182,21 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     setNotificationCount(count+1,false);
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
-                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+                        locale = new Locale(Constants.HINDI_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        languageChangeApi();
                         finish();
                         startActivity(getIntent());
                     }else{
-                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                         locale = new Locale(Constants.ENGLISH_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        languageChangeApi();
                         finish();
                         startActivity(getIntent());
                     }
@@ -228,12 +247,132 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-        if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
-            switchCompat.setChecked(true);
-        }else{
-            switchCompat.setChecked(false);
+        switchCompat.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                isTouched = true;
+                return false;
+            }
+        });
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (isTouched) {
+                    isTouched = false;
+                    if (isChecked) {
+                        SessionManagement.setLanguage(FirstActivity.this,Constants.HINDI_LANGUAGE);
+
+                    }
+                    else {
+                        SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
+
+                    }
+                    showlanguage();
+                }
+            }
+        });
+    }
+
+
+
+    public void toGetAllPermissions(){
+        // Adding if condition inside button.
+
+        // If All permission is enabled successfully then this block will execute.
+        if(CheckingPermissionIsEnabledOrNot())
+        {
+            Toast.makeText(FirstActivity.this, "All Permissions Granted Successfully", Toast.LENGTH_LONG).show();
+        }
+
+        // If, If permission is not enabled then else condition will execute.
+        else {
+
+            //Calling method to enable permission.
+            RequestMultiplePermission();
+
         }
     }
+
+    private void RequestMultiplePermission() {
+
+        // Creating String Array with Permissions.
+        ActivityCompat.requestPermissions(FirstActivity.this, new String[]
+                {
+                        CAMERA,
+                        ACCESS_FINE_LOCATION,
+                        INTERNET,
+                        CALL_PHONE,
+                        READ_EXTERNAL_STORAGE,
+                        WRITE_EXTERNAL_STORAGE
+                }, RequestPermissionCode);
+
+    }
+    // Calling override method.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case RequestPermissionCode:
+
+                if (grantResults.length > 0) {
+
+                    boolean CameraPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean AccessFineLoaction = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean InternetPermission = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+                    boolean CallPhonePermisission = grantResults[3] == PackageManager.PERMISSION_GRANTED;
+                    boolean ReadExternalStoragePermission = grantResults[4] == PackageManager.PERMISSION_GRANTED;
+                    boolean WriteExternalStoragePermission = grantResults[5] == PackageManager.PERMISSION_GRANTED;
+
+                    if (CameraPermission && AccessFineLoaction && InternetPermission && CallPhonePermisission  && ReadExternalStoragePermission  && WriteExternalStoragePermission) {
+
+                        Toast.makeText(FirstActivity.this, "Permission Granted", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        Toast.makeText(FirstActivity.this,"Permission Denied",Toast.LENGTH_LONG).show();
+
+                    }
+                }
+
+                break;
+        }
+    }
+
+    public boolean CheckingPermissionIsEnabledOrNot() {
+
+        int FirstPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), CAMERA);
+        int SecondPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
+        int ThirdPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), INTERNET);
+        int ForthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE);
+        int FivthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
+        int SixthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+
+        return FirstPermissionResult == PackageManager.PERMISSION_GRANTED &&
+                SecondPermissionResult == PackageManager.PERMISSION_GRANTED &&
+                ThirdPermissionResult == PackageManager.PERMISSION_GRANTED &&
+                ForthPermissionResult == PackageManager.PERMISSION_GRANTED &&
+                FivthPermissionResult == PackageManager.PERMISSION_GRANTED &&
+                SixthPermissionResult == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -339,8 +478,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
            }
 
         }
-
-
         @Override
         public void onFetchFailure(String msg) {
             logoutLayout.setClickable(true);
@@ -351,6 +488,60 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
         }
     };
+
+
+    public void languageChangeApi() {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            jsonBodyObj.put("lang",locale);
+            POSTAPIRequest postapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.LANGUAGE_CHANGED;
+
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(postapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:",token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(FirstActivity.this,languageChangeListner,url,headparam,jsonBodyObj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+    FetchDataListener languageChangeListner = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                     String message=   data.getString("message");
+
+                       // SessionManagement.logout(logoutListner, FirstActivity.this);
+
+
+                        Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+
+            }
+
+        }
+        @Override
+        public void onFetchFailure(String msg) {
+            logoutLayout.setClickable(true);
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
+
+
 
 
     public void setNotificationCount(int count,boolean isStarted){
@@ -500,7 +691,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 // app is in foreground, broadcast the push message
                 Intent languageChange = new Intent(Config.LANGUAGE_CHANGE);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(languageChange);
-                Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
             }
     }
 

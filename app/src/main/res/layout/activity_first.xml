@@ -27,8 +27,10 @@
             <RelativeLayout
                 android:id="@+id/rl_first_booking_requestList"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="50dp"
                 android:layout_below="@+id/water_tanker_toolbar"
+                android:background="@drawable/gradient_background_main"
+
                 >
 
                 <Button
@@ -40,12 +42,14 @@
                     android:textColor="@color/colorwhite"
                     android:layout_toLeftOf="@+id/firstactivity_divider1"
                     android:background="@drawable/bg_requestlist"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:layout_marginTop="10dp"/>
                 <View
                     android:layout_width="3dp"
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:id="@+id/firstactivity_divider1"/>
+                    android:id="@+id/firstactivity_divider1"
+                    android:layout_marginTop="10dp"/>
                 <Button
                     android:id="@+id/btn_first_bookingbtn"
                     android:layout_width="wrap_content"
@@ -55,7 +59,8 @@
                     android:text="bookingList"
                     android:layout_toRightOf="@+id/firstactivity_divider1"
                     android:textColor="@color/colorwhite"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:layout_marginTop="10dp"/>
             </RelativeLayout>
 
            <androidx.viewpager.widget.ViewPager
@@ -63,8 +68,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/tabs"
-                android:layout_below="@+id/rl_first_booking_requestList"
-                android:layout_marginBottom="60dp" />
+
+               android:layout_below="@+id/rl_first_booking_requestList"
+                 />
         </RelativeLayout>
 
 
@@ -226,9 +232,9 @@
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="10dp"
                     android:id="@+id/switch2"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="60dp"
                     android:thumb="@drawable/thumb2"
                     app:track="@drawable/track"
 

@@ -40,6 +40,7 @@
             android:background="@color/colorblack"
             android:weightSum="3">
             <RelativeLayout
+                android:id="@+id/image_with_infoLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -48,45 +49,42 @@
                 android:id="@+id/iv_tankr_strt_image_clicked"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:visibility="visible"/>
+                android:layout_centerInParent="true"
+                android:visibility="visible"/>
 
 
-            <RelativeLayout
-                android:id="@+id/rl_tankr_strt_latLon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="20dp">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginRight="10dp"
-                    android:visibility="gone">
-                    <TextView
-                        android:id="@+id/tv_tankr_strt_lat"
+
+
+                    <RelativeLayout
+                        android:id="@+id/rl_tankr_strt_latLon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:layout_alignParentBottom="true"
-
-                        android:text="paritosj"
-                        android:textColor="@color/colorblack"
-                        android:textSize="14sp"
-                        />
-                    <TextView
-                        android:id="@+id/tv_tankr_strt_lon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:textColor="@color/colorblack"
-                        android:text="sadad"/>
-
-                </LinearLayout>
-            </RelativeLayout>
+                        android:layout_marginBottom="20dp"
+                        android:background="@color/colorblack">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginRight="10dp"
+                            android:visibility="visible">
+                            <TextView
+                                android:id="@+id/tv_tankr_strt_lat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="paritosh"
+                                android:textColor="@color/colorwhite"
+                                android:textSize="14sp"
+                                />
+                            <TextView
+                                android:id="@+id/tv_tankr_strt_lon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/colorwhite"
+                                android:text="sadad"/>
+                        </LinearLayout>
+                    </RelativeLayout>
 
 
 
@@ -96,12 +94,13 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginBottom="20dp"
+                    android:background="@color/colorblack">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:visibility="gone">
+                        android:visibility="visible">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -110,7 +109,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
-
+                        android:background="@android:color/transparent"
                         android:gravity="center">
 
                         <ImageView
@@ -118,15 +117,8 @@
                             android:layout_width="10dp"
                             android:layout_height="10dp"
                             android:layout_weight="1"
-                            android:src="@mipmap/ic_launcher"></ImageView>
-                            <TextView
-                                android:id="@+id/tv_tankr_strt_day"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Firday ,"
-                                android:layout_marginLeft="5dp"
-                                android:layout_weight="1"
-                                android:textColor="@color/colorblack"></TextView>
+                            android:src="@drawable/date_camera"></ImageView>
+
                         <TextView
                             android:id="@+id/tv_tankr_strt_date"
                             android:layout_width="wrap_content"
@@ -134,8 +126,7 @@
                             android:text="24January 2020"
                             android:layout_marginLeft="2dp"
                             android:layout_weight="1"
-
-                            android:textColor="@color/colorblack"></TextView>
+                            android:textColor="@color/colorwhite"></TextView>
                     </LinearLayout>
 
                         <LinearLayout
@@ -146,12 +137,13 @@
                             android:layout_marginLeft="10dp"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentBottom="true"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:background="@android:color/transparent">
                             <ImageView
                                 android:id="@+id/iv_tankr_strt_clock"
                                 android:layout_width="10dp"
                                 android:layout_height="10dp"
-                                android:src="@mipmap/ic_launcher"
+                                android:src="@drawable/time_camera"
                                 android:layout_weight="1"></ImageView>
                             <TextView
                                 android:id="@+id/tv_tankr_strt_time_value"
@@ -160,7 +152,7 @@
                                 android:text="4:00"
                                 android:layout_marginLeft="5dp"
                                 android:layout_weight="1"
-                                android:textColor="@color/colorblack"></TextView>
+                                android:textColor="@color/colorwhite"></TextView>
                             <TextView
                                 android:id="@+id/tv_tankr_strt_time_ampm"
                                 android:layout_width="wrap_content"
@@ -168,7 +160,7 @@
                                 android:text="PM"
                                 android:layout_marginLeft="2dp"
                                 android:layout_weight="1"
-                                android:textColor="@color/colorblack"></TextView>
+                                android:textColor="@color/colorwhite"></TextView>
                         </LinearLayout>
                     </LinearLayout>
                 </RelativeLayout>

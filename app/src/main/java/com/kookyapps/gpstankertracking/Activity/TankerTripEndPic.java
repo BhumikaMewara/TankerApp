@@ -31,7 +31,7 @@ public class TankerTripEndPic extends AppCompatActivity {
         txt_retake=         (TextView) findViewById(R.id.tv_tankr_strt_retakeTxt);
         calender=           (ImageView)findViewById(R.id.iv_tankr_strt_calender);
         clock=              (ImageView)findViewById(R.id.iv_tankr_strt_clock);
-        day=                (TextView) findViewById(R.id.tv_tankr_strt_day);
+
         date=               (TextView) findViewById(R.id.tv_tankr_strt_date);
         time=               (TextView) findViewById(R.id.tv_tankr_strt_time_value);
         apmm=               (TextView) findViewById(R.id.tv_tankr_strt_time_ampm);

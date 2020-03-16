@@ -38,6 +38,12 @@
     <string name="accept">ACCEPT</string>
     <string name="view_map">View Map</string>
     <string name="start">START</string>
+    <string name="request_accepted">Request Accepted</string>
+    <string name="booking_started">Booking Started</string>
+    
+
+
+    <!--firstactivity-->
 
 
     <string name="wrongOtp">enter the otp correctly</string>

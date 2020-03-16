@@ -47,5 +47,6 @@
 
     <string name="wrongOtp">ओटीपी सही से दर्ज करें</string>
 
-
+    <string name="request_accepted">अनुरोध अस्वीकार कर दिया गया है</string>
+    <string name="booking_started">Booking Started</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.util.Log;
@@ -45,6 +46,7 @@ public class RequestList extends Fragment {
     RelativeLayout progressBar;
     TextView noRequest;
     Context context;
+    SwipeRefreshLayout refreshLayout;
     ArrayList<BookingListModal> requestlist;
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
@@ -69,6 +71,18 @@ public class RequestList extends Fragment {
         View root =inflater.inflate(R.layout.fragment_request_list, container, false);
         recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_reqstlist);
         progressBar = (RelativeLayout) root.findViewById(R.id.fg_request_progresbar);
+        refreshLayout=(SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(false);
+
+
+               requestlistApiCalling();
+
+            }
+        });
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.greenLight));
         noRequest=(TextView)root.findViewById(R.id.tv_requestlist_nodata);
         mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_DETAILS);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -359,4 +373,6 @@ public class RequestList extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
+
+
 }

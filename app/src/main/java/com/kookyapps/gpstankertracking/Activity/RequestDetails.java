@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -17,10 +18,18 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcel;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -60,28 +69,37 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.CALL_PERMISSION_REQUEST_CODE;
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
 public class RequestDetails extends AppCompatActivity implements View.OnClickListener {
 
-    TextView bookingid,distancetext,pickup,drop,controllername,contact_no,message,pagetitle,bottomtext;
+    TextView bookingid, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
     ImageView calltous;
     ImageView menunotification;
-    RelativeLayout menuback,bottom,notificationLayout,toolbarNotiCountLayout;
-    String init_type,bkngid ;
+    RelativeLayout menuback, bottom, notificationLayout, toolbarNotiCountLayout;
+    String init_type, bkngid;
     static String notificationCount;
     BookingListModal blmod;
     ArrayList<String> imagearray;
-    String imageencoded,can_accept,can_end,can_start;
-    boolean cameraAccepted;
+    String imageencoded, can_accept, can_end, can_start,currentPhotoPath;
+    boolean cameraAccepted, callaccepted;
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
-Button change;
+    Button change;
+    private static final int MAKE_CALL_PERMISSION_REQUEST_CODE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 2;
+
+    static final int REQUEST_TAKE_PHOTO = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +116,7 @@ Button change;
         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
         tv.setText(R.string.greet);*/
     }
+
     public void initViews() {
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
@@ -112,12 +131,48 @@ Button change;
         message = (TextView) findViewById(R.id.tv_bookingdetail_message);
 
 
-
-        toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        notificationLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
-        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
+        toolbarNotiCountLayout = (RelativeLayout) findViewById(R.id.rl_toolbar_notificationcount);
+        notificationLayout = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
+        notificationCountText = (TextView) findViewById(R.id.tv_toolbar_notificationcount);
         calltous = (ImageView) findViewById(R.id.iv_bookingdetail_bookingid_call);
-        calltous.setOnClickListener(this);
+        calltous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String phoneNumber = contact_no.getText().toString();
+
+                if (!TextUtils.isEmpty(phoneNumber)) {
+                    if (checkCall(Manifest.permission.CALL_PHONE)) {
+                        String dial = "tel:" + phoneNumber;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    Activity#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for Activity#requestPermissions for more details.
+                                return;
+                            }
+                        }
+                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
+                    } else {
+                        Toast.makeText(RequestDetails.this, "Permission Call Phone denied", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(RequestDetails.this, "Enter a phone number", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        if (checkCall(Manifest.permission.CALL_PHONE)) {
+            calltous.setEnabled(true);
+        } else {
+            calltous.setEnabled(false);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MAKE_CALL_PERMISSION_REQUEST_CODE);
+        }
+
+
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
         menunotification = (ImageView) findViewById(R.id.iv_tb_with_bck_arrow_notification);
@@ -178,7 +233,7 @@ Button change;
                 config.locale = locale;
                 getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                 Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();*/
-                        case R.id.iv_tb_with_bck_arrow_notification:
+              case R.id.iv_tb_with_bck_arrow_notification:
                         intent = new Intent(RequestDetails.this,Notifications.class);
                         startActivity(intent);
                         break;
@@ -186,37 +241,51 @@ Button change;
                         if (init_type.equals(Constants.REQUEST_DETAILS)){
                         bookingacceptedapiCalling();
                         }else if (init_type.equals(Constants.BOOKING_START)) {
-                        if (can_start.equals("true")) {
-                            if (checkPermission()) {
+                            if (can_start.equals("true")) {
+                                if (checkPermission()) {
                                 cameraAccepted = true;
-                            } else {
-                                requestPermission();
-                            }
-                            if (cameraAccepted) {
+                                } else {
+                                    requestPermission();
+                                }
+                                if (cameraAccepted) {
                                 Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(camera_intent, 0);
-                            } else {
-                                requestPermission();
+                                    if (camera_intent.resolveActivity(getPackageManager()) != null) {
+                                        startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
+                                    }
+                                } else {
+                                    requestPermission();
+                                }
+                            }
+                            else{
+                                intent = new Intent(RequestDetails.this,Map1.class);
+                                intent.putExtra("Bookingdata",blmod);
+                                startActivity(intent);
                             }
                         }
-                        else{
-                            intent = new Intent(RequestDetails.this,Map1.class);
-                            intent.putExtra("Bookingdata",blmod);
-                            startActivity(intent);
-                        }
-                        }
+                        break;
+
+
         }
     }
 
 
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},PERMISSION_REQUEST_CODE);
+        //ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_REQUEST_CODE);
     }
 
     private boolean checkPermission(){
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
+
         return result == PackageManager.PERMISSION_GRANTED;
+
+        //
     }
+
+    private boolean checkCall(String permission){
+        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
 
 
     @Override
@@ -232,6 +301,15 @@ Button change;
                     }
                 }
                 break;
+            case MAKE_CALL_PERMISSION_REQUEST_CODE:
+                callaccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
+                if (callaccepted){
+                    callaccepted=true;
+                }else {
+                    callaccepted=false;
+                }
+                calltous.setEnabled(true);
+                break;
         }
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -241,21 +319,137 @@ Button change;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-        if(resultCode!=0) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            imageencoded = Utils.encodeTobase64(bitmap);
+        Bundle b = data.getExtras();
+        if(resultCode!= REQUEST_IMAGE_CAPTURE && b.containsKey("data")) {
+
+         Bitmap bitmap = (Bitmap) b.get("data");
+
+           // bitmap = addStampToImage(bitmap);
+
+            //imageencoded = Utils.encodeTobase64(bitmap);
             if (can_start.equals("true")){
                 Intent intent= new Intent(this, TankerStartingPic.class);
-                intent.putExtra("Bitmap",imageencoded);
+                intent.putExtra("Bitmap",bitmap);
                 intent.putExtra("Bookingdata",blmod);
                 startActivity(intent);
+                finish();
             }
-
-
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            ex.printStackTrace();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+
+
+    private Bitmap addStampToImage(Bitmap originalBitmap) {
+
+        int extraHeight = (int) (originalBitmap.getHeight() * 0.15);
+
+        Bitmap newBitmap = Bitmap.createBitmap(originalBitmap.getWidth(),
+                originalBitmap.getHeight() , Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(newBitmap);
+        canvas.drawBitmap(originalBitmap, 0, 0, null);
+
+        Resources resources = getResources();
+        float scale = resources.getDisplayMetrics().density;
+
+        String text = "Friday 3 march 2020";
+
+        //Paint pText = new Paint();
+        Paint pText = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+        pText.setColor(Color.WHITE);
+        pText.setTextSize(12);
+        pText.setAntiAlias(true);
+
+
+
+       // setTextSizeForWidth(pText,(int) (originalBitmap.getHeight() * 0.04),text);
+
+
+        Rect bounds = new Rect();
+        pText.getTextBounds(text, 0, text.length(), bounds);
+
+        Rect textHeightWidth = new Rect();
+        pText.getTextBounds(text, 0, text.length(), textHeightWidth);
+
+        canvas.drawText(text, (canvas.getWidth() / 4) - (textHeightWidth.width() / 2),
+                originalBitmap.getHeight()  - textHeightWidth.height(),
+                pText);
+
+       //imageView.setImageBitmap(newBitmap);
+        return newBitmap;
+    }
+
+
+    private void setTextSizeForWidth(Paint paint, float desiredHeight,
+                                     String text) {
+
+        // Pick a reasonably large value for the test. Larger values produce
+        // more accurate results, but may cause problems with hardware
+        // acceleration. But there are workarounds for that, too; refer to
+        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+        final float testTextSize = 48f;
+
+        // Get the bounds of the text, using our testTextSize.
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        // Calculate the desired size as a proportion of our testTextSize.
+        float desiredTextSize = testTextSize * desiredHeight / bounds.height();
+
+        // Set the paint for that size.
+        paint.setTextSize(desiredTextSize);
+    }
+
+
+
+
 
     private void bookingacceptedapiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
@@ -286,6 +480,9 @@ Button change;
                         Intent intent = new Intent(getApplicationContext() , FirstActivity.class);
                         intent.putExtra("curretTab",1);
                         startActivity(intent);
+
+                        Toast.makeText(RequestDetails.this, getString(R.string.request_accepted), Toast.LENGTH_SHORT).show();
+
 
                     } else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);

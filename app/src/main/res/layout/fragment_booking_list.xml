@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
+        android:visibility="visible"
         android:id="@+id/rv_fg_bookinglist"/>
     <TextView
         android:id="@+id/tv_bookinglist_nodata"
@@ -15,9 +16,10 @@
         android:layout_height="wrap_content"
         android:text="No Bookings Found"
         android:gravity="center"
+        android:visibility="gone"
         android:layout_gravity="center"/>
     <include
         layout="@layout/progress_indicator"
         android:id="@+id/fg_booking_progresbar"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 </FrameLayout>

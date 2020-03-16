@@ -6,13 +6,19 @@
     tools:context=".fragment.RequestList">
 
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipeRefresh"
+        android:layout_margin="20dp">
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/rv_fg_reqstlist"/>
 
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
     <TextView

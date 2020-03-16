@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Activity.RequestDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +68,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
             /*itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);
             itemlayout.setOnClickListener(this);*/
             bookingview = (RelativeLayout) view.findViewById(R.id.rl_bookingitem_view);
+
             bookingview.setOnClickListener(this);
             bookingactiontext.setOnClickListener(this);
         }
@@ -109,7 +112,6 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final BookingListModal current = requestlist.get(position);
 
-
         switch (getItemViewType(position)){
 
 
@@ -129,6 +131,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
                         i.putExtra("init_type", init_type);
                         i.putExtra("booking_id", current.getBookingid());
                         context.startActivity(i);
+                        
                     }
                 });
                 break;

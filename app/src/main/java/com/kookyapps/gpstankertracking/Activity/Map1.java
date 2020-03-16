@@ -128,6 +128,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     static boolean isTouched = true;
 
 
+
     /*{
         try{
             socket = IO.socket(URLs.SOCKET_URL+ SessionManagement.getUserToken(this));
@@ -144,6 +145,25 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         Intent i = getIntent();
         Bundle b = i.getExtras();
         blmod = b.getParcelable("Bookingdata");
+
+        switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
+        if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
+            switchCompat.setChecked(true);
+            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+
+
+        }else{
+            switchCompat.setChecked(false);
+            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        }
 
         fromLat=Double.parseDouble(blmod.getFromlatitude());
         fromLong=Double.parseDouble(blmod.getFromlongitude());
@@ -344,13 +364,14 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
         if(resultCode!=0) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            imageencoded = Utils.encodeTobase64(bitmap);
+            /*imageencoded = Utils.encodeTobase64(bitmap);*/
 //            if (can_start.equals("true")){
                 Intent intent= new Intent(this, TankerStartingPic.class);
-                intent.putExtra("Bitmap",imageencoded);
+                intent.putExtra("Bitmap",bitmap);
                 intent.putExtra("Bookingdata",blmod);
                 intent.putExtra("init_type",Constants.TRIP_END_IMG);
                 startActivity(intent);
+                finish();
 //            }
         }
 
@@ -392,33 +413,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         navdrawer.setDrawerElevation(0f);
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
-
-switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
-        switchCompat.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                isTouched = true;
-                return false;
-            }
-        });
-        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isTouched) {
-                    isTouched = false;
-                    if (isChecked) {
-                        SessionManagement.setLanguage(Map1.this,Constants.HINDI_LANGUAGE);
-                    }
-                    else {
-                        SessionManagement.setLanguage(Map1.this,Constants.ENGLISH_LANGUAGE);
-                    }
-                    showlanguage();
-                }
-            }
-        });
-
 
 
         distance.setText(blmod.getDistance());
@@ -481,6 +475,33 @@ switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
                 }
             }
         };
+
+        switchCompat.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                isTouched = true;
+                return false;
+            }
+        });
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (isTouched) {
+                    isTouched = false;
+                    if (isChecked) {
+                        SessionManagement.setLanguage(Map1.this,Constants.HINDI_LANGUAGE);
+                    }
+                    else {
+                        SessionManagement.setLanguage(Map1.this,Constants.ENGLISH_LANGUAGE);
+                    }
+                    showlanguage();
+                }
+            }
+        });
+
+
 
     }
     public void setNotificationCount(int count,boolean isStarted){

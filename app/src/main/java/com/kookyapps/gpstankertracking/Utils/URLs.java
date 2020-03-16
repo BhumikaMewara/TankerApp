@@ -14,6 +14,8 @@ public class URLs {
     public static final String READ_NOTIFICATIONS="/notification/read/";
     public static final String BOOKING_END ="booking/end/";
     public static final String TRIP_DETAILS="trips";
+    public static final String LANGUAGE_CHANGED="settings";
+
 
 
 
