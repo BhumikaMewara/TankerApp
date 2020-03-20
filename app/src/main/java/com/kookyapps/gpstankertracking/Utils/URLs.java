@@ -15,6 +15,7 @@ public class URLs {
     public static final String BOOKING_END ="booking/end/";
     public static final String TRIP_DETAILS="trips";
     public static final String LANGUAGE_CHANGED="settings";
+    public static final String UPDATE_LOCATION="update-location";
 
 
 

@@ -22,12 +22,20 @@
                 app:popupTheme="@style/AppTheme"
                 app:layout_constraintTop_toTopOf="parent"/>
         <RelativeLayout
+            android:id="@+id/backgroundshadow"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@drawable/gradient_background_main"
+            android:layout_below="@+id/trip_details_toolbar"></RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/rl_trip_details_relativeView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/trip_details_toolbar"
+            android:layout_below="@+id/backgroundshadow"
             android:background="@color/green1"
-            android:padding="10dp">
+            android:padding="5dp"
+            android:layout_marginBottom="5dp">
             <TextView
                 android:id="@+id/tv_trip_details_totalTrip"
                 android:layout_width="wrap_content"
@@ -35,7 +43,9 @@
                 android:text="Total Trip :"
                 android:textColor="@color/greenLight"
                 android:textSize="20sp"
-                android:padding="5dp"/>
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"/>
             <TextView
                 android:id="@+id/tv_trip_details_totalKM"
                 android:layout_width="wrap_content"
@@ -43,7 +53,9 @@
                 android:text="Total KM :"
                 android:textColor="@color/greenLight"
                 android:textSize="20sp"
-                android:padding="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
                 android:layout_below="@+id/tv_trip_details_totalTrip"/>
             <TextView
                 android:id="@+id/tv_trip_details_totalTrip_value"
@@ -52,7 +64,9 @@
                 android:text=" "
                 android:textColor="@color/colorblack"
                 android:textSize="20sp"
-                android:padding="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/tv_trip_details_totalTrip"/>
             <TextView
@@ -62,7 +76,9 @@
                 android:text=" "
                 android:textColor="@color/colorblack"
                 android:textSize="20sp"
-                android:padding="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
                 android:layout_marginLeft="10dp"
                 android:layout_below="@+id/tv_trip_details_totalTrip_value"
                 android:layout_toRightOf="@+id/tv_trip_details_totalKM"/>

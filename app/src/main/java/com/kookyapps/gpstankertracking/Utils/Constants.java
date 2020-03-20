@@ -1,11 +1,14 @@
 package com.kookyapps.gpstankertracking.Utils;
 
+import com.kookyapps.gpstankertracking.R;
+
 public class Constants {
     public static final String REQUEST_DETAILS= "request_details";
     public static final String BOOKING_START= "booking_details";
     public static final String TRIP_DETAILS= "trip_details";
     public static final String COMPLETED_CALL="Completed";
     public static final String TRIP_END_IMG="trip_end_img";
+
 
 
 
@@ -36,6 +39,12 @@ public class Constants {
     public static final String ENGLISH_LANGUAGE  = "en";
 
 
+    public static final String HINDI_PATH  = "R.strings-hi" ;
+    public static final String ENGLISH_PATH  = "R.strings";
+
+
+    public static final String IS_ONLINE="1";
+    public static final String IS_OFFLINE="0";
 
 
 

@@ -10,19 +10,17 @@
         <RelativeLayout
             android:id="@+id/rl_toolbar_with_back_backLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="start">
             <RelativeLayout
                 android:id="@+id/rl_toolbarmenu_backimglayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_centerVertical="true">
                 <ImageView
                 android:id="@+id/toolbarmenu_backarrowImg"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginLeft="15dp"
-
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/back_arrow" />
             </RelativeLayout>
             <RelativeLayout
@@ -30,27 +28,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp">
+
                 <TextView
+                    android:id="@+id/tb_with_bck_arrow_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tb_with_bck_arrow_title"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="0dp"
                     android:text=" Trip Control"
-                    android:textSize="22dp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="@color/colorblack" />
+                    android:textColor="@color/colorblack"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_toolbar_with_back_notification"
                 android:layout_width="45dp"
-                android:layout_height="47dp"
+                android:layout_height="42dp"
                 android:layout_alignParentRight="true"
                 >
                 <ImageView
                     android:id="@+id/iv_tb_with_bck_arrow_notification"
                     android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:layout_alignParentLeft="true"
                     android:layout_marginRight="10dp"

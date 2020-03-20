@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
@@ -110,8 +111,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     userdetail.getString("driver_name"),
                                     userdetail.getString("token"),
                                     userdetail.getJSONObject("settings").getString("language"),
-                                    userdetail.getString("location"),"9");
+                                    userdetail.getString("location"),
+                                    userdetail.getString("activity_status"),"9");
+                            SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
+                            //String s = userdetail.getString("status");
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);
+                            //i.putExtra("status",s);
                             startActivity(i);
                             finish();
                         }

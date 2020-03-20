@@ -19,6 +19,9 @@ public class SessionManagement {
     private static final String LOCATION = "location";
     private static final String BOOKING = "booking";
     private static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
+    private static final String LANGUAGE_PATH = "languagePath";
+
+    private static final String IS_ONLINE = "is_online";
 
 
 
@@ -57,7 +60,7 @@ public class SessionManagement {
 
 
 
-    public static void createLoginSession(Context con, Boolean islogin, String user_id, String phcode, String phoneno, String username,String token,String language,String location,String noticount){
+    public static void createLoginSession(Context con, Boolean islogin, String user_id, String phcode, String phoneno, String username,String token,String language,String location,String status,String noticount){
 
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,IS_LOGGEDIN,islogin);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,USER_ID,user_id);
@@ -67,7 +70,10 @@ public class SessionManagement {
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,USER_TOKEN,token);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE,language);
         SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,LOCATION,location);
+        SharedPrefUtil.setPreferences(con,SHARED_PREF_LOGIN_TAG,IS_ONLINE,status);
         SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_NOTICATION_TAG,SHARED_NOTIFICATION_COUNT_KEY,noticount);
+
+
     }
 
     public static void logout(FetchDataListener fetchDataListener, Context con){
@@ -84,6 +90,7 @@ public class SessionManagement {
         userdata.put(USER_TOKEN,SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,USER_TOKEN));
         userdata.put(NAME,SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,NAME));
         userdata.put(LANGUAGE,SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,LANGUAGE));
+        userdata.put(IS_ONLINE,SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,LANGUAGE));
         return userdata;
     }
 
@@ -104,9 +111,18 @@ public class SessionManagement {
 
     public static String getLanguage(Context con){
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE);
+
     }
     public static void   setLanguage(Context con, String lang){
          SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE,lang);
+    }
+
+    public static String getLanguagePath(Context con){
+        return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE_PATH);
+
+    }
+    public static void setLanguagePath(Context con, String lang){
+        SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE_PATH,lang);
     }
     public static String getPhoneNo(Context con){
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,PHONE_NO);
@@ -120,12 +136,18 @@ public class SessionManagement {
     public static String getLocation(Context con){
         return SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_LOGIN_TAG,LOCATION);
     }
+
     /*public static String getLocation(Context con){
         if (SharedPrefUtil.hasKey(con,SHARED_PREF_LOGIN_TAG,USER_ID)) {
             return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG, USER_ID);
         }
         return "0";
     }*/
-
+public static String getUserStatus(Context con){
+    return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,IS_ONLINE);
+}
+    public static void   setUserStatus(Context con, String status) {
+        SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, IS_ONLINE, status);
+    }
 
 }

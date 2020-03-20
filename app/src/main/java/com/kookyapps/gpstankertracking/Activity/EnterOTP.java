@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
@@ -72,16 +73,11 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         setContentView(R.layout.activity_enter_otp);
         Intent i = getIntent();
         Bundle b = i.getExtras();
-imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
+        imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
     //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
        leftbit = Utils.decodeBase64(imageencoded);
-
         initView();
-
-//
-
-
     }
 
     public void initView() {
@@ -90,6 +86,7 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
         pageTitle.setText(R.string.enter_otp);
 
         title = (TextView) findViewById(R.id.tv_enterOtp_msgTitle);
+
         message = (TextView) findViewById(R.id.tv_enterOtp_msg);
         verify = (TextView) findViewById(R.id.tv_enterOtp_verifyText);
         msg_icon = (ImageView) findViewById(R.id.iv_enterOtp_message);
@@ -117,10 +114,11 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
 
 
         editText_one.addTextChangedListener(this);
-        editText_one.addTextChangedListener(this);
-        editText_one.addTextChangedListener(this);
-        editText_one.addTextChangedListener(this);
-        editText_one.addTextChangedListener(this);
+        editText_two.addTextChangedListener(this);
+        editText_three.addTextChangedListener(this);
+        editText_four.addTextChangedListener(this);
+        editText_five.addTextChangedListener(this);
+        editText_six.addTextChangedListener(this);
 
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
@@ -144,6 +142,10 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        /*pageTitle.setText(getResources().getString(R.string.enter_otp));
+                        title.setText(getResources().getString(R.string.enter_code));
+                        message.setText(getResources().getString(R.string.otpscreen_msg));*/
+
                     }else{
                         Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
                         Locale.setDefault(locale);
@@ -168,6 +170,7 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
                 validateOTP();
                 uploadBitmap();
                 /*   i = new Intent(this, TripComplete.class);
+
 
                 startActivity(i);*/
             case R.id.rl_toolbarmenu_backimglayout:
@@ -203,18 +206,41 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
 
     }
 
+
     @Override
     public void afterTextChanged(Editable editable) {
-        /*if (editable.length() == 1) {
 
-         *//*if (editText_one.length() == 1) {
-                editText_two.requestFocus(); }
-            if (editText_two.length() == 1) {
-                    editText_three.requestFocus(); }
-            if (editText_three.length() == 1) {
-                editText_four.requestFocus(); }*//*
+       // editText_one.setFocusable(false);
+      //  editText_three.requestFocus();
+//asdasdasd
+//moveToNext();
+        Log.i("setText",String.valueOf(editable.length()));
+        if (editable.length() == 1) {
+
+         if (editText_one.length() == 1) {
+             editText_two.requestFocus(); }
+         if (editText_two.length() == 1) {
+             editText_three.requestFocus(); }
+         if (editText_three.length() == 1) {
+             editText_four.requestFocus();
+         }
+         if (editText_four.length() == 1) {
+             editText_five.requestFocus();
+         }
+         if (editText_five.length() == 1) {
+             editText_six.requestFocus();
+
+         }
+         if (editText_six.length() == 1) {
+                return; }
+
         } else if (editable.length() == 0) {
-                if (editText_four.length() == 0) {
+            if (editText_six.length() == 0) {
+                editText_five.requestFocus(); }
+
+            if (editText_five.length() == 0) {
+                editText_four.requestFocus(); }
+            if (editText_four.length() == 0) {
                     editText_three.requestFocus(); }
                 if (editText_three.length() == 0) {
                     editText_two.requestFocus(); }
@@ -222,10 +248,14 @@ imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_
                     editText_one.requestFocus(); }
             }
 
-        }*/
-
     }
 
+
+
+    private void moveToNext(){
+        editText_one.setFocusable(false);
+        editText_three.requestFocus();
+    }
 
 private  void validateOTP(){
        if (editText_one.getText().equals("")){

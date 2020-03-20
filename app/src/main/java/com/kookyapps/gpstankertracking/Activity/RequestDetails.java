@@ -176,7 +176,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
         menunotification = (ImageView) findViewById(R.id.iv_tb_with_bck_arrow_notification);
-        menunotification.setOnClickListener(this);
+        notificationLayout.setOnClickListener(this);
         bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout);
         bottom.setOnClickListener(this);
         bottomtext = (TextView) findViewById(R.id.tv_result_details_bottomlayout_text);
@@ -233,7 +233,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 config.locale = locale;
                 getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                 Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();*/
-              case R.id.iv_tb_with_bck_arrow_notification:
+              case R.id.rl_toolbar_with_back_notification:
                         intent = new Intent(RequestDetails.this,Notifications.class);
                         startActivity(intent);
                         break;
@@ -621,6 +621,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 }else {
                                     bottom.setVisibility(View.GONE);
                                 }
+                            }else if (init_type.equals(Constants.TRIP_DETAILS)){
+                                bottom.setVisibility(View.GONE);
+                                pagetitle.setText(getString(R.string.trip_details));
                             }
 
                         } else {

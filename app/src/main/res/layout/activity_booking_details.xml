@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".Activity.BookingDetails">
 
-
     <include
         layout="@layout/toolbar_with_bk_arrow"
         android:id="@+id/include_bookingdetails"/>
@@ -14,8 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradient_background_main"
-        android:layout_below="@+id/include_bookingdetails"
-        >
+        android:layout_below="@+id/include_bookingdetails">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,9 +21,8 @@
             android:layout_marginTop="40dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:background="@color/colorwhite"
-            >
-            <TextView
+            android:background="@color/colorwhite">
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_booking_id_title"
@@ -34,7 +31,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="15dp"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_bookingid"
@@ -61,7 +58,7 @@
                 android:layout_below="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@+id/iv_bookingdetail_bookingid_call"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_distance_title"
@@ -72,7 +69,7 @@
                 android:text="Estimated Distance"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_distance"
@@ -92,8 +89,7 @@
                 android:background="@color/colordark_grey"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@id/bookingdetail_underline1"/>
-
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_pickup_title"
@@ -104,7 +100,7 @@
                 android:text="Pickup point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_pickup"
@@ -124,8 +120,7 @@
                 android:background="@color/colordark_grey"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@id/bookingdetail_underline1"/>
-
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_drop_title"
@@ -136,7 +131,7 @@
                 android:text="Drop Point"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_drop"
@@ -156,8 +151,7 @@
                 android:background="@color/colordark_grey"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@id/bookingdetail_underline1"/>
-
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_drivername_title"
@@ -168,7 +162,7 @@
                 android:text="Driver's Name"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_drivername"
@@ -188,8 +182,7 @@
                 android:background="@color/colordark_grey"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@id/bookingdetail_underline1"/>
-
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_contact_title"
@@ -200,7 +193,7 @@
                 android:text="Contact No."
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_contact"
@@ -220,8 +213,7 @@
                 android:background="@color/colordark_grey"
                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                 android:layout_alignEnd="@id/bookingdetail_underline1"/>
-
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_message_title"
@@ -232,7 +224,7 @@
                 android:text="Message"
                 android:textColor="@color/greenLight"
                 android:textSize="13dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_bookingdetail_message"
@@ -245,6 +237,4 @@
                 android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry."/>
         </RelativeLayout>
     </ScrollView>
-
-
 </RelativeLayout>

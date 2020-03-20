@@ -256,9 +256,18 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                                     bmod.setIsread("0");
                                     bmod.setTankerid(jsonObject.getString("tanker_id"));
                                     bmod.setNotificationtype(jsonObject.getString("type"));
-                                    bmod.setText(jsonObject.getJSONObject("text").getString("en"));
-                                    if (jsonObject.has("title")) {
-                                        bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
+                                    if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
+                                        bmod.setText(jsonObject.getJSONObject("text").getString("hi"));
+                                    }else{
+                                        bmod.setText(jsonObject.getJSONObject("text").getString("en"));
+                                    }
+
+                                        if (jsonObject.has("title")) {
+                                            if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
+                                            bmod.setTitle(jsonObject.getJSONObject("title").getString("hi"));
+                                            }else{
+                                            bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
+                                        }
                                     } else {
                                         bmod.setTitle("No Title Recieved");
                                     }
@@ -340,8 +349,22 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                                 bmod.setIsread("0");
                                 bmod.setTankerid(jsonObject.getString("tanker_id"));
                                 bmod.setNotificationtype(jsonObject.getString("type"));
-                                bmod.setText(jsonObject.getJSONObject("text").getString("en"));
-                                bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
+                                if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)) {
+                                    bmod.setText(jsonObject.getJSONObject("text").getString("hi"));
+                                }else{
+                                    bmod.setText(jsonObject.getJSONObject("text").getString("en"));
+                                }
+                                if (jsonObject.has("title")) {
+                                    if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
+                                        bmod.setTitle(jsonObject.getJSONObject("title").getString("hi"));
+                                    }else{
+                                        bmod.setTitle(jsonObject.getJSONObject("title").getString("en"));
+                                    }
+                                } else {
+                                    bmod.setTitle("No Title Recieved");
+                                }
+
+
                                 tmodalList.add(bmod);
                             }
                         }

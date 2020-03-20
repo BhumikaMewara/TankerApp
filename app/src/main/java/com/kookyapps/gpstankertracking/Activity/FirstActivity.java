@@ -7,24 +7,33 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.franmontiel.localechanger.LocaleChanger;
+import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
+import com.kookyapps.gpstankertracking.Utils.LocaleHelper;
+import com.kookyapps.gpstankertracking.app.GPSTracker;
 import com.kookyapps.gpstankertracking.fcm.Config;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -55,6 +64,7 @@ import com.kookyapps.gpstankertracking.fragment.RequestList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -85,43 +95,86 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
      String [] tabTitle ;
     Locale locale;
     Bundle b;
+    Context newContext; ;
     public static final int RequestPermissionCode = 7;
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
-    SwitchCompat switchCompat;
-    static Boolean isTouched = false;
+    SwitchCompat switchCompat, onlineSwitch;
+    static Boolean isTouched = false,isTouched2=true;
+    Boolean x=true,permissionGranted = false;
+    GPSTracker gpsTracker;
+    ArrayList<String> allpermissionsrequired;
+    String  stringLatitude,stringLongitude,s12;
+    private LocationManager locationManager;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+       // pagetitle=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
         toGetAllPermissions();
+        gpsTracker = new GPSTracker(this);
         switchCompat=(SwitchCompat)findViewById(R.id.switch2);
-
         if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
+            Log.i("language",SessionManagement.getLanguage(this));
             switchCompat.setChecked(true);
-            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+           /* Locale locale = new Locale(Constants.HINDI_LANGUAGE);
             Locale.setDefault(locale);
             Configuration config = new Configuration();
             config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-
-
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());*/
         }else{
-            switchCompat.setChecked(false);
-            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+         /* Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
             Locale.setDefault(locale);
             Configuration config = new Configuration();
             config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());*/
         }
 
+        onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
+        if(SessionManagement.getUserStatus(FirstActivity.this).equals(Constants.IS_ONLINE)){
+            onlineSwitch.setChecked(true);
+        }else{
+            onlineSwitch.setChecked(false);
+        }
+        if (gpsTracker.getIsGPSTrackingEnabled()){
+            stringLatitude = String.valueOf(gpsTracker.latitude);
+            stringLongitude = String.valueOf(gpsTracker.longitude);
+        }else
+        {
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gpsTracker.showSettingsAlert();
+        }
+        onlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_ONLINE);
+                    updateLcationApiCalling(Constants.IS_ONLINE);
+                } else {
+                    SessionManagement.setLanguage(FirstActivity.this, Constants.IS_OFFLINE);
+                    updateLcationApiCalling(Constants.IS_OFFLINE);
+                }
+
+            }
+
+        });
 
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
         username=(TextView)findViewById(R.id.tv_first_drawer_username);
         trip=(TextView)findViewById(R.id.tv_drawer_tripText);
+        String s= SessionManagement.getLanguagePath(FirstActivity.this);
+       //Log.i("menu",getResources().getString(R.menu.myUrl));
+//        trip.setText(getResources().getString(Integer.parseInt(s.);
         language=(TextView)findViewById(R.id.tv_drawer_language);
         logut=(TextView)findViewById(R.id.tv_drawer_logout);
         toolBarImgMenu =(ImageView)findViewById(R.id.toolbarmenu);
@@ -138,7 +191,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         //toolBarTitle =           (TextView)       findViewById(R.id.toolbartitle);
-        navdrawer=            (DrawerLayout)   findViewById(R.id.dl_first) ;
+        navdrawer= (DrawerLayout)   findViewById(R.id.dl_first) ;
         //actionBarDrawerToggle = new ActionBarDrawerToggle(this,navdrawer,R.string.drawer_open,R.string.drawer_close);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, navdrawer,
                 R.string.drawer_open, R.string.drawer_close) {
@@ -147,6 +200,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 super.onDrawerSlide(drawerView, slideOffset);
             }
         };
+
         navdrawer.setDrawerElevation(0f);
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
@@ -157,7 +211,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         rqstbtn= (Button)findViewById(R.id.btn_first_rqstbtn);
         bkngbtn= (Button)findViewById(R.id.btn_first_bookingbtn);
 
-
         fullname.setText(SessionManagement.getName(FirstActivity.this));
         username.setText(SessionManagement.getUserId(FirstActivity.this));
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -167,11 +220,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             notificationCountText.setText(String.valueOf(noticount));
             toolbarNotiCountLayout.setVisibility(View.VISIBLE);
         }
-
-
-
-
-
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -182,7 +230,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     setNotificationCount(count+1,false);
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
-                        locale = new Locale(Constants.HINDI_LANGUAGE);
+                        /*locale = new Locale(Constants.HINDI_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
@@ -190,20 +238,24 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                         languageChangeApi();
                         finish();
                         startActivity(getIntent());
+*/
                     }else{
-                         locale = new Locale(Constants.ENGLISH_LANGUAGE);
+                       /*  locale = new Locale(Constants.ENGLISH_LANGUAGE);
                         Locale.setDefault(locale);
                         Configuration config = new Configuration();
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                         languageChangeApi();
                         finish();
-                        startActivity(getIntent());
+                        startActivity(getIntent());*/
                     }
                 }
             }
         };
-        pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
+             pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
+       // pagetitle.setText(s12);
+
+
         tripLayout.setOnClickListener(this);
         logoutLayout.setOnClickListener(this);
         rqstbtn.setOnClickListener(this);
@@ -233,12 +285,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
-
         });
-
-
         setCurrentTab();
         toolbarmenuLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,20 +309,27 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             {
                 if (isTouched) {
                     isTouched = false;
-                    if (isChecked) {
-                        SessionManagement.setLanguage(FirstActivity.this,Constants.HINDI_LANGUAGE);
 
+                    if (isChecked) {
+                        SessionManagement.setLanguage(FirstActivity.this, Constants.HINDI_LANGUAGE);
                     }
-                    else {
                         SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
 
                     }
                     showlanguage();
                 }
-            }
+
         });
     }
+    @Override
+    protected void attachBaseContext(Context newBase) {
 
+        newBase = LocaleChanger.configureBaseContext(newBase);
+
+        s12= newBase.getResources().getString(R.string.request_list);
+
+        super.attachBaseContext(newBase);
+    }
 
 
     public void toGetAllPermissions(){
@@ -285,7 +340,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         {
             Toast.makeText(FirstActivity.this, "All Permissions Granted Successfully", Toast.LENGTH_LONG).show();
         }
-
         // If, If permission is not enabled then else condition will execute.
         else {
 
@@ -355,28 +409,55 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 FivthPermissionResult == PackageManager.PERMISSION_GRANTED &&
                 SixthPermissionResult == PackageManager.PERMISSION_GRANTED;
     }
+    public void updateLcationApiCalling(String currentStatus) {
+
+        JSONObject jsonBodyObj = new JSONObject();
 
 
+        try {
+            jsonBodyObj.put("lat", stringLatitude);
+            jsonBodyObj.put("lng", stringLongitude);
+            jsonBodyObj.put("status", currentStatus);
 
+            POSTAPIRequest postapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(postapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:", token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(FirstActivity.this, updateLocationListner, url, headparam, jsonBodyObj);
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    FetchDataListener updateLocationListner = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                        String message=   data.getString("message");
+                        Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
 
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
 
+        }
+        @Override
+        public void onFetchFailure(String msg) {
+            logoutLayout.setClickable(true);
+        }
 
+        @Override
+        public void onFetchStart() {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
+    };
 
     private void setCurrentTab(){
         b= getIntent().getExtras();
@@ -518,8 +599,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                      String message=   data.getString("message");
 
                        // SessionManagement.logout(logoutListner, FirstActivity.this);
-
-
                         Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
 
                     }
@@ -582,12 +661,26 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
-        // clear the notification area when the app is opened
+        // clear the no04  ki[[vtification area when the app is opened
+
+        if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)) {
+            Log.i("language", SessionManagement.getLanguage(this));
+            switchCompat.setChecked(true);
+            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        }else {
+            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-
-
 
 
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -616,7 +709,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     }
     @Override
     public void onBackPressed() {
-        {
+
+        if (navdrawer.isDrawerOpen(GravityCompat.START)) {
+            navdrawer.closeDrawer(GravityCompat.START);
+        }else {
+
 
             // Create the object of
             // AlertDialog Builder class
@@ -694,6 +791,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 //Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
             }
     }
+
 
 
 }

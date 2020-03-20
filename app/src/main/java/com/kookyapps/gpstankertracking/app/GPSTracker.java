@@ -99,7 +99,6 @@ public class GPSTracker extends Service implements LocationListener {
                  * satellites. Depending on conditions, this provider may take a while to return
                  * a location fix.
                  */
-
                 provider_info = LocationManager.GPS_PROVIDER;
 
             } else if (isNetworkEnabled) { // Try to get location if you Network Service is enabled

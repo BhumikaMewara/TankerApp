@@ -6,9 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/cl_triplist_itemlayout"
-android:layout_marginBottom="20dp"
-    android:background="@drawable/booking_item_background"
-    >
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/booking_item_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_triplist_itemlayout2"
@@ -19,13 +18,10 @@ android:layout_marginBottom="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_marginTop="10dp"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-
         <ImageView
             android:id="@+id/iv_trip_details_bookingid"
             android:layout_width="12dp"
@@ -35,7 +31,6 @@ android:layout_marginBottom="20dp"
             android:src="@drawable/booking_id"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/iv_trip_details_distance"
             android:layout_width="12dp"
@@ -45,16 +40,14 @@ android:layout_marginBottom="20dp"
             app:layout_constraintBottom_toBottomOf="@id/iv_trip_details_bookingid"
             app:layout_constraintEnd_toStartOf="@+id/tv_trip_details_distance"
             app:layout_constraintTop_toTopOf="@+id/iv_trip_details_bookingid" />
-
         <ImageView
             android:id="@+id/iv_trip_details_from"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginTop="25dp"
-            android:src="@drawable/from_booking_list"
+            android:src="@drawable/from_cbs"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_bookingid"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_bookingid" />
-
         <ImageView
             android:id="@+id/iv_trip_details_to"
             android:layout_width="15dp"
@@ -64,34 +57,29 @@ android:layout_marginBottom="20dp"
             app:layout_constraintEnd_toEndOf="@+id/iv_trip_details_from"
             app:layout_constraintStart_toStartOf="@+id/iv_trip_details_from"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_totitle" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_bookingid_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="Booking ID"
-            android:textColor="@color/colorblack"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_trip_details_bookingid"
             app:layout_constraintStart_toEndOf="@+id/iv_trip_details_bookingid"
             app:layout_constraintTop_toTopOf="@+id/iv_trip_details_bookingid"
             app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:text="Distance"
-            android:textColor="@color/colorblack"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="@id/iv_trip_details_bookingid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/iv_trip_details_distance"
             app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_bookingid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -106,13 +94,11 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_bookingid_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_bookingid_title" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_distance1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-
             android:foregroundGravity="center_vertical"
             android:maxLines="1"
             android:text="2345 KM"
@@ -123,8 +109,7 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_distance"
             app:layout_constraintTop_toTopOf="@+id/tv_trip_details_bookingid" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_fromlocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -138,12 +123,10 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@+id/iv_trip_details_from"
             app:layout_constraintTop_toTopOf="@+id/iv_trip_details_from" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_fromtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="From"
@@ -152,8 +135,7 @@ android:layout_marginBottom="20dp"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromlocation"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_bookingid"
             app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_fromtime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -164,19 +146,20 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromlocation"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_fromlocation" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_totitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="To"
             android:textSize="12dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_trip_details_tolocation"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromtitle"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_fromtime" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_tolocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -189,8 +172,7 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_totitle"
             app:layout_constraintTop_toTopOf="@+id/iv_trip_details_to" />
-
-        <TextView
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_totime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -204,20 +186,15 @@ android:layout_marginBottom="20dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_tolocation"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_tolocation" />
-
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/colordark_grey"
             app:layout_constraintBottom_toTopOf="@+id/iv_trip_details_to"
             app:layout_constraintEnd_toEndOf="@+id/iv_trip_details_from"
             app:layout_constraintStart_toStartOf="@+id/iv_trip_details_from"
             app:layout_constraintTop_toBottomOf="@+id/iv_trip_details_from" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

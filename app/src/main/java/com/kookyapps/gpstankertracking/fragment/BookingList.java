@@ -64,16 +64,10 @@ Context context;
 
 
 
-
-
-
     public BookingList(Context context) {
         // Required empty public constructor
         this.context = context;
     }
-
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

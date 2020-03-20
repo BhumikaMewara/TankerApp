@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Water Tanker</string>
     <string name="no_booking">No Bookings Found</string>
+    <!--<item name="myUrl" type="menu">http://myUrl.com</item>-->
     <string name="drawer_open">open</string>
     <string name="drawer_close">close</string>
 
@@ -15,15 +16,19 @@
     <string name="customer_number">Customer Mobile</string>
     <string name="message">Message</string>
 
+
     <!-- Page Titles-->
     <string name="trip_complete">Trip Complete</string>
     <string name="trip_details">Trip Details</string>
+    <string name="trips">Trips</string>
     <string name="enter_otp">Enter OTP</string>
     <string name="notifications">Notifications</string>
     <string name="booking_list">Booking List</string>
     <string name="request_list">Request List</string>
     <string name="request_details">Request Deatils</string>
     <string name="booking_details">Booking Deatils</string>
+
+
 
     <string name="enter_code">Enter Code</string>
     <string name="otpscreen_msg">Please ask the customer to provide 6 digit verification code</string>
@@ -43,7 +48,8 @@
     
 
 
-    <!--firstactivity-->
+    <!--notification single item-->
+    <string name="notification_heading"> The Standard Lorem Ipsum passage, used since 1500s </string>
 
 
     <string name="wrongOtp">enter the otp correctly</string>

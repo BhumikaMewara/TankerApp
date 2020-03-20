@@ -122,10 +122,10 @@
                         <TextView
                             android:id="@+id/tv_tankr_strt_date"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="24January 2020"
+                            android:layout_height="9dp"
                             android:layout_marginLeft="2dp"
                             android:layout_weight="1"
+                            android:text="24January 2020"
                             android:textColor="@color/colorwhite"></TextView>
                     </LinearLayout>
 

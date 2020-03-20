@@ -101,13 +101,12 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
         back.setOnClickListener(this);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pageTitle.setText(getString(R.string.trip_details));
+        pageTitle.setText(getString(R.string.trips));
         notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
         notification.setOnClickListener(this);
         trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
         notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
-
 
 
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -192,7 +191,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         Intent i ;
         switch (view.getId()){
-            case R.id.rl_water_tanker_toolbar_menu_notification:
+            case R.id.rl_toolbar_with_back_notification:
                 Intent intent;
                 intent = new Intent(TripDetails.this,Notifications.class);
                 startActivity(intent);
@@ -476,14 +475,11 @@ FetchDataListener tripListener= new FetchDataListener() {
             trip_details_listView.setVisibility(View.VISIBLE);
         }
     }
-    @Override
-    public void onBackPressed() {
-       super.onBackPressed();
 
-    }
 
     public void setNotificationCount(int count,boolean isStarted){
         notificationCount = SessionManagement.getNotificationCount(TripDetails.this);
+
         if(Integer.parseInt(notificationCount)!=count) {
             notificationCount = String.valueOf(count);
             if (count <= 0) {
@@ -543,5 +539,11 @@ FetchDataListener tripListener= new FetchDataListener() {
                 notificationCountLayout.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }

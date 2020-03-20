@@ -335,7 +335,7 @@
             android:layout_width="290dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="@color/colorGreyLight"
+            android:background="@color/drawerColor"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 

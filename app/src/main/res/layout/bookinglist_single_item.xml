@@ -6,214 +6,230 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="5dp"
     android:background="@drawable/booking_item_background">
-    <ImageView
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:id="@+id/iv_bookingitem_bookingid"
-        android:src="@drawable/booking_id"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="15dp"/>
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:id="@+id/tv_bookingitem_bookingid_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:text="Booking ID"
-        android:textColor="@color/colorblack"
-        android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_bookingid"
-        app:layout_constraintStart_toEndOf="@+id/iv_bookingitem_bookingid"
-        app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_bookingid"
-        app:layout_constraintVertical_bias="1.0" />
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_bookingitem_distance_title"
-        android:text="Distance"
-        android:layout_marginRight="30dp"
-        android:textColor="@color/colorblack"
-        android:textSize="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_distance"
-        app:layout_constraintVertical_bias="1.0"
-        app:layout_constraintBottom_toBottomOf="@id/iv_bookingitem_bookingid"/>
-    <ImageView
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:id="@+id/iv_bookingitem_distance"
-        android:src="@drawable/distance_booking_list"
-        android:layout_marginRight="10dp"
-        app:layout_constraintEnd_toStartOf="@+id/tv_bookingitem_distance_title"
-        app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_bookingid"
-        app:layout_constraintBottom_toBottomOf="@id/iv_bookingitem_bookingid"/>
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_bookingitem_bookingid"
-        android:textSize="12dp"
-        android:text="1234567"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:foregroundGravity="center_vertical"
-        android:textColor="@color/colorblack"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_bookingid_title"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid_title"
-        app:layout_constraintEnd_toStartOf="@+id/tv_bookingitem_distance"
-        app:layout_constraintHorizontal_bias="0"
-        android:layout_marginTop="1dp"/>
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_bookingitem_distance"
-        android:textColor="@color/colorblack"
-        android:maxLines="1"
-        android:foregroundGravity="center_vertical"
-        android:ellipsize="end"
-        android:textSize="12dp"
-        android:text="2345 KM"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_distance_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintTop_toTopOf="@+id/tv_bookingitem_bookingid"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_bookingitem_bookingid"
-        />
-    <ImageView
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:id="@+id/iv_bookingitem_from"
-        android:src="@drawable/from_booking_list"
-        android:layout_marginTop="25dp"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_bookingid"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid"/>
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_bookingitem_fromlocation"
-        android:text="Boranada,Summer Nagar,115"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="@color/colorblack"
-        app:layout_constraintStart_toEndOf="@+id/iv_bookingitem_from"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_from"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_from"
-        android:layout_marginLeft="10dp"/>
 
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:id="@+id/tv_bookingitem_fromtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:text="From"
-        android:textSize="12dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        app:layout_constraintBottom_toTopOf="@+id/tv_bookingitem_fromlocation"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromlocation"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid"
-        app:layout_constraintVertical_bias="1.0" />
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:id="@+id/tv_bookingitem_fromtime"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Saturday, 24 January, 04:20 PM"
-        android:textSize="10dp"
-        android:textColor="@color/colorblack"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_fromlocation"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromlocation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-         />
-
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:id="@+id/tv_bookingitem_totitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:text="To"
-        android:textSize="12dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_fromtime"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromtitle"/>
-
-    <ImageView
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:id="@+id/iv_bookingitem_to"
-        android:src="@drawable/to_booking_list"
-        android:layout_marginTop="2dp"
-        app:layout_constraintStart_toStartOf="@+id/iv_bookingitem_from"
-        app:layout_constraintEnd_toEndOf="@+id/iv_bookingitem_from"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_totitle"/>
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_bookingitem_tolocation"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:text="Chopasani Housing Board, Shree Krishna Nagar,161"
-        android:textColor="@color/colorblack"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_totitle"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_to"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_to" />
-    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-        android:id="@+id/tv_bookingitem_totime"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Saturday, 24 January, 04:20 PM"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textSize="10dp"
-        android:textColor="@color/colorblack"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_tolocation"
-        app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_tolocation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        />
-    <View
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:background="@color/colordark_grey"
-        app:layout_constraintTop_toBottomOf="@+id/iv_bookingitem_from"
-        app:layout_constraintStart_toStartOf="@+id/iv_bookingitem_from"
-        app:layout_constraintEnd_toEndOf="@+id/iv_bookingitem_from"
-        app:layout_constraintBottom_toTopOf="@+id/iv_bookingitem_to"/>
-
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_triplist_itemlayout2"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:id="@+id/rl_bookingitem_view"
-        android:background="@color/greenLight"
-        android:visibility="visible"
+        android:layout_height="wrap_content"
+        android:background="@drawable/booking_item_background"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_totime">
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:id="@+id/iv_bookingitem_bookingid"
+            android:src="@drawable/booking_id"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="15dp"/>
         <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/tv_bookingitem_viewaction"
-            android:text="View"
-            android:textColor="@color/colorwhite"
-            android:textSize="16dp"
-            android:gravity="center"/>
+            android:id="@+id/tv_bookingitem_bookingid_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Booking ID"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_bookingid"
+            app:layout_constraintStart_toEndOf="@+id/iv_bookingitem_bookingid"
+            app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_bookingid"
+            app:layout_constraintVertical_bias="1.0" />
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_bookingitem_distance_title"
+            android:text="Distance"
+            android:layout_marginRight="30dp"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_distance"
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintBottom_toBottomOf="@id/iv_bookingitem_bookingid"/>
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:id="@+id/iv_bookingitem_distance"
+            android:src="@drawable/distance_booking_list"
+            android:layout_marginRight="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/tv_bookingitem_distance_title"
+            app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_bookingid"
+            app:layout_constraintBottom_toBottomOf="@id/iv_bookingitem_bookingid"/>
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_bookingitem_bookingid"
+            android:textSize="12dp"
+            android:text="1234567"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:foregroundGravity="center_vertical"
+            android:textColor="@color/colorblack"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_bookingid_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid_title"
+            app:layout_constraintEnd_toStartOf="@+id/tv_bookingitem_distance"
+            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginTop="1dp"/>
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_bookingitem_distance"
+            android:textColor="@color/colorblack"
+            android:maxLines="1"
+            android:foregroundGravity="center_vertical"
+            android:ellipsize="end"
+            android:textSize="12dp"
+            android:text="2345 KM"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_distance_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toTopOf="@+id/tv_bookingitem_bookingid"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_bookingitem_bookingid" />
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/iv_bookingitem_from"
+            android:src="@drawable/from_cbs"
+            android:layout_marginTop="25dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_bookingid"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid"/>
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_bookingitem_fromlocation"
+            android:text="Boranada,Summer Nagar,115"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/colorblack"
+            app:layout_constraintStart_toEndOf="@+id/iv_bookingitem_from"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_from"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_from"
+            android:layout_marginLeft="10dp"/>
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:id="@+id/tv_bookingitem_fromtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="From"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_bookingitem_fromlocation"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromlocation"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_bookingid"
+            app:layout_constraintVertical_bias="1.0" />
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:id="@+id/tv_bookingitem_fromtime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Saturday, 24 January, 04:20 PM"
+            android:textSize="10dp"
+            android:textColor="@color/colorblack"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_fromlocation"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromlocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0" />
+
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:id="@+id/tv_bookingitem_totitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="To"
+            android:textSize="12dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_bookingitem_tolocation"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_fromtime"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_fromtitle"
+            app:layout_constraintVertical_bias="1.0"/>
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/iv_bookingitem_to"
+            android:src="@drawable/to_booking_list"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="@+id/iv_bookingitem_from"
+            app:layout_constraintEnd_toEndOf="@+id/iv_bookingitem_from"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_totitle"/>
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_bookingitem_tolocation"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="Chopasani Housing Board, Shree Krishna Nagar,161"
+            android:textColor="@color/colorblack"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_totitle"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/iv_bookingitem_to"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_bookingitem_to" />
+        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:id="@+id/tv_bookingitem_totime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Saturday, 24 January, 04:20 PM"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="10dp"
+            android:textColor="@color/colorblack"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_tolocation"
+            app:layout_constraintStart_toStartOf="@+id/tv_bookingitem_tolocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/colordark_grey"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/iv_bookingitem_from"
+            app:layout_constraintStart_toStartOf="@+id/iv_bookingitem_from"
+            app:layout_constraintEnd_toEndOf="@+id/iv_bookingitem_from"
+            app:layout_constraintBottom_toTopOf="@+id/iv_bookingitem_to"/>
         <RelativeLayout
-            android:layout_width="35dp"
+            android:layout_width="match_parent"
             android:layout_height="35dp"
-            android:layout_alignParentRight="true"
-            android:id="@+id/rl_bookingitem_view_icon"
-            android:background="@color/greenDark">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/forwordarrow"/>
+            android:id="@+id/rl_bookingitem_view"
+            android:background="@color/greenLight"
+            android:visibility="visible"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bookingitem_totime">
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_bookingitem_viewaction"
+                android:text="View"
+                android:textColor="@color/colorwhite"
+                android:textSize="16dp"
+                android:gravity="center"/>
+            <RelativeLayout
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:id="@+id/rl_bookingitem_view_icon"
+                android:background="@color/greenDark">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/forwordarrow"/>
+            </RelativeLayout>
         </RelativeLayout>
-    </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

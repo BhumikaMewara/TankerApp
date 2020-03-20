@@ -1,43 +1,78 @@
 {
   "project_info": {
-    "project_number": "31543893111",
-    "firebase_url": "https://water-tanker-tracker.firebaseio.com",
-    "project_id": "water-tanker-tracker",
-    "storage_bucket": "water-tanker-tracker.appspot.com"
+    "project_number": "765955969333",
+    "firebase_url": "https://willyoudateme.firebaseio.com",
+    "project_id": "willyoudateme",
+    "storage_bucket": "willyoudateme.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:31543893111:android:296bd6f40e99a3d6dc7a72",
+        "mobilesdk_app_id": "1:765955969333:android:3ff675e67c664462503c7c",
         "android_client_info": {
-          "package_name": "com.kookyapps.gpstankertracking"
+          "package_name": "com.example.watertankercontroller"
         }
       },
       "oauth_client": [
         {
-          "client_id": "31543893111-b2bjn7susk3k78af2dr6gu0ruorg27l9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.kookyapps.gpstankertracking",
-            "certificate_hash": "66738c550a05bd4fa7c821af2e12542ec2202ea2"
-          }
-        },
-        {
-          "client_id": "31543893111-jbaa9d2movab3bgi5rbjd1q2af1s5mh7.apps.googleusercontent.com",
+          "client_id": "765955969333-186gkn6j40mol7ceduossg6k293q1u7n.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCB0qAhs3ula07lSJHuLj-GFJXifUPW9_A"
+          "current_key": "AIzaSyB8xYpqWDtO3e516NGxvRx6wiFEBpxl4AM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "31543893111-jbaa9d2movab3bgi5rbjd1q2af1s5mh7.apps.googleusercontent.com",
+              "client_id": "765955969333-186gkn6j40mol7ceduossg6k293q1u7n.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "765955969333-0rlm2f5rqtvt0sgbdjt3j7k9ljik2alr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pradeep.MBM"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765955969333:android:d090a662c26ab014503c7c",
+        "android_client_info": {
+          "package_name": "com.kookyapps.gpstankertracking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "765955969333-186gkn6j40mol7ceduossg6k293q1u7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8xYpqWDtO3e516NGxvRx6wiFEBpxl4AM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "765955969333-186gkn6j40mol7ceduossg6k293q1u7n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "765955969333-0rlm2f5rqtvt0sgbdjt3j7k9ljik2alr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pradeep.MBM"
+              }
             }
           ]
         }

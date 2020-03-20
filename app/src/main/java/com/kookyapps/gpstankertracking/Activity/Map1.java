@@ -85,6 +85,7 @@ import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.Utils.Utils;
+import com.kookyapps.gpstankertracking.app.GPSTracker;
 import com.kookyapps.gpstankertracking.fcm.Config;
 import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 
@@ -123,7 +124,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     BroadcastReceiver mRegistrationBroadcastReceiver;
     DrawerLayout navdrawer;
     ActionBarDrawerToggle actionBarDrawerToggle;
-    SwitchCompat switchCompat;
+    SwitchCompat switchCompat,onlineSwitch;
+    GPSTracker gpsTracker;
+    String  stringLatitude,stringLongitude;
 
     static boolean isTouched = true;
 
@@ -145,6 +148,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         Intent i = getIntent();
         Bundle b = i.getExtras();
         blmod = b.getParcelable("Bookingdata");
+        gpsTracker = new GPSTracker(this);
 
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
@@ -164,6 +168,49 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             config.locale = locale;
             getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
         }
+
+        /*onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
+        if(SessionManagement.getUserStatus(Map1.this).equals(Constants.IS_ONLINE)){
+            onlineSwitch.setChecked(true);
+
+        }else{
+            onlineSwitch.setChecked(false);
+
+        }
+
+        if (gpsTracker.getIsGPSTrackingEnabled()){
+            stringLatitude = String.valueOf(gpsTracker.latitude);
+            stringLongitude = String.valueOf(gpsTracker.longitude);
+        }else
+        {
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gpsTracker.showSettingsAlert();
+        }
+
+
+
+
+        onlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    SessionManagement.setUserStatus(Map1.this, Constants.IS_ONLINE);
+                    updateLcationApiCalling(Constants.IS_ONLINE);
+                } else {
+                    SessionManagement.setLanguage(Map1.this, Constants.IS_OFFLINE);
+                    updateLcationApiCalling(Constants.IS_OFFLINE);
+                }
+
+            }
+
+        });
+*/
+
+
 
         fromLat=Double.parseDouble(blmod.getFromlatitude());
         fromLong=Double.parseDouble(blmod.getFromlongitude());
@@ -349,6 +396,61 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
         }
     };
+
+
+    public void updateLcationApiCalling(String currentStatus) {
+
+        JSONObject jsonBodyObj = new JSONObject();
+
+
+        try {
+            jsonBodyObj.put("lat", stringLatitude);
+            jsonBodyObj.put("lng", stringLongitude);
+            jsonBodyObj.put("status", currentStatus);
+
+            POSTAPIRequest postapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(postapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:", token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(Map1.this, updateLocationListner, url, headparam, jsonBodyObj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    FetchDataListener updateLocationListner = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                        String message=   data.getString("message");
+                        Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+
+        }
+        @Override
+        public void onFetchFailure(String msg) {
+            logoutLayout.setClickable(true);
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
+
+
+
 
 
 

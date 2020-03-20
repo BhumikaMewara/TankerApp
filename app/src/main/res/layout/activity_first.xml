@@ -37,12 +37,14 @@
                     android:id="@+id/btn_first_rqstbtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="requestList"
+                    android:text=" request  List "
                     android:padding="3dp"
                     android:textColor="@color/colorwhite"
                     android:layout_toLeftOf="@+id/firstactivity_divider1"
                     android:background="@drawable/bg_requestlist"
                     android:textSize="12sp"
+                    android:paddingRight="8dp"
+                    android:paddingLeft="8dp"
                     android:layout_marginTop="10dp"/>
                 <View
                     android:layout_width="3dp"
@@ -56,10 +58,12 @@
                     android:layout_height="wrap_content"
                     android:padding="3dp"
                     android:background="@drawable/bg_bookinglist"
-                    android:text="bookingList"
+                    android:text=" booking  List "
                     android:layout_toRightOf="@+id/firstactivity_divider1"
                     android:textColor="@color/colorwhite"
                     android:textSize="12sp"
+                    android:paddingRight="8dp"
+                    android:paddingLeft="8dp"
                     android:layout_marginTop="10dp"/>
             </RelativeLayout>
 
@@ -68,9 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/tabs"
-
-               android:layout_below="@+id/rl_first_booking_requestList"
-                 />
+                android:layout_below="@+id/rl_first_booking_requestList" />
         </RelativeLayout>
 
 
@@ -79,7 +81,7 @@
             android:layout_width="290dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="@color/colorGreyLight"
+            android:background="@color/drawerColor"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
@@ -99,29 +101,27 @@
                     android:layout_weight="3">
 
 
-                    <TextView
+                    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                         android:id="@+id/tv_first_drawer_fullName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginStart="-10dp"
-                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="10dp"
                         android:text="Robert Percival"
-                        android:gravity="center"
+                        android:gravity="start"
                         android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="@android:color/black" />
 
-                    <TextView
+                    <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                         android:id="@+id/tv_first_drawer_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="robert123"
-                        android:layout_gravity="center"
-                        android:gravity="center_horizontal"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="start"
                         android:textStyle="bold"
                         android:textSize="14sp"
-                        android:layout_marginStart="-10dp"
                         android:textColor="@android:color/black" />
 
                 </LinearLayout>
@@ -129,7 +129,6 @@
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
                     android:layout_gravity="end"
                     android:gravity="end">
@@ -165,12 +164,9 @@
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="start"
-                android:gravity="start"
-
-                >
+                android:gravity="start">
                 <ImageView
                     android:id="@+id/iv_first_tripitem"
                     android:layout_width="25dp"
@@ -178,14 +174,14 @@
                     android:src="@drawable/trip_menu"
                     android:layout_marginTop="16dp"
                     android:layout_gravity="start"/>
-                <TextView
+                <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                     android:id="@+id/tv_drawer_tripText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginStart="5dp"
                     android:layout_gravity="start"
-                    android:text="Trip"
+                    android:text=" "
                     android:textColor="@android:color/black"
                     android:textSize="14sp"/>
 
@@ -219,7 +215,7 @@
                     android:src="@drawable/language_menu"
                     android:layout_marginTop="16dp"
                     android:layout_gravity="start"/>
-                <TextView
+                <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                     android:id="@+id/tv_drawer_language"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -236,11 +232,9 @@
                     android:id="@+id/switch2"
                     android:layout_marginStart="60dp"
                     android:thumb="@drawable/thumb2"
-                    app:track="@drawable/track"
-
-                    >
-                    android:textOn="Hindi"
-                    android:textOff="English"
+                    app:track="@drawable/track">
+                    android:textOn="Hi"
+                    android:textOff="En"
                     app:showText="true"
 
                 </androidx.appcompat.widget.SwitchCompat>
@@ -287,7 +281,7 @@
                     android:src="@drawable/logout_menu"
                     android:layout_marginTop="16dp"
                     android:layout_gravity="start"/>
-                <TextView
+                <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                     android:id="@+id/tv_drawer_logout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

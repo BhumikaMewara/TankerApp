@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">पानी का टैंकर</string>
     <string name="no_booking">No Bookings Found</string>
+    <!--<item name="myUrl" type="menu">http://myUrl.com</item>-->
     <string name="drawer_open">open</string>
     <string name="drawer_close">close</string>
 
@@ -20,6 +21,7 @@
     <!-- Page Titles-->
     <string name="trip_complete">ट्रिप पूरी हुई</string>
     <string name="trip_details">यात्रा विवरण</string>
+    <string name="trips">यात्राएं</string>
     <string name="enter_otp">OTP दर्ज करें</string>
     <string name="notifications">सूचनाएं</string>
     <string name="booking_list">बुकिंग सूची</string>
@@ -43,7 +45,7 @@
 
 
     <!-- Trip Complete-->
-
+    <string name="notification_heading"> The Standard Lorem Ipsum passage, used since 1500s </string>
 
     <string name="wrongOtp">ओटीपी सही से दर्ज करें</string>
 
