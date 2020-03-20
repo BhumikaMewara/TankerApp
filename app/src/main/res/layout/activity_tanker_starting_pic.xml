@@ -69,20 +69,49 @@
                             android:orientation="vertical"
                             android:layout_marginRight="10dp"
                             android:visibility="visible">
-                            <TextView
-                                android:id="@+id/tv_tankr_strt_lat"
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="paritosh"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:id="@+id/textLatitude"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Lat: "
+                                    android:textColor="@color/colorwhite"
+                                    android:textSize="14sp"></TextView>
+                                <TextView
+                                    android:id="@+id/tv_tankr_strt_lat"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="paritosh"
+                                    android:textColor="@color/colorwhite"
+                                    android:textSize="14sp"
+                                    />
+                            </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/textLongitude"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Long: "
                                 android:textColor="@color/colorwhite"
-                                android:textSize="14sp"
-                                />
+                                android:textSize="14sp"></TextView>
                             <TextView
                                 android:id="@+id/tv_tankr_strt_lon"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorwhite"
                                 android:text="sadad"/>
+                        </LinearLayout>
+
+
                         </LinearLayout>
                     </RelativeLayout>
 
@@ -122,7 +151,7 @@
                         <TextView
                             android:id="@+id/tv_tankr_strt_date"
                             android:layout_width="wrap_content"
-                            android:layout_height="9dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginLeft="2dp"
                             android:layout_weight="1"
                             android:text="24January 2020"
