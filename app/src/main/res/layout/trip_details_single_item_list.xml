@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Booking ID"
+            android:text="@string/booking_id_text"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_trip_details_bookingid"
             app:layout_constraintStart_toEndOf="@+id/iv_trip_details_bookingid"
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
-            android:text="Distance"
+            android:text="@string/distance"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="@id/iv_trip_details_bookingid"
             app:layout_constraintEnd_toEndOf="parent"
@@ -129,23 +129,98 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="From"
+            android:text="@string/from"
             android:textSize="12dp"
             app:layout_constraintBottom_toTopOf="@+id/tv_trip_details_fromlocation"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromlocation"
             app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_bookingid"
             app:layout_constraintVertical_bias="1.0" />
-        <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+
+
+
+        <LinearLayout
             android:id="@+id/tv_trip_details_fromtime"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Saturday, 24 January, 04:20 PM"
-            android:textColor="@color/colorblack"
-            android:textSize="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromlocation"
-            app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_fromlocation" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_fromlocation"
+            android:orientation="horizontal" >
+
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+            android:id="@+id/tv_currentDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Saturday, "
+                android:textColor="@color/colorblack"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/tv_trip_details_fromlocation"
+                app:layout_constraintTop_toBottomOf="@+id/tv_trip_details_fromlocation"
+                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
+
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                android:id="@+id/tv_currentDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 24 "
+                android:textColor="@color/colorblack"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/tv_currentDay"
+                app:layout_constraintTop_toBottomOf="@+id/tv_currentDay"
+                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
+           <!-- <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                android:id="@+id/tv_currentMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" January "
+                android:textColor="@color/colorblack"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/tv_currentDate"
+                app:layout_constraintTop_toBottomOf="@+id/tv_currentDate"
+                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                android:id="@+id/tv_currentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 04:30 "
+                android:textColor="@color/colorblack"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/tv_currentMonth"
+                app:layout_constraintTop_toBottomOf="@+id/tv_currentMonth"
+                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                android:id="@+id/tv_currentAMPM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" PM "
+                android:textColor="@color/colorblack"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/tv_currentMonth"
+                app:layout_constraintTop_toBottomOf="@+id/tv_currentMonth"
+                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
+-->
+
+
+        </LinearLayout>
+
+
+
         <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
             android:id="@+id/tv_trip_details_totitle"
             android:layout_width="wrap_content"
@@ -153,7 +228,7 @@
             android:layout_marginBottom="2dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="To"
+            android:text="@string/to"
             android:textSize="12dp"
             android:layout_marginTop="10dp"
             app:layout_constraintBottom_toTopOf="@+id/tv_trip_details_tolocation"

@@ -3,7 +3,6 @@
     package="com.kookyapps.gpstankertracking">
 
     <application
-        android:name=".LocaleChangeApp"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"

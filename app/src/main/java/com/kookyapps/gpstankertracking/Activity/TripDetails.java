@@ -47,7 +47,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +60,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     DrawerLayout navdrawer;
     ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
-    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username,notificationCountText;
+    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username,notificationCountText,date,time,bookingid,distance,from,to;
     RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
@@ -98,6 +102,14 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         totalKm=(TextView)findViewById(R.id.tv_trip_details_totalKM_value);
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
+bookingid=findViewById(R.id.tv_trip_details_bookingid_title);
+distance=findViewById(R.id.tv_trip_details_distance);
+from=findViewById(R.id.tv_trip_details_fromtitle);
+to=findViewById(R.id.tv_trip_details_totitle);
+
+
+       /* date=findViewById(R.id.tv_currentDay);
+        time=findViewById(R.id.tv_currentDate);*/
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
         back.setOnClickListener(this);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
@@ -181,6 +193,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             }
         });
        tripDetailsListApiCalling();
+
 
 
 

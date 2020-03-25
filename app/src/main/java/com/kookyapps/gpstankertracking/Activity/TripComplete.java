@@ -58,12 +58,14 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
 
     }
     public void initViews(){
+
             init_type = getIntent().getExtras().getString("init_type");
            // bkngid = getIntent().getExtras().getString("booking_id");
             blmod= (BookingListModal) getIntent().getExtras().get("Bookingdata");
             pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
             back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
             noti=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
+
             notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
             notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
@@ -86,7 +88,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             }
         };
 
-
         bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
             distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
             pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
@@ -99,6 +100,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             noti.setOnClickListener(this);
             bottom.setOnClickListener(this);
             pagetitle.setText(getString(R.string.trip_complete));
+
 
 
     }

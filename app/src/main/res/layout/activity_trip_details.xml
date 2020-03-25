@@ -36,21 +36,21 @@
             android:background="@color/green1"
             android:padding="5dp"
             android:layout_marginBottom="5dp">
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:id="@+id/tv_trip_details_totalTrip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Trip :"
+                android:text="@string/total_trip"
                 android:textColor="@color/greenLight"
                 android:textSize="20sp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:paddingTop="5dp"/>
-            <TextView
+            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:id="@+id/tv_trip_details_totalKM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total KM :"
+                android:text="@string/total_km"
                 android:textColor="@color/greenLight"
                 android:textSize="20sp"
                 android:paddingLeft="5dp"

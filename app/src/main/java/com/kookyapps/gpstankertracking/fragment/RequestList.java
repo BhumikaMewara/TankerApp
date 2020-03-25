@@ -2,6 +2,7 @@ package com.kookyapps.gpstankertracking.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.kookyapps.gpstankertracking.Activity.FirstActivity;
+import com.kookyapps.gpstankertracking.Activity.MainActivity;
 import com.kookyapps.gpstankertracking.Adapters.RequestListAdapter;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
@@ -48,6 +51,10 @@ public class RequestList extends Fragment {
     Context context;
     SwipeRefreshLayout refreshLayout;
     ArrayList<BookingListModal> requestlist;
+
+
+    ArrayList<BookingListModal> tripList;
+
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
     private final int PAGE_START  = 1;
@@ -69,20 +76,27 @@ public class RequestList extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root =inflater.inflate(R.layout.fragment_request_list, container, false);
+
         recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_reqstlist);
         progressBar = (RelativeLayout) root.findViewById(R.id.fg_request_progresbar);
         refreshLayout=(SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
+
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshLayout.setRefreshing(false);
+                tripList.clear();
 
-
-               requestlistApiCalling();
-
+                mAdapter.clearAll();
+                requestlistApiCalling();
             }
         });
-        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.greenLight));
+        refreshLayout.setColorSchemeColors (getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(android.R.color.holo_green_dark),
+                getResources().getColor(android.R.color.holo_orange_dark),
+                getResources().getColor(android.R.color.holo_blue_dark));
+
+
         noRequest=(TextView)root.findViewById(R.id.tv_requestlist_nodata);
         mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_DETAILS);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -117,9 +131,14 @@ public class RequestList extends Fragment {
                 return isLoading;
             }
         });
+
+
         requestlistApiCalling();
         return root;
+
     }
+
+
 
 
     private void requestlistApiCalling(){
@@ -145,7 +164,7 @@ public class RequestList extends Fragment {
             try {
                 if (data != null) {
                     if (data.getInt("error")==0) {
-                        ArrayList<BookingListModal> tripList=new ArrayList<>();
+                        tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");
                         totaltxnCount = data.getInt("total");
                         if (totaltxnCount > page_size) {
@@ -217,6 +236,9 @@ public class RequestList extends Fragment {
                                 tripList.add(tdmod);
                             }
                         }
+                        else {
+                           noRequest.setText("No Request Found");
+                        }
                         Log.d("RequestList:", data.toString());
                         setRecyclerView();
                         mAdapter.addAll(tripList);
@@ -225,6 +247,7 @@ public class RequestList extends Fragment {
                         else
                             isLastPage = true;
                     }
+
                 }
 
             } catch (JSONException e) {

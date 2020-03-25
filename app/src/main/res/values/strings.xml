@@ -15,18 +15,29 @@
     <string name="controller_name">Controller Name</string>
     <string name="customer_number">Customer Mobile</string>
     <string name="message">Message</string>
+    <string name="total_trip">Total Trips : </string>
+    <string name="total_km">Total Km :</string>
+    <string name="view">View</string>
+
 
 
     <!-- Page Titles-->
     <string name="trip_complete">Trip Complete</string>
     <string name="trip_details">Trip Details</string>
     <string name="trips">Trips</string>
+    <string name="language">Language</string>
+    <string name="logout">LogOut</string>
     <string name="enter_otp">Enter OTP</string>
     <string name="notifications">Notifications</string>
     <string name="booking_list">Booking List</string>
     <string name="request_list">Request List</string>
     <string name="request_details">Request Deatils</string>
     <string name="booking_details">Booking Deatils</string>
+
+    <string name="distance">Distance</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+
 
 
 

@@ -10,11 +10,13 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -137,21 +139,13 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                     setNotificationCount(count+1,false);
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)){
-                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.HINDI_LANGUAGE);
                         /*pageTitle.setText(getResources().getString(R.string.enter_otp));
                         title.setText(getResources().getString(R.string.enter_code));
                         message.setText(getResources().getString(R.string.otpscreen_msg));*/
 
                     }else{
-                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
                     }
                 }
             }
@@ -442,6 +436,11 @@ private  void validateOTP(){
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
 
+        if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)) {
+            setAppLocale(Constants.HINDI_LANGUAGE);
+        }else {
+            setAppLocale(Constants.HINDI_LANGUAGE);
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         //change the language when prompt
@@ -461,6 +460,19 @@ private  void validateOTP(){
                 notificationCountLayout.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+
+    private void setAppLocale(String localeCode){
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+            config.setLocale(new Locale(localeCode.toLowerCase()));
+        } else {
+            config.locale = new Locale(localeCode.toLowerCase());
+        }
+        resources.updateConfiguration(config, dm);
     }
 
 

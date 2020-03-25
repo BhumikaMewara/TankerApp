@@ -81,7 +81,8 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             bookingid = (TextView)view.findViewById(R.id.tv_trip_details_bookingid);
             distance = (TextView)view.findViewById(R.id.tv_trip_details_distance1);
             from_address = (TextView)view.findViewById(R.id.tv_trip_details_fromlocation);
-            fromtime = (TextView)view.findViewById(R.id.tv_trip_details_fromtime);
+            fromtime=(TextView)view.findViewById(R.id.tv_currentDay);
+
             to_address = (TextView)view.findViewById(R.id.tv_trip_details_tolocation);
             totime = (TextView)view.findViewById(R.id.tv_trip_details_totime);
             itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);

@@ -17,12 +17,21 @@
     <string name="controller_name">नियंत्रक का नाम</string>
     <string name="customer_number">ग्राहक का मोबाइल नंबर</string>
     <string name="message">संदेश</string>
+    <string name="distance">दूरी</string>
+    <string name="from">कहाँ से</string>
+    <string name="to">कहां तक</string>
+    <string name="view">आगे देखें</string>
+
+    <string name="total_trip">कुल यात्राएं </string>
+    <string name="total_km">कुल किमी</string>
 
     <!-- Page Titles-->
     <string name="trip_complete">ट्रिप पूरी हुई</string>
     <string name="trip_details">यात्रा विवरण</string>
     <string name="trips">यात्राएं</string>
-    <string name="enter_otp">OTP दर्ज करें</string>
+    <string name="language">भाषा</string>
+    <string name="logout">लॉग आउट</string>
+    <string name="enter_otp">ओटीपी  दर्ज करें</string>
     <string name="notifications">सूचनाएं</string>
     <string name="booking_list">बुकिंग सूची</string>
     <string name="request_list">अनुरोध सूची</string>

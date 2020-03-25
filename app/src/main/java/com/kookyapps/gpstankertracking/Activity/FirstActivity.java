@@ -29,12 +29,14 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -86,7 +88,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     ViewPager viewPager;
     LinearLayout l ,tripLayout ,logoutLayout;
     RelativeLayout r ,toolbarNotiCountLayout,toolbarmenuLayout,notificationLayout;
-    TextView fullname,username,trip,language,logut,toolBarTitle,pagetitle;
+    TextView fullname,username,trip,language,logut,toolBarTitle,pagetitle,bookind_id,distance,from,to,view;
     ImageView tripImg,languageImg,logoutImg,flagImg,toolBarImgMenu,toolBarImgNotification;
     static String notificationCount;
     Button rqstbtn , bkngbtn;
@@ -121,17 +123,10 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
             Log.i("language",SessionManagement.getLanguage(this));
             switchCompat.setChecked(true);
-           /* Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());*/
+            setAppLocale(Constants.HINDI_LANGUAGE);
         }else{
-         /* Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());*/
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
+
         }
 
         onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
@@ -172,9 +167,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
         username=(TextView)findViewById(R.id.tv_first_drawer_username);
         trip=(TextView)findViewById(R.id.tv_drawer_tripText);
-        String s= SessionManagement.getLanguagePath(FirstActivity.this);
-       //Log.i("menu",getResources().getString(R.menu.myUrl));
-//        trip.setText(getResources().getString(Integer.parseInt(s.);
+
         language=(TextView)findViewById(R.id.tv_drawer_language);
         logut=(TextView)findViewById(R.id.tv_drawer_logout);
         toolBarImgMenu =(ImageView)findViewById(R.id.toolbarmenu);
@@ -190,7 +183,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         notificationLayout.setOnClickListener(this);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        //toolBarTitle =           (TextView)       findViewById(R.id.toolbartitle);
+
         navdrawer= (DrawerLayout)   findViewById(R.id.dl_first) ;
         //actionBarDrawerToggle = new ActionBarDrawerToggle(this,navdrawer,R.string.drawer_open,R.string.drawer_close);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, navdrawer,
@@ -211,6 +204,12 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         rqstbtn= (Button)findViewById(R.id.btn_first_rqstbtn);
         bkngbtn= (Button)findViewById(R.id.btn_first_bookingbtn);
 
+        bookind_id=(TextView)findViewById(R.id.tv_bookingitem_bookingid_title);
+        distance=(TextView)findViewById(R.id.tv_bookingitem_distance_title);
+        from=(TextView)findViewById(R.id.tv_bookingitem_fromtitle);
+        to=(TextView)findViewById(R.id.tv_bookingitem_totitle);
+        view=(TextView)findViewById(R.id.tv_bookingitem_viewaction);
+
         fullname.setText(SessionManagement.getName(FirstActivity.this));
         username.setText(SessionManagement.getUserId(FirstActivity.this));
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -230,30 +229,23 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     setNotificationCount(count+1,false);
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
-                        /*locale = new Locale(Constants.HINDI_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.HINDI_LANGUAGE);
                         languageChangeApi();
                         finish();
                         startActivity(getIntent());
-*/
+
                     }else{
-                       /*  locale = new Locale(Constants.ENGLISH_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                         setAppLocale(Constants.ENGLISH_LANGUAGE);
                         languageChangeApi();
+
                         finish();
-                        startActivity(getIntent());*/
+                        startActivity(getIntent());
                     }
                 }
             }
         };
              pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-       // pagetitle.setText(s12);
+
 
 
         tripLayout.setOnClickListener(this);
@@ -312,24 +304,16 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
                     if (isChecked) {
                         SessionManagement.setLanguage(FirstActivity.this, Constants.HINDI_LANGUAGE);
+                    }else {
+                        SessionManagement.setLanguage(FirstActivity.this, Constants.ENGLISH_LANGUAGE);
                     }
-                        SessionManagement.setLanguage(FirstActivity.this,Constants.ENGLISH_LANGUAGE);
-
-                    }
+                }
                     showlanguage();
                 }
 
         });
     }
-    @Override
-    protected void attachBaseContext(Context newBase) {
 
-        newBase = LocaleChanger.configureBaseContext(newBase);
-
-        s12= newBase.getResources().getString(R.string.request_list);
-
-        super.attachBaseContext(newBase);
-    }
 
 
     public void toGetAllPermissions(){
@@ -664,19 +648,9 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         // clear the no04  ki[[vtification area when the app is opened
 
         if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)) {
-            Log.i("language", SessionManagement.getLanguage(this));
-            switchCompat.setChecked(true);
-            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+            setAppLocale(Constants.HINDI_LANGUAGE);
         }else {
-            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
@@ -792,6 +766,18 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
     }
 
+
+    private void setAppLocale(String localeCode){
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+            config.setLocale(new Locale(localeCode.toLowerCase()));
+        } else {
+            config.locale = new Locale(localeCode.toLowerCase());
+        }
+        resources.updateConfiguration(config, dm);
+    }
 
 
 }

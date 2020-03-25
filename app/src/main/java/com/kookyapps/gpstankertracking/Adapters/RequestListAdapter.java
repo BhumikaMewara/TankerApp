@@ -162,6 +162,12 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
             notifyItemRemoved(position);
         }
     }
+   public void clearAll(){
+     requestlist.clear();
+     notifyDataSetChanged();
+    }
+
+
 
     public void addLoadingFooter() {
         isLoadingAdded = true;
@@ -181,6 +187,9 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
     public BookingListModal getItem(int position) {
         return requestlist.get(position);
     }
+
+
+
 
 
 }

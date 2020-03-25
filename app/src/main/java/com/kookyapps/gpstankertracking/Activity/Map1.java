@@ -25,16 +25,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -49,13 +53,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
@@ -66,6 +73,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kookyapps.gpstankertracking.Utils.Constants;
@@ -79,6 +87,7 @@ import com.github.nkzawa.socketio.client.Socket;*/
 
 
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
+import com.kookyapps.gpstankertracking.Utils.FetchURL;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
@@ -93,15 +102,17 @@ import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
+import com.google.maps.android.PolyUtil;
 
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
-public class Map1 extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,com.google.android.gms.location.LocationListener{
+public class Map1 extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,com.google.android.gms.location.LocationListener,TaskLoadedCallback{
 
     private GoogleMap mMap;
     LinearLayout tripLayout,logoutLayout,l;
     RelativeLayout notifications,bottom,seemore,details , redLayout,toolbarNotiCountLayout,toolbarmenuLayout,r;
-    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText;
+    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText,trips,language,logout;
     TextView fullname,username;
     ImageView seemoreImg ;
     Double toLat , toLong,fromLat,fromLong;
@@ -110,13 +121,20 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     BookingListModal blmod;
     static String notificationCount;
     ArrayList<String> allpermissionsrequired;
+    static ArrayList<LatLng> waypoints = null;
     private LocationManager locationManager;
     private GoogleApiClient mGoogleApiClient;
+    long distance1=0,duration=0;
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 2 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 20000;
     private LatLng currentlatlng=null;
+
+    private LatLng pickupLatLng=null,dropLatLng=null;
+    Polyline currentPolyline;
     private Marker currentmarker=null;
+    Marker pickupMarker,dropMarker;
+    MarkerOptions currentop;
     SupportMapFragment mapFragment;
     private Socket socket;
     boolean cameraAccepted;
@@ -127,8 +145,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     SwitchCompat switchCompat,onlineSwitch;
     GPSTracker gpsTracker;
     String  stringLatitude,stringLongitude;
-
+    Locale locale;
     static boolean isTouched = true;
+    ArrayList<LatLng> mapRoute=null;
 
 
 
@@ -153,62 +172,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
             switchCompat.setChecked(true);
-            Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-
+            setAppLocale(Constants.HINDI_LANGUAGE);
 
         }else{
             switchCompat.setChecked(false);
-            Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-            Locale.setDefault(locale);
-            Configuration config = new Configuration();
-            config.locale = locale;
-            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
-
-        /*onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
-        if(SessionManagement.getUserStatus(Map1.this).equals(Constants.IS_ONLINE)){
-            onlineSwitch.setChecked(true);
-
-        }else{
-            onlineSwitch.setChecked(false);
-
-        }
-
-        if (gpsTracker.getIsGPSTrackingEnabled()){
-            stringLatitude = String.valueOf(gpsTracker.latitude);
-            stringLongitude = String.valueOf(gpsTracker.longitude);
-        }else
-        {
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gpsTracker.showSettingsAlert();
-        }
-
-
-
-
-        onlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (isChecked) {
-                    SessionManagement.setUserStatus(Map1.this, Constants.IS_ONLINE);
-                    updateLcationApiCalling(Constants.IS_ONLINE);
-                } else {
-                    SessionManagement.setLanguage(Map1.this, Constants.IS_OFFLINE);
-                    updateLcationApiCalling(Constants.IS_OFFLINE);
-                }
-
-            }
-
-        });
-*/
 
 
 
@@ -257,32 +226,45 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        locationCahnge1st = false;
+        pickupLatLng = new LatLng(Double.parseDouble(blmod.getFromlatitude()),Double.parseDouble(blmod.getFromlongitude()));
+         dropLatLng = new LatLng(Double.parseDouble(blmod.getTolatitude()),Double.parseDouble(blmod.getTologitude()));
+        MarkerOptions pickupop,dropop,currentop;
+        //Bitmap b = BitmapFactory.decodeResource(getResources(),R.drawable.truck_map);
         // Add a marker in Sydney, Australia, and move the camera.
         LatLng from = new LatLng(fromLat,fromLong);
         LatLng to = new LatLng(toLat,toLong);
 
-        MarkerOptions op1 = new MarkerOptions()
+        pickupop = new MarkerOptions()
                 .position(from)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.hydrant_pickuppoint_map));
 
 
 
-        MarkerOptions op2 = new MarkerOptions()
+        dropop = new MarkerOptions()
                 .position(to)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_map));
 
 
-        mMap.addMarker(op1);
-        mMap.addMarker(op2);
+        mMap.addMarker(pickupop);
+        mMap.addMarker(dropop);
         if(currentlatlng!=null){
-            MarkerOptions current = new MarkerOptions()
+           currentop = new MarkerOptions()
                     .position(currentlatlng)
+                   .flat(true)
+                   .alpha(.6f)
+                   .anchor(0.5f,0.5f)
+                   .rotation(90)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-            currentmarker = mMap.addMarker(current);
+            currentmarker = mMap.addMarker(currentop);
+            pickupMarker = mMap.addMarker(pickupop);
+            dropMarker = mMap.addMarker(dropop);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 12));
         }
 
+        if (mapRoute == null) {
+            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+        }
     }
 
     public void drawerMenu (View view ){
@@ -487,6 +469,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
         title.setText(R.string.title_activity_maps);
+
+        trips=(TextView)findViewById(R.id.tv_map_tripText);
+        language=(TextView)findViewById(R.id.tv_map_language);
+        logout=(TextView)findViewById(R.id.tv_map_logout);
+
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
@@ -538,7 +525,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_pickup_map);
-        checkAndRequestPermissions(this,allpermissionsrequired);
+
 
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
@@ -558,25 +545,18 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 }
                 else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
-                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                       setAppLocale(Constants.HINDI_LANGUAGE);
                         finish();
                         startActivity(getIntent());
                     }else{
-                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
                         finish();
                         startActivity(getIntent());
                     }
                 }
             }
         };
+
 
         switchCompat.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -604,8 +584,64 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         });
 
 
+        checkAndRequestPermissions(this,allpermissionsrequired);
+    }
+
+
+    public void languageChangeApi() {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            jsonBodyObj.put("lang",locale);
+            POSTAPIRequest postapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.LANGUAGE_CHANGED;
+
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(postapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:",token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(Map1.this,languageChangeListner,url,headparam,jsonBodyObj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
+    FetchDataListener languageChangeListner = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                        String message=   data.getString("message");
+
+                        // SessionManagement.logout(logoutListner, FirstActivity.this);
+                        Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+
+            }
+
+        }
+        @Override
+        public void onFetchFailure(String msg) {
+            logoutLayout.setClickable(true);
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
+
+
+
+
+
+
     public void setNotificationCount(int count,boolean isStarted){
         notificationCount = SessionManagement.getNotificationCount(Map1.this);
         if(Integer.parseInt(notificationCount)!=count) {
@@ -647,8 +683,23 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+
+
+        if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)) {
+            setAppLocale(Constants.HINDI_LANGUAGE);
+        }else {
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
+        }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
+
+
+
+
+
+
+
 
         // clear the notification area when the app is opened
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
@@ -800,9 +851,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         if(currentlatlng!=null) {
             // createPickUpLocations();
             if (locationCahnge1st) {
-                locationCahnge1st = false;
+
 
                 mapFragment.getMapAsync(this);
+
             }else {
                 MarkerOptions current = new MarkerOptions()
                         .position(currentlatlng)
@@ -810,7 +862,22 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 if (currentmarker != null)
                     currentmarker.remove();
                 currentmarker = mMap.addMarker(current);
+
+
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+            }
+            if (mapRoute == null) {
+
+            } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true, 10)&&(!locationCahnge1st)) {
+                if (waypoints == null)
+                    waypoints = new ArrayList<>();
+                if (waypoints.size() >= 10)
+                    waypoints.remove(0);
+                double lt = Double.parseDouble(String.format("%.4f", currentlatlng.latitude));
+                double lg = Double.parseDouble(String.format("%.4f", currentlatlng.longitude));
+                LatLng t = new LatLng(lt, lg);
+                waypoints.add(t);
+                new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
             }
 
 
@@ -847,6 +914,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         }
     }*/
 
+
     private Emitter.Listener onBookingAborted = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -866,6 +934,66 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         }
     };
 
+
+
+    @Override
+    public void onTaskDone(Object... values) {
+        if(currentPolyline!=null)
+            currentPolyline.remove();
+        //int size = values.length;
+        currentPolyline = mMap.addPolyline((PolylineOptions)values[0]);
+        distance1 = (long)values[1];
+        duration = (long)values[2];
+        mapRoute = (ArrayList<LatLng>) values[3];
+    }
+
+
+    private String getUrl(LatLng origin, LatLng dest, String directionMode) {
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        // Mode
+        String mode = "mode=" + directionMode;
+
+        String waypoint = "&waypoints=";
+        String parameters = "";
+        try {
+            if(waypoints!=null) {
+                for (int i = 0; i < waypoints.size(); i++) {
+                    LatLng temp = waypoints.get(i);
+                    if (i == 0) {
+                        waypoint = waypoint + "via:-" + temp.latitude + "%2C" + temp.longitude;
+                    } else {
+                        waypoint = waypoint + "%7Cvia:-" + temp.latitude + "%2C" + temp.longitude;
+                    }
+                }
+                if (waypoints.size() <= 0) {
+                    parameters = str_origin + "&" + str_dest + "&" + mode;
+                } else {
+                    parameters = str_origin + "&" + str_dest + "&" + waypoint + "&" + mode;
+                }
+            }else{
+                parameters = str_origin + "&" + str_dest + "&" + mode;
+            }
+            // Building the parameters to the web service
+
+        }catch (Exception e){
+            e.printStackTrace();
+            parameters = str_origin + "&" + str_dest + "&" + mode;
+        }
+        //String parameters = str_origin + "&" + str_dest + "&" + waypoint + "&" + mode;
+        // Output format
+        String output = "json";
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
+        return url;
+    }
+
+
+
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -884,5 +1012,19 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             Toast.makeText(this, "language has been changed", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private void setAppLocale(String localeCode){
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+            config.setLocale(new Locale(localeCode.toLowerCase()));
+        } else {
+            config.locale = new Locale(localeCode.toLowerCase());
+        }
+        resources.updateConfiguration(config, dm);
+    }
+
 
 }
