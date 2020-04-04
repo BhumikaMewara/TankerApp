@@ -53,6 +53,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.CircleOptions;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -101,6 +102,7 @@ import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import com.google.maps.android.PolyUtil;
@@ -115,7 +117,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText,trips,language,logout;
     TextView fullname,username;
     ImageView seemoreImg ;
-    Double toLat , toLong,fromLat,fromLong;
+    Double toLat , toLong,fromLat,fromLong,currentLat,currentLong;
     Animation slideUp, slideDown;
     Boolean t = false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
     BookingListModal blmod;
@@ -148,6 +150,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     Locale locale;
     static boolean isTouched = true;
     ArrayList<LatLng> mapRoute=null;
+    private List<BookingListModal> requestlist;
 
 
 
@@ -191,8 +194,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
+
+
+
        initSocket();
        initViews();
+
+
 
     }
 
@@ -203,9 +211,33 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             socket = IO.socket(URLs.SOCKET_URL+ SessionManagement.getUserToken(this));
                     socket.connect();
 
+            if (gpsTracker.getIsGPSTrackingEnabled()){
 
+currentLat=0.000;
+currentLong=0.000;
+                currentLat = gpsTracker.latitude;
+                currentLong=gpsTracker.longitude;
+
+            }
+            else
+            {
+                // can't get location
+                // GPS or Network is not enabled
+                // Ask user to enable GPS/network in settings
+                gpsTracker.showSettingsAlert();
+            }
+
+            Double dist=distance(currentLat,currentLong,toLat,toLong);
+            Double geofenceDist= Double.valueOf(blmod.getGeofence_in_meter());
+            if (dist <=geofenceDist){
+              Log.i("info","geofenceClose");
+            }else {
+                Log.i("info","geofence not close");
+            }
             socket.on("aborted:Booking",onBookingAborted);
             JSONObject params = new JSONObject();
+
+
 
                 params.put("booking_id", blmod.getBookingid());
 /*                params.put("lat", currentlatlng.latitude);
@@ -223,6 +255,33 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         /////////////////////////////////////////////////////////////
     }
 
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist=dist/0.62137;
+        dist=dist*1609.34;
+
+
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -230,6 +289,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         pickupLatLng = new LatLng(Double.parseDouble(blmod.getFromlatitude()),Double.parseDouble(blmod.getFromlongitude()));
          dropLatLng = new LatLng(Double.parseDouble(blmod.getTolatitude()),Double.parseDouble(blmod.getTologitude()));
         MarkerOptions pickupop,dropop,currentop;
+        CircleOptions circleOptions;
         //Bitmap b = BitmapFactory.decodeResource(getResources(),R.drawable.truck_map);
         // Add a marker in Sydney, Australia, and move the camera.
         LatLng from = new LatLng(fromLat,fromLong);
@@ -241,11 +301,24 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
 
 
+
         dropop = new MarkerOptions()
                 .position(to)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_map));
 
 
+
+        double geofenceradius;
+        geofenceradius=Double.valueOf(blmod.getGeofence_in_meter());
+        circleOptions = new CircleOptions()
+                .center( new LatLng(toLat, toLong) )
+
+                .radius( geofenceradius )
+                .fillColor(0x40ff0000)
+                .strokeColor(Color.TRANSPARENT)
+                .strokeWidth(2);
+
+        mMap.addCircle(circleOptions);
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
         if(currentlatlng!=null){
@@ -945,6 +1018,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         distance1 = (long)values[1];
         duration = (long)values[2];
         mapRoute = (ArrayList<LatLng>) values[3];
+
     }
 
 

@@ -14,8 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.franmontiel.localechanger.LocaleChanger;
-import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
+
 import com.kookyapps.gpstankertracking.Utils.LocaleHelper;
 import com.kookyapps.gpstankertracking.app.GPSTracker;
 import com.kookyapps.gpstankertracking.fcm.Config;
@@ -69,6 +68,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
@@ -237,7 +237,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     }else{
                          setAppLocale(Constants.ENGLISH_LANGUAGE);
                         languageChangeApi();
-
                         finish();
                         startActivity(getIntent());
                     }
@@ -322,7 +321,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         // If All permission is enabled successfully then this block will execute.
         if(CheckingPermissionIsEnabledOrNot())
         {
-            Toast.makeText(FirstActivity.this, "All Permissions Granted Successfully", Toast.LENGTH_LONG).show();
+           // Toast.makeText(FirstActivity.this, "All Permissions Granted Successfully", Toast.LENGTH_LONG).show();
         }
         // If, If permission is not enabled then else condition will execute.
         else {
@@ -363,7 +362,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     boolean ReadExternalStoragePermission = grantResults[4] == PackageManager.PERMISSION_GRANTED;
                     boolean WriteExternalStoragePermission = grantResults[5] == PackageManager.PERMISSION_GRANTED;
 
-                    if (CameraPermission && AccessFineLoaction && InternetPermission && CallPhonePermisission  && ReadExternalStoragePermission  && WriteExternalStoragePermission) {
+
+                    if (CameraPermission && AccessFineLoaction && InternetPermission && CallPhonePermisission  && ReadExternalStoragePermission  &&  WriteExternalStoragePermission) {
 
                         Toast.makeText(FirstActivity.this, "Permission Granted", Toast.LENGTH_LONG).show();
                     }
@@ -385,13 +385,15 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         int ForthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE);
         int FivthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
         int SixthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+       // int SeventhPermissionResult=ContextCompat.checkSelfPermission(getApplicationContext(),ACCESS_BACKGROUND_LOCATION);
 
         return FirstPermissionResult == PackageManager.PERMISSION_GRANTED &&
                 SecondPermissionResult == PackageManager.PERMISSION_GRANTED &&
                 ThirdPermissionResult == PackageManager.PERMISSION_GRANTED &&
                 ForthPermissionResult == PackageManager.PERMISSION_GRANTED &&
                 FivthPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                SixthPermissionResult == PackageManager.PERMISSION_GRANTED;
+                SixthPermissionResult == PackageManager.PERMISSION_GRANTED ;
+               // SeventhPermissionResult==PackageManager.PERMISSION_GRANTED;
     }
     public void updateLcationApiCalling(String currentStatus) {
 

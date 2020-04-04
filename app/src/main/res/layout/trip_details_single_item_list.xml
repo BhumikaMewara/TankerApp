@@ -162,18 +162,7 @@
                 ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
 
 
-            <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
-                android:id="@+id/tv_currentDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 24 "
-                android:textColor="@color/colorblack"
-                android:textSize="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toStartOf="@+id/tv_currentDay"
-                app:layout_constraintTop_toBottomOf="@+id/tv_currentDay"
-                ></com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView>
+
 
            <!-- <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                 android:id="@+id/tv_currentMonth"

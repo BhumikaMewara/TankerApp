@@ -99,7 +99,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="25dp"
                 android:paddingTop="5dp"
+                android:maxLines="1"
+                android:maxLength="20"
                 android:textSize="12sp"
+                android:hint="xyz@gmail.com"
                 android:layout_marginRight="25dp"/>
 
 
@@ -142,6 +145,9 @@
                 android:layout_marginLeft="25dp"
                 android:paddingTop="5dp"
                 android:textSize="12sp"
+                android:maxLines="1"
+                android:maxLength="20"
+                android:hint="Enter Password"
                 android:inputType="textWebPassword"
                 android:layout_marginRight="25dp"/>
         </LinearLayout>

@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -84,6 +87,19 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(TripComplete.this));
                     setNotificationCount(count+1,false);
+
+                }
+                else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
+                        setAppLocale(Constants.HINDI_LANGUAGE);
+                        finish();
+                        startActivity(getIntent());
+
+                    }else{
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
+                        finish();
+                        startActivity(getIntent());
+                    }
                 }
             }
         };
@@ -332,6 +348,20 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+
+    private void setAppLocale(String localeCode){
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+            config.setLocale(new Locale(localeCode.toLowerCase()));
+        } else {
+            config.locale = new Locale(localeCode.toLowerCase());
+        }
+        resources.updateConfiguration(config, dm);
+    }
+
 
 
 }

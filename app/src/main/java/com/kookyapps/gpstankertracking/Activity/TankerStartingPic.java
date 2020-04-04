@@ -233,37 +233,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         String lon = "72.00000";
         drawString(originalBitmap,canvas,0,originalBitmap.getHeight() - 30,text);
         drawString(originalBitmap,canvas,0,originalBitmap.getHeight() - 15,time);
-        /*drawString(originalBitmap,canvas,originalBitmap.getWidth(),originalBitmap.getHeight() - 30,lat);
-        drawString(originalBitmap,canvas,originalBitmap.getWidth(),originalBitmap.getHeight() - 15,lon);
-*/
-       /* //Paint pText = new Paint();
-        Paint pText = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-        pText.setColor(Color.WHITE);
-        //pText.setTextSize(8);
 
-        pText.setAntiAlias(true);
-
-
-
-
-         setTextSizeForWidth(pText,(int) (originalBitmap.getWidth()),text);
-
-
-
-
-        Rect bounds = new Rect();
-        pText.getTextBounds(text, 0, text.length(), bounds);
-
-
-        Rect textHeightWidth = new Rect();
-        pText.getTextBounds(text, 0, text.length(), textHeightWidth);
-
-        canvas.drawText(text, 5,
-                originalBitmap.getHeight()  - textHeightWidth.height(),
-                pText);
-*/
-
-        //imageView.setImageBitmap(newBitmap);
         return newBitmap;
     }
 
@@ -353,22 +323,6 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                 break;*/
 
 
-        }
-    }
-
-    public static void store(Bitmap bm, String fileName){
-        final String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Screenshots";
-        File dir = new File(dirPath);
-        if(!dir.exists())
-            dir.mkdirs();
-        File file = new File(dirPath, fileName);
-        try {
-            FileOutputStream fOut = new FileOutputStream(file);
-            bm.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-            fOut.flush();
-            fOut.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

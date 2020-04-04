@@ -265,6 +265,8 @@ FetchDataListener tripListener= new FetchDataListener() {
                             JSONObject jsonObject = (JSONObject) array.get(i);
 
                             tdmod.setBookingid(jsonObject.getString("_id"));
+                            tdmod.setFromtime(jsonObject.getString("trip_start_at"));
+                            tdmod.setTotime(jsonObject.getString("trip_end_at"));
                             JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                             if (dropPoint != null) {
                                 tdmod.setTolocation(dropPoint.getString("location"));
@@ -393,6 +395,8 @@ FetchDataListener tripListener= new FetchDataListener() {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
 
                                 tdmod.setBookingid(jsonObject.getString("_id"));
+                                tdmod.setFromtime(jsonObject.getString("trip_start_at"));
+                                tdmod.setTotime(jsonObject.getString("trip_end_at"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));

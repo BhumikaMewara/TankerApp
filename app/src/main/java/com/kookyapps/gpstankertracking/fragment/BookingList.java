@@ -53,7 +53,7 @@ Context context;
     private int totalNotificationCount;
     private final int PAGE_START  = 1;
     private int TOTAL_PAGES = 1;
-    private static int page_size = 15;
+    private static int page_size =7;
     private boolean isLoading = false;
     private boolean isLastPage = false;
     private int currentPage = PAGE_START;
@@ -136,6 +136,7 @@ public void bookinglistApiCalling(){
         public void onFetchComplete(JSONObject data) {
             try {
                 if (data!=null){
+
                     if (data.getInt("error") == 0) {
                         ArrayList<BookingListModal> tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");
@@ -159,6 +160,8 @@ public void bookinglistApiCalling(){
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
                                     tdmod.setToaddress(dropPoint.getString("address"));
+                                   // tdmod.setGeofence_in_meter();
+                                  //  tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
                                     JSONObject geometry = dropPoint.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -172,7 +175,7 @@ public void bookinglistApiCalling(){
                                     }else {
                                         RequestQueueService.showAlert("Error! no data in geometry",getActivity());
                                     }
-                                    Log.i("dropPoint", "");
+                                    Log.i("dropPoint", "droppoint");
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in drop_point", getActivity());
                                 }
@@ -209,6 +212,8 @@ public void bookinglistApiCalling(){
 
                                 tripList.add(tdmod);
                             }
+                        }else {
+                            noBooking.setText("No Request Found");
                         }
                         Log.d("RequestList:", data.toString());
                         setRecyclerView();
@@ -275,6 +280,7 @@ public void bookinglistApiCalling(){
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
                                     tdmod.setToaddress(dropPoint.getString("address"));
+                                    tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
                                     JSONObject geometry = dropPoint.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -288,7 +294,7 @@ public void bookinglistApiCalling(){
                                     }else {
                                         RequestQueueService.showAlert("Error! no data in geometry",getActivity());
                                     }
-                                    Log.i("dropPoint", "");
+                                    Log.i("dropPoint", "drop");
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in drop_point", getActivity());
                                 }
@@ -306,6 +312,7 @@ public void bookinglistApiCalling(){
                                         } else {
                                             RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
                                         }
+
 
                                     }else {
                                         RequestQueueService.showAlert("Error! no data in geometry",getActivity());

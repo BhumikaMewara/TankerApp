@@ -154,6 +154,8 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 mVH.totime.setText(tripList.get(position).getTotime());
                 mVH.from_address.setText(tripList.get(position).getFromlocation());
                 mVH.to_address.setText(tripList.get(position).getTolocation());
+
+
                 mVH.itemlayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

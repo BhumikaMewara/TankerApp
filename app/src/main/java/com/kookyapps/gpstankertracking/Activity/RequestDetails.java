@@ -109,12 +109,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
 
 
-        /*Locale locale = new Locale("en");
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-        tv.setText(R.string.greet);*/
+
     }
 
     public void initViews() {
@@ -179,6 +174,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         notificationLayout.setOnClickListener(this);
         bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout);
         bottom.setOnClickListener(this);
+        bottom.setClickable(true);
         bottomtext = (TextView) findViewById(R.id.tv_result_details_bottomlayout_text);
 
 
@@ -199,17 +195,12 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                     setNotificationCount(count+1,false);
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(RequestDetails.this).equals(Constants.HINDI_LANGUAGE)){
-                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.HINDI_LANGUAGE);
+                        finish();
                     }else{
-                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
+                        finish();
+                        startActivity(getIntent());
                     }
                 }
             }
@@ -227,19 +218,14 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                     onBackPressed();
                     break;
 
-              /*  Locale locale = new Locale("hi");
-                Locale.setDefault(locale);
-                Configuration config = new Configuration();
-                config.locale = locale;
-                getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                Toast.makeText(this, getResources().getString(R.string.booking_id_text), Toast.LENGTH_SHORT).show();*/
               case R.id.rl_toolbar_with_back_notification:
                         intent = new Intent(RequestDetails.this,Notifications.class);
                         startActivity(intent);
                         break;
-                        case R.id.rl_result_details_bottomLayout:
+            case R.id.rl_result_details_bottomLayout:
                         if (init_type.equals(Constants.REQUEST_DETAILS)){
                         bookingacceptedapiCalling();
+                        bottom.setClickable(false);
                         }else if (init_type.equals(Constants.BOOKING_START)) {
                             if (can_start.equals("true")) {
                                 if (checkPermission()) {
@@ -565,7 +551,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             if (drop_point != null) {
                                 drop_point.getString("location");
 
-                                blmod.setGeofence_in_meter(drop_point.getString("geofence_in_meter"));
+
                                 blmod.setToaddress(drop_point.getString("address"));
                                 drop.setText(blmod.getToaddress());
                                 JSONObject geomaetry = drop_point.getJSONObject("geometry");
@@ -585,7 +571,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             {
                                 if (pickup_point != null) {
                                     blmod.setFromlocation(pickup_point.getString("location"));
-                                    //drop_point.getString("geofence_in_meter");
+
                                     blmod.setFromaddress(pickup_point.getString("address"));
                                     pickup.setText(blmod.getFromaddress());
 
@@ -718,11 +704,18 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         Configuration conf = res.getConfiguration();
         conf.locale = myLocale;
         res.updateConfiguration(conf, dm);
+    }
 
-
-        /*Intent refresh = new Intent(this, AndroidLocalize.class);
-        finish();
-        startActivity(refresh);*/
+    private void setAppLocale(String localeCode){
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+            config.setLocale(new Locale(localeCode.toLowerCase()));
+        } else {
+            config.locale = new Locale(localeCode.toLowerCase());
+        }
+        resources.updateConfiguration(config, dm);
     }
 
 

@@ -21,6 +21,7 @@
     <string name="from">कहाँ से</string>
     <string name="to">कहां तक</string>
     <string name="view">आगे देखें</string>
+    <string name="nonotificatiocation">कोई अधिसूचना नहीं मिली</string>
 
     <string name="total_trip">कुल यात्राएं </string>
     <string name="total_km">कुल किमी</string>
