@@ -305,23 +305,24 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-        Bundle b = data.getExtras();
-        if(resultCode!= REQUEST_IMAGE_CAPTURE && b.containsKey("data")) {
+        if (resultCode!=0) {
+            Bundle b = data.getExtras();
+            if (resultCode != REQUEST_IMAGE_CAPTURE && b.containsKey("data")) {
 
-         Bitmap bitmap = (Bitmap) b.get("data");
+                Bitmap bitmap = (Bitmap) b.get("data");
 
-           // bitmap = addStampToImage(bitmap);
+                // bitmap = addStampToImage(bitmap);
 
-            //imageencoded = Utils.encodeTobase64(bitmap);
-            if (can_start.equals("true")){
-                Intent intent= new Intent(this, TankerStartingPic.class);
-                intent.putExtra("Bitmap",bitmap);
-                intent.putExtra("Bookingdata",blmod);
-                startActivity(intent);
-                finish();
+                //imageencoded = Utils.encodeTobase64(bitmap);
+                if (can_start.equals("true")) {
+                    Intent intent = new Intent(this, TankerStartingPic.class);
+                    intent.putExtra("Bitmap", bitmap);
+                    intent.putExtra("Bookingdata", blmod);
+                    startActivity(intent);
+                    finish();
+                }
             }
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
