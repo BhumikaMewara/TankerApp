@@ -65,9 +65,7 @@ public class BookingListModal implements Parcelable {
     }
 
 
-    public String getGeofence_in_meter() {
-        return geofence_in_meter;
-    }
+    public String getGeofence_in_meter() { return geofence_in_meter; }
 
     public void setGeofence_in_meter(String geofence_in_meter) {
         this.geofence_in_meter = geofence_in_meter;

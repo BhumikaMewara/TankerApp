@@ -184,6 +184,7 @@ public class RequestList extends Fragment {
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
                                     tdmod.setToaddress(dropPoint.getString("address"));
+                                    tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
                                     JSONObject geometry = dropPoint.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -304,6 +305,7 @@ public class RequestList extends Fragment {
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
                                     tdmod.setToaddress(dropPoint.getString("address"));
+                                    tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
                                     JSONObject geometry = dropPoint.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -325,9 +327,7 @@ public class RequestList extends Fragment {
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));
-
                                     tdmod.setFromaddress(pickup.getString("address"));
-
                                     JSONObject geometry = pickup.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -346,20 +346,20 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data in pick_up", getActivity());
                                 }
-                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                /*JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }
+                                }*/
 
-                                modalList.add(tdmod);
+                                tripList.add(tdmod);
                             }
                         }
                         Log.d("RequestList:", mydata.toString());
                         mAdapter.removeLoadingFooter();
                         isLoading = false;
-                        mAdapter.addAll(modalList);
+                        mAdapter.addAll(tripList);
                         if (currentPage < TOTAL_PAGES) mAdapter.addLoadingFooter();
                         else isLastPage = true;
                     }

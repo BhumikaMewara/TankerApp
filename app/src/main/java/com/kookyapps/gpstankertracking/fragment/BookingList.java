@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.util.Log;
@@ -43,10 +44,11 @@ import java.util.List;
  */
 public class BookingList extends Fragment {
 
-RecyclerView recyclerView;
-RelativeLayout progressBar;
-TextView noBooking;
-Context context;
+    RecyclerView recyclerView;
+    RelativeLayout progressBar;
+    TextView noBooking;
+    Context context;
+    SwipeRefreshLayout refreshLayout;
     ArrayList<BookingListModal> requestlist;
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
@@ -138,7 +140,8 @@ public void bookinglistApiCalling(){
                 if (data!=null){
 
                     if (data.getInt("error") == 0) {
-                        ArrayList<BookingListModal> tripList=new ArrayList<>();
+                        requestlist=new ArrayList<>();
+                        //ArrayList<BookingListModal> tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");
 
                         totaltxnCount = data.getInt("total");
@@ -160,8 +163,7 @@ public void bookinglistApiCalling(){
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
                                     tdmod.setToaddress(dropPoint.getString("address"));
-                                   // tdmod.setGeofence_in_meter();
-                                  //  tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
+                                    tdmod.setGeofence_in_meter(dropPoint.getString("geofence_in_meter"));
                                     JSONObject geometry = dropPoint.getJSONObject("geometry");
                                     if (geometry!=null) {
                                         geometry.getString("type");
@@ -202,22 +204,22 @@ public void bookinglistApiCalling(){
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                /*JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in distance", getActivity());
-                                }
+                                }*/
 
 
-                                tripList.add(tdmod);
+                                requestlist.add(tdmod);
                             }
                         }else {
-                            noBooking.setText("No Request Found");
+                            noBooking.setText("No Booking Found");
                         }
                         Log.d("RequestList:", data.toString());
                         setRecyclerView();
-                        mAdapter.addAll(tripList);
+                        mAdapter.addAll(requestlist);
                         if (currentPage < TOTAL_PAGES)
                             mAdapter.addLoadingFooter();
                         else
@@ -320,20 +322,20 @@ public void bookinglistApiCalling(){
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                /*JSONObject distance = jsonObject.getJSONObject("distance");
                                 if (distance != null) {
                                     tdmod.setDistance(distance.getString("text"));
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }
+                                }*/
 
-                                modalList.add(tdmod);
+                                requestlist.add(tdmod);
                             }
                         }
                         Log.d("RequestList:", mydata.toString());
                         mAdapter.removeLoadingFooter();
                         isLoading = false;
-                        mAdapter.addAll(modalList);
+                        mAdapter.addAll(requestlist);
                         if (currentPage < TOTAL_PAGES) mAdapter.addLoadingFooter();
                         else isLastPage = true;
                     }

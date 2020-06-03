@@ -117,7 +117,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText,trips,language,logout;
     TextView fullname,username;
     ImageView seemoreImg ;
-    Double toLat , toLong,fromLat,fromLong,currentLat,currentLong;
+    Double toLat , toLong,fromLat,fromLong,currentLat,currentLong,geofenceDist;
+
     Animation slideUp, slideDown;
     Boolean t = false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
     BookingListModal blmod;
@@ -153,16 +154,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     private List<BookingListModal> requestlist;
 
 
-
-    /*{
-        try{
-            socket = IO.socket(URLs.SOCKET_URL+ SessionManagement.getUserToken(this));
-        }catch (URISyntaxException e){
-            e.printStackTrace();
-        }
-    }*/
-
-    //Transition transition = new Slide(Gravity.BOTTOM);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -188,6 +179,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         fromLong=Double.parseDouble(blmod.getFromlongitude());
         toLat=Double.parseDouble(blmod.getTolatitude());
         toLong=Double.parseDouble(blmod.getTologitude());
+       // geofenceDist=Double.parseDouble(blmod.getGeofence_in_meter());
+
 
 
         allpermissionsrequired = new ArrayList<>();
@@ -228,13 +221,13 @@ currentLong=0.000;
             }
 
             Double dist=distance(currentLat,currentLong,toLat,toLong);
-            Double geofenceDist= Double.valueOf(blmod.getGeofence_in_meter());
-            if (dist <=geofenceDist){
+           // Double geofenceDist= Double.valueOf(blmod.getGeofence_in_meter());
+            /*if (dist <=geofenceDist){
               Log.i("info","geofenceClose");
             }else {
                 Log.i("info","geofence not close");
-            }
-            socket.on("aborted:Booking",onBookingAborted);
+            }*/
+         socket.on("aborted:Booking",onBookingAborted);
             JSONObject params = new JSONObject();
 
 
@@ -308,7 +301,7 @@ currentLong=0.000;
 
 
 
-        double geofenceradius;
+       /* double geofenceradius;
         geofenceradius=Double.valueOf(blmod.getGeofence_in_meter());
         circleOptions = new CircleOptions()
                 .center( new LatLng(toLat, toLong) )
@@ -317,8 +310,7 @@ currentLong=0.000;
                 .fillColor(0x40ff0000)
                 .strokeColor(Color.TRANSPARENT)
                 .strokeWidth(2);
-
-        mMap.addCircle(circleOptions);
+        mMap.addCircle(circleOptions);*/
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
         if(currentlatlng!=null){
@@ -687,8 +679,6 @@ currentLong=0.000;
                 if (data!=null){
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
-
-                        // SessionManagement.logout(logoutListner, FirstActivity.this);
                         Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
 
                     }
