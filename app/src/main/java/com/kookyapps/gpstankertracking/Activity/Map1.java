@@ -206,8 +206,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
             if (gpsTracker.getIsGPSTrackingEnabled()){
 
-currentLat=0.000;
-currentLong=0.000;
+                currentLat=0.000;
+                currentLong=0.000;
                 currentLat = gpsTracker.latitude;
                 currentLong=gpsTracker.longitude;
 
@@ -228,16 +228,11 @@ currentLong=0.000;
                 Log.i("info","geofence not close");
             }*/
          socket.on("aborted:Booking",onBookingAborted);
-            JSONObject params = new JSONObject();
-
-
-
+                JSONObject params = new JSONObject();
                 params.put("booking_id", blmod.getBookingid());
-/*                params.put("lat", currentlatlng.latitude);
+                /*params.put("lat", currentlatlng.latitude);
                 params.put("lng",currentlatlng.longitude);*/
                 socket.emit("subscribe:Booking",params);
-
-
         }catch (URISyntaxException e){
             e.printStackTrace();
 
@@ -280,7 +275,7 @@ currentLong=0.000;
         mMap = googleMap;
         locationCahnge1st = false;
         pickupLatLng = new LatLng(Double.parseDouble(blmod.getFromlatitude()),Double.parseDouble(blmod.getFromlongitude()));
-         dropLatLng = new LatLng(Double.parseDouble(blmod.getTolatitude()),Double.parseDouble(blmod.getTologitude()));
+        dropLatLng = new LatLng(Double.parseDouble(blmod.getTolatitude()),Double.parseDouble(blmod.getTologitude()));
         MarkerOptions pickupop,dropop,currentop;
         CircleOptions circleOptions;
         //Bitmap b = BitmapFactory.decodeResource(getResources(),R.drawable.truck_map);
@@ -360,21 +355,17 @@ currentLong=0.000;
                 /*i = new Intent(this,EnterOTP.class);
                 startActivity(i);*/
             case R.id.rl_map_seemore:
-
                 if (t) {
-
                     details.setVisibility(View.VISIBLE);
                     seemoreText.setText(getString(R.string.seeless));
                     seemoreImg.setImageResource(R.drawable.see_fewer_map);
                     details.animate().translationY(0);
-
                     t = false;
                 }else{
                     seemoreText.setText(getString(R.string.seemore));
                     seemoreImg.setImageResource(R.drawable.see_more_map);
                     details.animate().translationY(-1000);
                     details.setVisibility(View.GONE);
-
                     //seemore.setVisibility(View.VISIBLE);
                     t = true;
                 }
@@ -444,17 +435,12 @@ currentLong=0.000;
         }
     };
 
-
     public void updateLcationApiCalling(String currentStatus) {
-
         JSONObject jsonBodyObj = new JSONObject();
-
-
         try {
             jsonBodyObj.put("lat", stringLatitude);
             jsonBodyObj.put("lng", stringLongitude);
             jsonBodyObj.put("status", currentStatus);
-
             POSTAPIRequest postapiRequest = new POSTAPIRequest();
             String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
             Log.i("url", String.valueOf(url));
@@ -463,7 +449,6 @@ currentLong=0.000;
             Log.i("Token:", token);
             HeadersUtil headparam = new HeadersUtil(token);
             postapiRequest.request(Map1.this, updateLocationListner, url, headparam, jsonBodyObj);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -523,7 +508,6 @@ currentLong=0.000;
                 finish();
 //            }
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -746,31 +730,17 @@ currentLong=0.000;
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
-
-
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)) {
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else {
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-
-
-
-
-
-
-
-
         // clear the notification area when the app is opened
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notificationCountText.getText().toString();
         boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-
-
         boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if(b2){
             newNotification();
@@ -914,10 +884,7 @@ currentLong=0.000;
         if(currentlatlng!=null) {
             // createPickUpLocations();
             if (locationCahnge1st) {
-
-
                 mapFragment.getMapAsync(this);
-
             }else {
                 MarkerOptions current = new MarkerOptions()
                         .position(currentlatlng)
@@ -925,8 +892,6 @@ currentLong=0.000;
                 if (currentmarker != null)
                     currentmarker.remove();
                 currentmarker = mMap.addMarker(current);
-
-
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
             }
             if (mapRoute == null) {
@@ -955,8 +920,7 @@ currentLong=0.000;
                 e.printStackTrace();
             }
             socket.emit("locationUpdate:Booking",params);
-           /////////////////////////////////////////////////////////////
-
+           ////////////////////////////////////////////////////////////
 
         } else
             Toast.makeText(Map1.this,"Current location not fetched",Toast.LENGTH_LONG).show();
