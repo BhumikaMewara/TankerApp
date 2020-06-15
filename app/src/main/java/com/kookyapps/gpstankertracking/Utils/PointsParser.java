@@ -22,10 +22,10 @@ import androidx.core.content.ContextCompat;
 
 
 public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal> {
-
     TaskLoadedCallback taskCallback;
     String directionMode = "driving";
     Context mContext;
+    String mapdata;
 
     public PointsParser(Context mContext, String directionMode) {
         this.taskCallback = (TaskLoadedCallback) mContext;
@@ -39,6 +39,7 @@ public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal>
 
         JSONObject jObject;
         MapDataParserModal calculated = null;
+        mapdata = jsonData[0];
         //List<List<HashMap<String, String>>> routes = null;
 
         try {
@@ -101,9 +102,10 @@ public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal>
                 lineOptions.width(20);
                 lineOptions.color(ContextCompat.getColor(mContext, R.color.greenLight));
             }
-            taskCallback.onTaskDone(lineOptions,distance,duration,points);
+            taskCallback.onTaskDone(lineOptions,distance,duration,points,mapdata);
         }else {
             Log.d("mylog", "without Polylines drawn");
+            taskCallback.onTaskDone();
         }
         // Drawing polyline in the Google Map for the i-th route
     }

@@ -32,7 +32,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class GPSTracker extends Service implements LocationListener {
+import static android.content.Context.LOCATION_SERVICE;
+
+public class GPSTracker implements LocationListener {
     // Get Class Name
     private static String TAG = GPSTracker.class.getName();
     public Boolean permissionGranted = false;
@@ -348,16 +350,6 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
     }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-
-
-
 
 }
 

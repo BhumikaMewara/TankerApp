@@ -75,7 +75,6 @@ import java.util.Map;
 
 
 public class TankerStartingPic extends AppCompatActivity implements View.OnClickListener {
-
     ImageView img_retake,picture ,calender,clock;
     ImageButton captureImgBtn ;
     TextView txt_retake,date,time,lat,lon,apmm,day;
@@ -107,8 +106,6 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         allpermissionsrequired = new ArrayList<>();
         allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-
-
         initView();
 
 
@@ -376,14 +373,10 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                     if(permissionGranted){
                         checkLocation();
                         if (gpsTracker.getIsGPSTrackingEnabled()){
-
-
                             String stringLatitude = String.valueOf(gpsTracker.latitude);
                             lat.setText(stringLatitude);
-
                             String stringLongitude = String.valueOf(gpsTracker.longitude);
                             lon.setText(stringLongitude);
-
                         }
                         else
                         {
@@ -398,9 +391,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                         checkAndRequestPermissions(TankerStartingPic.this,allpermissionsrequired);
                     }
                 }
-
         }
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
