@@ -596,8 +596,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             params.put("lng",currentlatlng.longitude);
             if(s!="") {
                 params.put("path", s);
-                params.put("distance",distance1);
-                params.put("duration",duration);
             }
         }catch (JSONException e){
             e.printStackTrace();

@@ -512,7 +512,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     FetchDataListener bookingdetailsApiListner = new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject mydata) {
-
+            Log.d("RequestDetails:",mydata.toString());
             try {
                 if (mydata != null) {
                     if (mydata.getInt("error") == 0) {
@@ -521,6 +521,13 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         blmod = new BookingListModal();
                         if (data != null) {
                             blmod.setBookingid(data.getString("_id"));
+                            if(data.getString("status")=="0"){
+                                SessionManagement.removeOngoingBooking(RequestDetails.this);
+                                Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                RequestDetails.this.finish();
+                            }
                             bookingid.setText(blmod.getBookingid());
 
                             if (data.getString("message").equals("")){
