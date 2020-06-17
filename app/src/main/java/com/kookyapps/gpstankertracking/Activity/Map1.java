@@ -56,6 +56,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
@@ -132,8 +133,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     private GoogleApiClient mGoogleApiClient;
     long distance1=0,duration=0;
     private LocationRequest mLocationRequest;
-    private long UPDATE_INTERVAL = 2 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 20000;
+    private FusedLocationProviderClient fusedLocationClient;
+    private long UPDATE_INTERVAL = 2000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 2000;
     private LatLng currentlatlng=null;
 
     private LatLng pickupLatLng=null,dropLatLng=null;
@@ -157,10 +159,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     private List<BookingListModal> requestlist;
 
     // The minimum distance to change updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5; // 10 meters
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 10; // 10 seconds
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 2; // 10 seconds
 
     boolean isGPSEnabled = false;
 
@@ -325,7 +327,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             }
         });
 
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         checkAndRequestPermissions(this,allpermissionsrequired);
     }
 
@@ -488,8 +490,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     public void onLocationChanged(Location location) {
         //double lt = Double.parseDouble(String.format("%.6f", location.latitude));
         //double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
-        currentlatlng = new LatLng(Double.parseDouble(String.format("%.6f", location.getLatitude())),Double.parseDouble(String.format("%.6f", location.getLongitude())));
-        //currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
+        //currentlatlng = new LatLng(Double.parseDouble(String.format("%.6f", location.getLatitude())),Double.parseDouble(String.format("%.6f", location.getLongitude())));
+         currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
         if(currentlatlng!=null) {
             // createPickUpLocations();
             if (locationCahnge1st) {
@@ -516,7 +518,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                 double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
                 LatLng t = new LatLng(lt, lg);
                 waypoints.add(currentlatlng);
-                locationManager.removeUpdates(Map1.this);
+                //locationManager.removeUpdates(Map1.this);
                 new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
             }else{
                 JSONObject params = new JSONObject();
@@ -601,7 +603,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             e.printStackTrace();
         }
         socket.emit("locationUpdate:Booking",params);
-        startLocationUpdates();
+        //startLocationUpdates();
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
