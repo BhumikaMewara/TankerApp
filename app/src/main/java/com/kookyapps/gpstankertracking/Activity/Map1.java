@@ -858,8 +858,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_CODE:
+        //switch (requestCode) {
+          //  case PERMISSION_REQUEST_CODE:
                 if (resultCode != 0) {
                     Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                     Intent intent = new Intent(this, TankerStartingPic.class);
@@ -868,9 +868,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     intent.putExtra("init_type", Constants.TRIP_END_IMG);
                     startActivity(intent);
                     finish();
-                    break;
+            //        break;
                 }
-        }
+        //}
         super.onActivityResult(requestCode, resultCode, data);
     }
 

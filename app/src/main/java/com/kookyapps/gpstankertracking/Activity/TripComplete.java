@@ -58,6 +58,14 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_trip_complete);
         initViews();
         bookingByIdApiCalling();
+        if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
+            Log.i("language",SessionManagement.getLanguage(this));
+            //switchCompat.setChecked(true);
+            setAppLocale(Constants.HINDI_LANGUAGE);
+        }else{
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
+
+        }
 
     }
     public void initViews(){
@@ -93,7 +101,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                     if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
                         finish();
-                        startActivity(getIntent());
+                        //startActivity(getIntent());
 
                     }else{
                         setAppLocale(Constants.ENGLISH_LANGUAGE);
@@ -363,7 +371,14 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        Intent i = new Intent(this, FirstActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+        finish();
+    }
 }
 
 
