@@ -8,6 +8,7 @@ public class Constants {
     public static final String TRIP_DETAILS= "trip_details";
     public static final String COMPLETED_CALL="Completed";
     public static final String TRIP_END_IMG="trip_end_img";
+    public static final String SPLASH_START= "splash";
 
 
 
