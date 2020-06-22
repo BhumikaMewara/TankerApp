@@ -57,6 +57,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
@@ -113,7 +115,7 @@ import com.google.maps.android.PolyUtil;
 
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
-public class Map1 extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener,TaskLoadedCallback{
+public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback ,LocationListener,TaskLoadedCallback{
 
     private GoogleMap mMap;
     LinearLayout tripLayout,logoutLayout,l;
@@ -134,8 +136,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     long distance1=0,duration=0;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient fusedLocationClient;
-    private long UPDATE_INTERVAL = 2000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 2000;
+    private LocationCallback locationCallback;
+    private long UPDATE_INTERVAL = 3000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 3000;
     private LatLng currentlatlng=null;
 
     private LatLng pickupLatLng=null,dropLatLng=null;
@@ -172,6 +175,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     // flag for GPS Tracking is enabled
     boolean isGPSTrackingEnabled = false;
     private String provider_info;
+    private boolean locationInProcess = false;
+    private final int LOC_REQUEST = 10101;
+    String init_type,bkngid;
 
 
     @Override
@@ -181,6 +187,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         Intent i = getIntent();
         Bundle b = i.getExtras();
         blmod = b.getParcelable("Bookingdata");
+        init_type = getIntent().getExtras().getString("init_type");
+        bkngid = getIntent().getExtras().getString("booking_id");
         //gpsTracker = new GPSTracker(this);
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
@@ -191,19 +199,20 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
 
-        fromLat=Double.parseDouble(blmod.getFromlatitude());
-        fromLong=Double.parseDouble(blmod.getFromlongitude());
-        toLat=Double.parseDouble(blmod.getTolatitude());
-        toLong=Double.parseDouble(blmod.getTologitude());
+        fromLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlatitude())));
+        fromLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlongitude())));
+        toLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getTolatitude())));
+        toLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getTologitude())));
        // geofenceDist=Double.parseDouble(blmod.getGeofence_in_meter());
 
         allpermissionsrequired = new ArrayList<>();
         allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-
        //initSocket();
        initViews();
     }
+
+
 
 
     public void initViews(){
@@ -344,9 +353,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         }else{
             permissionGranted = true;
             checkLocation();
-            buildGoogleApiClient();
         }
     }
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -362,8 +373,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     }
                     if(permissionGranted){
                         checkLocation();
-                        buildGoogleApiClient();
-                        //createPickUpLocations();
+                        /*if(checkLocation()){
+                            mapFragment.getMapAsync(Map1.this);
+                        }*/
                     }else{
                         checkAndRequestPermissions(Map1.this,allpermissionsrequired);
                     }
@@ -374,10 +386,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private boolean checkLocation() {
-        if (!isLocationEnabled())
+    private void checkLocation() {
+        boolean gpsenable=isLocationEnabled();
+        if(!gpsenable){
             showAlert();
-        return isLocationEnabled();
+        }else{
+            mapFragment.getMapAsync(Map1.this);
+        }
+        /*if (!isLocationEnabled())
+            showAlert();*/
+        //return isLocationEnabled();
     }
 
 
@@ -390,13 +408,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(myIntent);
+                        Map1.this.startActivityForResult(myIntent,LOC_REQUEST);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-
+                        checkLocation();
                     }
                 });
         dialog.show();
@@ -409,30 +427,31 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         //getting network status
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         // Try to get location if you GPS Service is enabled
-        if (isGPSEnabled) {
+        return isGPSEnabled && isNetworkEnabled;
+        /*if (isGPSEnabled) {
             this.isGPSTrackingEnabled = true;
             Log.d("MAP1:", "Application use GPS Service");
-            /*
+            *//*
              * This provider determines location using
              * satellites. Depending on conditions, this provider may take a while to return
              * a location fix.
-             */
+             *//*
             provider_info = LocationManager.GPS_PROVIDER;
         } else if (isNetworkEnabled) { // Try to get location if you Network Service is enabled
             this.isGPSTrackingEnabled = true;
             Log.d("MAP1:", "Application use Network State to get GPS coordinates");
-            /*
+            *//*
              * This provider determines location based on
              * availability of cell tower and WiFi access points. Results are retrieved
              * by means of a network lookup.
-             */
+             *//*
             provider_info = LocationManager.NETWORK_PROVIDER;
         }
-        return isGPSTrackingEnabled;
+        return isGPSTrackingEnabled;*/
     }
 
 
-    protected synchronized void buildGoogleApiClient(){
+    /*protected synchronized void buildGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -463,10 +482,25 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i("PICKUP ACTIVITY:", "Connection failed. Error: " + connectionResult.getErrorCode());
-    }
+    }*/
 
     protected void startLocationUpdates() {
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(UPDATE_INTERVAL)
+                .setInterval(FASTEST_INTERVAL);
+
+        if (!permissionGranted) {
+            return;
+        }
         try {
+            fusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mlocationCallback,
+                    Looper.getMainLooper());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        /*try {
             if (!permissionGranted) {
                 return;
             }
@@ -482,16 +516,111 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
         }
         catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
     }
 
+    private LocationCallback mlocationCallback = new LocationCallback(){
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+
+            if (!locationInProcess) {
+                locationInProcess = true;
+                if (locationResult == null) {
+                    locationInProcess = false;
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                    if(!location.hasAccuracy()){
+                        locationInProcess = false;
+                        return;
+                    }
+                    if(location.getAccuracy()>100){
+                        locationInProcess = false;
+                        return;
+                    }
+                    double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
+                    double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
+                    currentlatlng = new LatLng(lt,lg);
+                    if (currentlatlng != null) {
+                        // createPickUpLocations();
+                    /*if (locationCahnge1st) {
+                        mapFragment.getMapAsync(Map1.this);
+                    }else {*/
+                        MarkerOptions current = new MarkerOptions()
+                                .position(currentlatlng)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
+                        if (currentmarker != null)
+                            currentmarker.remove();
+                        currentmarker = mMap.addMarker(current);
+
+                        //}
+                        if (mapRoute == null) {
+                            if (waypoints == null)
+                                waypoints = new ArrayList<>();
+
+                            waypoints.add(currentlatlng);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+                            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+                        } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true,15)) {
+                            if (waypoints == null) {
+                                waypoints = new ArrayList<>();
+                                waypoints.add(currentlatlng);
+                            }else {
+                                double dist =0;
+                                if(waypoints.size()!=0){
+                                    int index = waypoints.size()-1;
+                                    dist = distance((double) waypoints.get(index).latitude,(double) waypoints.get(index).longitude,(double) currentlatlng.latitude,(double) currentlatlng.longitude);
+                                }
+                                if(dist>100) {
+                                    if (waypoints.size() >= 10)
+                                        waypoints.remove(0);
+                                    waypoints.add(currentlatlng);
+                                    new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+                                }else{
+                                    JSONObject params = new JSONObject();
+                                    try {
+                                        params.put("id", blmod.getBookingid());
+                                        params.put("lat", currentlatlng.latitude);
+                                        params.put("lng", currentlatlng.longitude);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    socket.emit("locationUpdate:Booking", params);
+                                    locationInProcess = false;
+                                }
+                            }
+
+
+                        } else {
+                            JSONObject params = new JSONObject();
+                            try {
+                                params.put("id", blmod.getBookingid());
+                                params.put("lat", currentlatlng.latitude);
+                                params.put("lng", currentlatlng.longitude);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            socket.emit("locationUpdate:Booking", params);
+                            locationInProcess = false;
+                        }
+                    } else {
+                        Log.d("Map1:", "Current location not fetched");
+                        locationInProcess = false;
+                        Toast.makeText(Map1.this, "Current location not fetched", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     public void onLocationChanged(Location location) {
         //double lt = Double.parseDouble(String.format("%.6f", location.latitude));
         //double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
         //currentlatlng = new LatLng(Double.parseDouble(String.format("%.6f", location.getLatitude())),Double.parseDouble(String.format("%.6f", location.getLongitude())));
-         currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
+        currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
         if(currentlatlng!=null) {
             // createPickUpLocations();
             if (locationCahnge1st) {
@@ -510,16 +639,28 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     waypoints = new ArrayList<>();
                 waypoints.add(currentlatlng);
             } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true, 10)&&(!locationCahnge1st)) {
-                if (waypoints == null)
+                if (waypoints == null) {
                     waypoints = new ArrayList<>();
-                if (waypoints.size() >= 10)
-                    waypoints.remove(0);
-                double lt = Double.parseDouble(String.format("%.6f", currentlatlng.latitude));
+                    waypoints.add(currentlatlng);
+                }else {
+                    double dist =0;
+                    if(waypoints.size()!=0){
+                        int index = waypoints.size()-1;
+                        dist = distance((double) waypoints.get(index).latitude,(double) waypoints.get(index).longitude,(double) currentlatlng.latitude,(double) currentlatlng.longitude);
+                    }
+                    if(dist>100) {
+                        if (waypoints.size() >= 10)
+                            waypoints.remove(0);
+                        waypoints.add(currentlatlng);
+                        new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+                    }
+                }
+                /*double lt = Double.parseDouble(String.format("%.6f", currentlatlng.latitude));
                 double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
-                LatLng t = new LatLng(lt, lg);
-                waypoints.add(currentlatlng);
+                LatLng t = new LatLng(lt, lg);*/
+
                 //locationManager.removeUpdates(Map1.this);
-                new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+
             }else{
                 JSONObject params = new JSONObject();
                 try {
@@ -540,9 +681,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        LatLng jodhpur = new LatLng(26.283779, 73.021964);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(jodhpur));
+
         locationCahnge1st = false;
-        pickupLatLng = new LatLng(Double.parseDouble(String.format("%.6f", new Double(blmod.getFromlatitude()))),Double.parseDouble(String.format("%.6f", new Double(blmod.getFromlongitude()))));
-        dropLatLng = new LatLng(Double.parseDouble(String.format("%.6f", new Double(blmod.getTolatitude()))),Double.parseDouble(String.format("%.6f", new Double(blmod.getFromlongitude()))));
+        pickupLatLng = new LatLng(fromLat,fromLong);
+        dropLatLng = new LatLng(toLat,toLong);
         MarkerOptions pickupop,dropop,currentop;
         pickupop = new MarkerOptions()
                 .position(pickupLatLng)
@@ -554,7 +698,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
 
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
-        if(currentlatlng!=null){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 15));
+        /*if(currentlatlng!=null){
             currentop = new MarkerOptions()
                     .position(currentlatlng)
                     .flat(true)
@@ -565,13 +710,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             currentmarker = mMap.addMarker(currentop);
             pickupMarker = mMap.addMarker(pickupop);
             dropMarker = mMap.addMarker(dropop);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 12));
-        }
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 15));
+        }*/
         initSocket();
-        if (mapRoute == null) {
+        /*if (mapRoute == null) {
             locationManager.removeUpdates(Map1.this);
             new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-        }
+        }*/
     }
 
     @Override
@@ -603,6 +748,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             e.printStackTrace();
         }
         socket.emit("locationUpdate:Booking",params);
+        locationInProcess = false;
         //startLocationUpdates();
     }
 
@@ -623,7 +769,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     if (i == 0) {
                         waypoint = waypoint + "via:" + temp.latitude + "%2C" + temp.longitude;
                     } else {
-                        waypoint = waypoint + "%7C" + temp.latitude + "%2C" + temp.longitude;
+                        waypoint = waypoint + "%7Cvia:" + temp.latitude + "%2C" + temp.longitude;
                     }
                 }
                 if (waypoints.size() <= 0) {
@@ -657,6 +803,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
             JSONObject params = new JSONObject();
             params.put("booking_id", blmod.getBookingid());
             socket.emit("subscribe:Booking", params);
+            startLocationUpdates();
+
         }catch (URISyntaxException e){
             e.printStackTrace();
         }catch (JSONException e){
@@ -872,6 +1020,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
                     finish();
                     break;
                 }
+            case LOC_REQUEST:
+                checkLocation();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -1095,4 +1245,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener, OnM
     }
 
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Map1.this,RequestDetails.class);
+        intent.putExtra("init_type", Constants.BOOKING_START);
+        intent.putExtra("booking_id", bkngid);
+        startActivity(intent);
+        finish();
+    }
 }

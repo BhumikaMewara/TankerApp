@@ -96,6 +96,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
     Button change;
+
     private static final int MAKE_CALL_PERMISSION_REQUEST_CODE = 1;
     static final int REQUEST_IMAGE_CAPTURE = 2;
 
@@ -245,7 +246,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             else{
                                 intent = new Intent(RequestDetails.this,Map1.class);
                                 intent.putExtra("Bookingdata",blmod);
+                                intent.putExtra("init_type", Constants.BOOKING_START);
+                                intent.putExtra("booking_id", bkngid);
                                 startActivity(intent);
+                                finish();
                             }
                         }
                         break;
@@ -684,25 +688,30 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         super.onResume();
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
-        // clear the notification area when the app is opened
-        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
-                Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
-        boolean b1 = sharedCount!=viewCount;
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
-            newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
-                notificationCountText.setText(String.valueOf(sharedCount));
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+        try {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(Config.PUSH_NOTIFICATION));
+            // clear the notification area when the app is opened
+            int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                    Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
+            int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+            boolean b1 = sharedCount != viewCount;
+            boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+            if (b2) {
+                newNotification();
+            } else if (b1) {
+                if (sharedCount < 100 && sharedCount > 0) {
+                    notificationCountText.setText(String.valueOf(sharedCount));
+                    toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+                } else {
+                    notificationCountText.setText("99+");
+                    toolbarNotiCountLayout.setVisibility(View.VISIBLE);
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     public void setLocale(String lang) {
