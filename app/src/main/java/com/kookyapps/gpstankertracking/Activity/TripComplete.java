@@ -58,12 +58,12 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_trip_complete);
         initViews();
         bookingByIdApiCalling();
-        if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
+        if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.ENGLISH_LANGUAGE)){
             Log.i("language",SessionManagement.getLanguage(this));
             //switchCompat.setChecked(true);
-            setAppLocale(Constants.HINDI_LANGUAGE);
-        }else{
             setAppLocale(Constants.ENGLISH_LANGUAGE);
+        }else{
+            setAppLocale(Constants.HINDI_LANGUAGE);
 
         }
 

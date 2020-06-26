@@ -665,6 +665,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
 
 
+
         boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if(b2){
             newNotification();
