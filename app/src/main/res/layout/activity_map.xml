@@ -46,8 +46,7 @@
                     <RelativeLayout
                         android:id="@+id/Map1_booking_id_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="70dp"
-                        android:layout_marginTop="40dp"
+                        android:layout_height="50dp"
                         android:layout_marginLeft="15dp"
                         android:background="@color/colorwhite">
                         <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
@@ -57,7 +56,6 @@
                             android:text="@string/booking_id_text"
                             android:textColor="@color/greenLight"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginTop="15dp"
                             android:textSize="13dp"/>
                         <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                             android:layout_width="wrap_content"
@@ -77,19 +75,18 @@
                             android:id="@+id/map_underline1"
                             android:background="@color/colordark_grey"
                             android:layout_marginTop="5dp"
-                            android:layout_marginBottom="10dp"
                             android:layout_below="@+id/tv_map_bookingid_text"
                             android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                             android:layout_alignEnd="@+id/iv_bookingdetail_bookingid_call"/>
-
-
                     </RelativeLayout>
 
                     <ScrollView
+                        android:id="@+id/sv_map_detailsScroll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/gradient_background_main"
                         android:layout_below="@+id/Map1_booking_id_layout"
+                        android:visibility="gone"
                         >
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -98,41 +95,7 @@
                             android:layout_marginLeft="15dp"
                             android:layout_marginRight="15dp"
                             android:background="@color/colorwhite"
-                            >
-                            <!--<TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/tv_map_booking_id_title"
-                                android:text="Booking ID"
-                                android:textColor="@color/greenLight"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginTop="15dp"
-                                android:textSize="13dp"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/tv_map_bookingid_text"
-                                android:text="123456789"
-                                android:textColor="@color/colorblack"
-                                android:textSize="13dp"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginTop="5dp"
-                                android:layout_alignStart="@+id/tv_bookingdetail_booking_id_title"
-                                android:layout_below="@+id/tv_map_booking_id_title"/>
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:id="@+id/map_underline1"
-                                android:background="@color/colordark_grey"
-                                android:layout_marginTop="5dp"
-                                android:layout_below="@+id/tv_map_bookingid_text"
-                                android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
-                                android:layout_alignEnd="@+id/iv_bookingdetail_bookingid_call"/>
-
--->
-
-
+                          >
                             <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -148,7 +111,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_drop_text"
                                 android:layout_below="@+id/tv_map_drop_title"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="5dp"
                                 android:textColor="@color/colorblack"
                                 android:textSize="13dp"
                                 android:layout_marginLeft="10dp"
@@ -172,7 +135,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_contact_title"
                                 android:layout_below="@+id/map_underline2"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="5dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
                                 android:text="@string/customer_number"
@@ -184,7 +147,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_contact_text"
                                 android:layout_below="@+id/tv_map_contact_title"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="5dp"
                                 android:textColor="@color/colorblack"
                                 android:textSize="13dp"
                                 android:layout_marginLeft="10dp"
@@ -207,7 +170,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_distance_title"
                                 android:layout_below="@+id/map_underline3"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="5dp"
                                 android:layout_alignStart="@+id/tv_bookingdetail_bookingid"
                                 android:layout_alignEnd="@+id/bookingdetail_underline1"
                                 android:text="@string/estimated_distance"
@@ -220,7 +183,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tv_map_distance"
                                 android:layout_below="@+id/tv_map_distance_title"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="5dp"
                                 android:textColor="@color/colorblack"
                                 android:textSize="13dp"
                                 android:layout_marginLeft="10dp"
@@ -248,6 +211,8 @@
                     android:id="@+id/rl_map_seemore"
                     android:layout_below="@+id/rl_map_data"
                     android:layout_marginTop="3dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
                     android:background="@color/colorwhite">
 
                     <ImageView
@@ -258,10 +223,10 @@
                         android:layout_centerVertical="true"
                         android:background="@color/colorwhite"
                         android:layout_toLeftOf="@+id/firstactivity_divider1"
-                        android:src="@drawable/see_fewer_map"/>
+                        android:src="@drawable/see_more_map"/>
                     <View
                         android:layout_width="3dp"
-                        android:layout_height="10dp"
+                        android:layout_height="5dp"
                         android:layout_centerHorizontal="true"
                         android:background="@color/colorwhite"
                         android:id="@+id/firstactivity_divider1"/>
@@ -270,7 +235,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="3dp"
-                        android:text="@string/seeless"
+                        android:text="@string/seemore"
                         android:layout_centerVertical="true"
                         android:textColor="@color/greenDark"
                         android:layout_toRightOf="@+id/firstactivity_divider1"

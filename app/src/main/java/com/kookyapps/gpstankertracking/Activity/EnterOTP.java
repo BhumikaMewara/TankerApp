@@ -86,9 +86,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         //otpcode=        (EditText)findViewById(R.id.ed_enterOtp_otp);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
         pageTitle.setText(R.string.enter_otp);
-
         title = (TextView) findViewById(R.id.tv_enterOtp_msgTitle);
-
         message = (TextView) findViewById(R.id.tv_enterOtp_msg);
         verify = (TextView) findViewById(R.id.tv_enterOtp_verifyText);
         msg_icon = (ImageView) findViewById(R.id.iv_enterOtp_message);
@@ -102,17 +100,14 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
 
-        /*SpannableString content = new SpannableString("Resend OTP");
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        resend.setText(content);*/
 
         verifyLayout.setOnClickListener(this);
-        editText_one = (EditText) findViewById(R.id.editText_one);
-        editText_two = (EditText) findViewById(R.id.editText_two);
+        editText_one   = (EditText) findViewById(R.id.editText_one);
+        editText_two   = (EditText) findViewById(R.id.editText_two);
         editText_three = (EditText) findViewById(R.id.editText_three);
-        editText_four = (EditText) findViewById(R.id.editText_four);
-        editText_five = (EditText) findViewById(R.id.editText_fifth);
-        editText_six = (EditText) findViewById(R.id.editText_sixth);
+        editText_four  = (EditText) findViewById(R.id.editText_four);
+        editText_five  = (EditText) findViewById(R.id.editText_fifth);
+        editText_six   = (EditText) findViewById(R.id.editText_sixth);
 
 
         editText_one.addTextChangedListener(this);
@@ -140,9 +135,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
-                        /*pageTitle.setText(getResources().getString(R.string.enter_otp));
-                        title.setText(getResources().getString(R.string.enter_code));
-                        message.setText(getResources().getString(R.string.otpscreen_msg));*/
 
                     }else{
                         setAppLocale(Constants.ENGLISH_LANGUAGE);

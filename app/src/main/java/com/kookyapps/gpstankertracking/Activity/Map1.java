@@ -56,6 +56,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,10 +127,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText,trips,language,logout;
     TextView fullname,username;
     ImageView seemoreImg ;
+    ScrollView scrolldetails;
     Double toLat , toLong,fromLat,fromLong,currentLat,currentLong,geofenceDist;
 
     Animation slideUp, slideDown;
-    Boolean t = false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
+    Boolean t =false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
     BookingListModal blmod;
     static String notificationCount;
     ArrayList<String> allpermissionsrequired;
@@ -244,6 +246,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         seemoreImg=(ImageView)findViewById(R.id.iv_map_seemore_image);
         seemoreText=(TextView)findViewById(R.id.tv_map_seemore_text);
         details=(RelativeLayout)findViewById(R.id.rl_map_main);
+        scrolldetails=(ScrollView)findViewById(R.id.sv_map_detailsScroll);
         slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
         slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
         bookingid=(TextView)findViewById(R.id.tv_map_bookingid_text);
@@ -956,16 +959,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 startActivity(i);*/
             case R.id.rl_map_seemore:
                 if (t) {
-                    details.setVisibility(View.VISIBLE);
+                    scrolldetails.setVisibility(View.VISIBLE);
                     seemoreText.setText(getString(R.string.seeless));
                     seemoreImg.setImageResource(R.drawable.see_fewer_map);
-                    details.animate().translationY(0);
+                    scrolldetails.animate().translationY(0);
                     t = false;
                 }else{
                     seemoreText.setText(getString(R.string.seemore));
                     seemoreImg.setImageResource(R.drawable.see_more_map);
-                    details.animate().translationY(-1000);
-                    details.setVisibility(View.GONE);
+                    scrolldetails.animate().translationY(-1000);
+                    scrolldetails.setVisibility(View.GONE);
                     //seemore.setVisibility(View.VISIBLE);
                     t = true;
                 }

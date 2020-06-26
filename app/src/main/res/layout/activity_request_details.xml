@@ -15,9 +15,10 @@
         android:id="@+id/include_bookingdetails"/>
 
 
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/include_bookingdetails"
         android:layout_marginTop="5dp"
         android:background="@drawable/gradient_background_main">
@@ -27,8 +28,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:layout_marginRight="15dp"
+            android:layout_marginBottom="20dp"
             android:background="@color/colorwhite">
 
             <ImageView
