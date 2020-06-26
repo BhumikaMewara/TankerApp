@@ -525,7 +525,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         blmod = new BookingListModal();
                         if (data != null) {
                             blmod.setBookingid(data.getString("_id"));
-                            if(data.getString("status")=="0"){
+                            String status = data.getString("status");
+                            if(status.equals("0") || status.equals("5")||status.equals("6")){
                                 SessionManagement.removeOngoingBooking(RequestDetails.this);
                                 Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -99,7 +99,7 @@ public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal>
                 lineOptions.width(10);
                 lineOptions.color(Color.BLUE);
             } else {
-                lineOptions.width(20);
+                lineOptions.width(30);
                 lineOptions.color(ContextCompat.getColor(mContext, R.color.greenLight));
             }
             taskCallback.onTaskDone(lineOptions,distance,duration,points,mapdata);
