@@ -155,6 +155,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 verifyLayout.setClickable(false);
                 validateOTP();
                 uploadBitmap();
+                break;
                 /*   i = new Intent(this, TripComplete.class);
 
 
@@ -295,7 +296,8 @@ private  void validateOTP(){
                                     finish();
                                 }else{
 
-                                    RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
+                                    //RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
+                                    RequestQueueService.showAlert("Error in response", EnterOTP.this);
                                     verifyLayout.setClickable(true);
                                     //   requestLayout.setBackgroundResource(R.drawable.straight_corners);
                                 }

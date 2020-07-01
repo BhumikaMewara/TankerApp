@@ -36,7 +36,6 @@ public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal>
     // Parsing the data in non-ui thread
     @Override
     protected MapDataParserModal doInBackground(String... jsonData) {
-
         JSONObject jObject;
         MapDataParserModal calculated = null;
         mapdata = jsonData[0];

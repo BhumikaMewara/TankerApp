@@ -63,6 +63,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
@@ -119,7 +120,7 @@ import com.google.maps.android.PolyUtil;
 
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
-public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback ,LocationListener,TaskLoadedCallback{
+public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback ,TaskLoadedCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraMoveStartedListener {
 
     private GoogleMap mMap;
     LinearLayout tripLayout,logoutLayout,l;
@@ -146,6 +147,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     private long UPDATE_INTERVAL = 3000;  /* 10 secs */
     private long FASTEST_INTERVAL = 3000;
     private LatLng currentlatlng=null;
+    private boolean isRecentered = true;
+    private float bearing=0;
 
     Polyline travelled_polyline = null;
     private LatLng pickupLatLng=null,dropLatLng=null;
@@ -167,6 +170,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     static boolean isTouched = true;
     ArrayList<LatLng> mapRoute=null;
     private List<BookingListModal> requestlist;
+    boolean isRequestingLocation = false;
 
     double travelled_distance=0;
     PolylineOptions travelledoptions = null;
@@ -402,9 +406,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }else{
             mapFragment.getMapAsync(Map1.this);
         }
-        /*if (!isLocationEnabled())
-            showAlert();*/
-        //return isLocationEnabled();
     }
 
 
@@ -431,67 +432,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     private boolean isLocationEnabled() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //getting GPS status
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        //getting network status
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        // Try to get location if you GPS Service is enabled
         return isGPSEnabled && isNetworkEnabled;
-        /*if (isGPSEnabled) {
-            this.isGPSTrackingEnabled = true;
-            Log.d("MAP1:", "Application use GPS Service");
-            *//*
-             * This provider determines location using
-             * satellites. Depending on conditions, this provider may take a while to return
-             * a location fix.
-             *//*
-            provider_info = LocationManager.GPS_PROVIDER;
-        } else if (isNetworkEnabled) { // Try to get location if you Network Service is enabled
-            this.isGPSTrackingEnabled = true;
-            Log.d("MAP1:", "Application use Network State to get GPS coordinates");
-            *//*
-             * This provider determines location based on
-             * availability of cell tower and WiFi access points. Results are retrieved
-             * by means of a network lookup.
-             *//*
-            provider_info = LocationManager.NETWORK_PROVIDER;
-        }
-        return isGPSTrackingEnabled;*/
     }
-
-
-    /*protected synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        fromBuildMethod = true;
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (!permissionGranted) {
-            return;
-        }
-        if(fromBuildMethod){
-            startLocationUpdates();
-            fromBuildMethod = false;
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-        Log.i("PICKUP ACTIVITY:", "Connection Suspended");
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i("PICKUP ACTIVITY:", "Connection failed. Error: " + connectionResult.getErrorCode());
-    }*/
 
     protected void startLocationUpdates() {
         mLocationRequest = LocationRequest.create()
@@ -502,30 +446,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         if (!permissionGranted) {
             return;
         }
-        try {
-            fusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mlocationCallback,
-                    Looper.getMainLooper());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        /*try {
-            if (!permissionGranted) {
-                return;
-            }
-            if (locationManager != null) {
-                Location location = locationManager.getLastKnownLocation(provider_info);
-
-                if(location!=null)
-                    currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
-            }
-            locationManager.requestLocationUpdates(provider_info, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-        }catch(SecurityException e){
-            e.printStackTrace();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }*/
+        requestUpdate();
     }
 
     private double bearingBetweenLocations(LatLng latLng1,LatLng latLng2) {
@@ -598,10 +519,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         locationInProcess = false;
                         return;
                     }
-                    if(location.getAccuracy()>100){
+                    if(location.getAccuracy()>50){
                         locationInProcess = false;
                         return;
                     }
+                    if(location.hasBearing())
+                        bearing = location.getBearing();
+
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     if(currentlatlng!=null){
@@ -622,25 +546,24 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         MarkerOptions current = new MarkerOptions()
                                 .position(currentlatlng)
                                 .flat(true)
+                                .rotation(bearing)
                                 .anchor(.5f,.5f)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
                         if (currentmarker != null)
                             currentmarker.remove();
                         currentmarker = mMap.addMarker(current);
-                        double bearing = 0;
-                        if(prevlatlng != null) {
-                            bearing = bearingBetweenLocations(prevlatlng, currentlatlng);
-                            rotateMarker(currentmarker, (float) bearing);
+                        if(isRecentered) {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
                         }
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
 
                         //}
                         if (mapRoute == null) {
                             if (waypoints == null)
                                 waypoints = new ArrayList<>();
                             waypoints.add(currentlatlng);
-                            new FetchURL(Map1.this).execute(getUrl(currentlatlng, dropLatLng, "driving"), "driving");
-                        } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true,15)) {
+                            pickupLatLng = currentlatlng;
+                            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+                        } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true,10)) {
                             if (waypoints == null) {
                                 waypoints = new ArrayList<>();
                                 waypoints.add(currentlatlng);
@@ -654,7 +577,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                                     if (waypoints.size() >= 10)
                                         waypoints.remove(0);
                                     waypoints.add(currentlatlng);
-                                    new FetchURL(Map1.this).execute(getUrl(currentlatlng, dropLatLng, "driving"), "driving");
+                                    new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
                                 }else{
                                     JSONObject params = new JSONObject();
                                     try {
@@ -692,68 +615,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }
     };
 
-    @Override
-    public void onLocationChanged(Location location) {
-        //double lt = Double.parseDouble(String.format("%.6f", location.latitude));
-        //double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
-        //currentlatlng = new LatLng(Double.parseDouble(String.format("%.6f", location.getLatitude())),Double.parseDouble(String.format("%.6f", location.getLongitude())));
-        currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
-        if(currentlatlng!=null) {
-            // createPickUpLocations();
-            if (locationCahnge1st) {
-                mapFragment.getMapAsync(this);
-            }else {
-                MarkerOptions current = new MarkerOptions()
-                        .position(currentlatlng)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-                if (currentmarker != null)
-                    currentmarker.remove();
-                currentmarker = mMap.addMarker(current);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
-            }
-            if (mapRoute == null) {
-                if (waypoints == null)
-                    waypoints = new ArrayList<>();
-                waypoints.add(currentlatlng);
-            } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true, 10)&&(!locationCahnge1st)) {
-                if (waypoints == null) {
-                    waypoints = new ArrayList<>();
-                    waypoints.add(currentlatlng);
-                }else {
-                    double dist =0;
-                    if(waypoints.size()!=0){
-                        int index = waypoints.size()-1;
-                        dist = distance((double) waypoints.get(index).latitude,(double) waypoints.get(index).longitude,(double) currentlatlng.latitude,(double) currentlatlng.longitude);
-                    }
-                    if(dist>100) {
-                        if (waypoints.size() >= 10)
-                            waypoints.remove(0);
-                        waypoints.add(currentlatlng);
-                        new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-                    }
-                }
-                /*double lt = Double.parseDouble(String.format("%.6f", currentlatlng.latitude));
-                double lg = Double.parseDouble(String.format("%.6f", currentlatlng.longitude));
-                LatLng t = new LatLng(lt, lg);*/
 
-                //locationManager.removeUpdates(Map1.this);
-
-            }else{
-                JSONObject params = new JSONObject();
-                try {
-                    params.put("id", blmod.getBookingid());
-                    params.put("lat", currentlatlng.latitude);
-                    params.put("lng",currentlatlng.longitude);
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-                socket.emit("locationUpdate:Booking",params);
-            }
-        } else {
-            Log.d("Map1:", "Current location not fetched");
-            Toast.makeText(Map1.this, "Current location not fetched", Toast.LENGTH_LONG).show();
-        }
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -776,24 +638,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 15));
-        /*if(currentlatlng!=null){
-            currentop = new MarkerOptions()
-                    .position(currentlatlng)
-                    .flat(true)
-                    .alpha(.6f)
-                    .anchor(0.5f,0.5f)
-                    .rotation(90)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-            currentmarker = mMap.addMarker(currentop);
-            pickupMarker = mMap.addMarker(pickupop);
-            dropMarker = mMap.addMarker(dropop);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 15));
-        }*/
         initSocket();
-        /*if (mapRoute == null) {
-            locationManager.removeUpdates(Map1.this);
-            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-        }*/
     }
 
     @Override
@@ -853,7 +698,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         String waypoint = "waypoints=";
         String parameters = "";
         try {
-            /*if(waypoints!=null) {
+            if(waypoints!=null) {
                 for (int i = 0; i < waypoints.size(); i++) {
                     LatLng temp = waypoints.get(i);
                     if (i == 0) {
@@ -869,8 +714,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
             }else{
                 parameters = str_origin + "&" + str_dest + "&" + mode;
-            }*/
-            parameters = str_origin + "&" + str_dest + "&" + mode;
+            }
+            //parameters = str_origin + "&" + str_dest + "&" + mode;
             // Building the parameters to the web service
 
         }catch (Exception e){
@@ -949,6 +794,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     requestPermission();
                 }
                 if (cameraAccepted) {
+                    stopUpdate();
                     Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
                 } else {
@@ -1038,58 +884,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }
     };
 
-    public void updateLcationApiCalling(String currentStatus) {
-        JSONObject jsonBodyObj = new JSONObject();
-        try {
-            jsonBodyObj.put("lat", stringLatitude);
-            jsonBodyObj.put("lng", stringLongitude);
-            jsonBodyObj.put("status", currentStatus);
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            Log.i("Token:", token);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(Map1.this, updateLocationListner, url, headparam, jsonBodyObj);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    FetchDataListener updateLocationListner = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject data) {
-            try {
-                if (data!=null){
-                    if (data.getInt("error") == 0) {
-                        String message=   data.getString("message");
-                        Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            } catch (JSONException e){
-                e.printStackTrace();
-            }
-
-        }
-        @Override
-        public void onFetchFailure(String msg) {
-            logoutLayout.setClickable(true);
-        }
-
-        @Override
-        public void onFetchStart() {
-
-        }
-    };
-
-
-
-
-
-
-
     private boolean checkPermission(){
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
         return result == PackageManager.PERMISSION_GRANTED;
@@ -1110,6 +904,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     startActivity(intent);
                     finish();
                     //break;
+                }else{
+                    requestUpdate();
                 }
             case LOC_REQUEST:
                 checkLocation();
@@ -1167,10 +963,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
         }
     };
-
-
-
-
 
 
     public void setNotificationCount(int count,boolean isStarted){
@@ -1239,45 +1031,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
-
     private Emitter.Listener onBookingAborted = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            locationManager.removeUpdates(Map1.this);
+            stopUpdate();
             Map1.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1293,28 +1050,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }
     };
 
-
-
-
-
-
-
-
-
-
-
-
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         socket.disconnect();
         socket.off("aborted:Booking");
+        stopUpdate();
+        super.onDestroy();
     }
 
 
     public void showlanguage(){
-            /*SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_LANGUAGE_LANGUAGE_TAG,
-                    Constants.SHARED_LANGUAGE_CHANGED_KEY,"yes");*/
         if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
             // app is in foreground, broadcast the push message
             Intent languageChange = new Intent(Config.LANGUAGE_CHANGE);
@@ -1339,10 +1084,49 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(Map1.this,RequestDetails.class);
+        /*Intent intent = new Intent(Map1.this,RequestDetails.class);
         intent.putExtra("init_type", Constants.BOOKING_START);
         intent.putExtra("booking_id", bkngid);
         startActivity(intent);
-        finish();
+        finish();*/
+        super.onBackPressed();
     }
+
+    public void requestUpdate(){
+        if(!isRequestingLocation) {
+            try {
+                isRequestingLocation = true;
+                fusedLocationClient.requestLocationUpdates(mLocationRequest,
+                        mlocationCallback,
+                        Looper.getMainLooper());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void stopUpdate(){
+        if(isRequestingLocation) {
+            isRequestingLocation = false;
+            fusedLocationClient.removeLocationUpdates(mlocationCallback);
+        }
+    }
+
+    @Override
+    public void onCameraMoveStarted(int i) {
+        switch (i){
+            case GoogleMap.OnCameraMoveStartedListener
+                    .REASON_GESTURE:
+                isRecentered =  false;
+                break;
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if(marker.equals(currentmarker)){
+            isRecentered = true;
+        }
+        return false;
+    }
+
 }
