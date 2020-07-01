@@ -134,6 +134,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     Animation slideUp, slideDown;
     Boolean t =false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
     BookingListModal blmod;
+    private String parserstring="";
     static String notificationCount;
     ArrayList<String> allpermissionsrequired;
     static ArrayList<LatLng> waypoints = null;
@@ -449,59 +450,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         requestUpdate();
     }
 
-    private double bearingBetweenLocations(LatLng latLng1,LatLng latLng2) {
-
-        double PI = 3.14159;
-        double lat1 = latLng1.latitude * PI / 180;
-        double long1 = latLng1.longitude * PI / 180;
-        double lat2 = latLng2.latitude * PI / 180;
-        double long2 = latLng2.longitude * PI / 180;
-
-        double dLon = (long2 - long1);
-
-        double y = Math.sin(dLon) * Math.cos(lat2);
-        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
-                * Math.cos(lat2) * Math.cos(dLon);
-
-        double brng = Math.atan2(y, x);
-
-        brng = Math.toDegrees(brng);
-        brng = (brng + 360) % 360;
-
-        return brng;
-    }
-
-    private void rotateMarker(final Marker marker, final float toRotation) {
-        if(!isMarkerRotating) {
-            final Handler handler = new Handler();
-            final long start = SystemClock.uptimeMillis();
-            final float startRotation = marker.getRotation();
-            final long duration = 1000;
-
-            final Interpolator interpolator = new LinearInterpolator();
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    isMarkerRotating = true;
-
-                    long elapsed = SystemClock.uptimeMillis() - start;
-                    float t = interpolator.getInterpolation((float) elapsed / duration);
-
-                    float rot = t * toRotation + (1 - t) * startRotation;
-
-                    marker.setRotation(-rot > 180 ? rot / 2 : rot);
-                    if (t < 1.0) {
-                        // Post again 16ms later.
-                        handler.postDelayed(this, 16);
-                    } else {
-                        isMarkerRotating = false;
-                    }
-                }
-            });
-        }
-    }
-
     private LocationCallback mlocationCallback = new LocationCallback(){
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -515,84 +463,61 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     // ...
-                    if(!location.hasAccuracy()){
+                    if (!location.hasAccuracy()) {
                         locationInProcess = false;
                         return;
                     }
-                    if(location.getAccuracy()>50){
+                    if (location.getAccuracy() > 50) {
                         locationInProcess = false;
                         return;
                     }
-                    if(location.hasBearing())
-                        bearing = location.getBearing();
-
+                    if (location.hasBearing())
+                        bearing = location.getBearing()+90;
+                    if (currentlatlng != null)
+                        prevlatlng = currentlatlng;
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
-                    if(currentlatlng!=null){
-                        prevlatlng = currentlatlng;
-                    }
-                    currentlatlng = new LatLng(lt,lg);
-                    if (currentlatlng != null) {
-                        // createPickUpLocations();
-                    /*if (locationCahnge1st) {
-                        mapFragment.getMapAsync(Map1.this);
-                    }else {*/
-                    if(travelledpath==null) {
+                    currentlatlng = new LatLng(lt, lg);
+                    if (travelledpath == null) {
                         travelledpath = new ArrayList<>();
-                    }else{
-                        travelled_distance = travelled_distance + distance((double) travelledpath.get(travelledpath.size()-1).latitude,(double) travelledpath.get(travelledpath.size()-1).longitude,(double) currentlatlng.latitude,(double) currentlatlng.longitude);
+                    } else {
+                        travelled_distance = travelled_distance + distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
                     }
                     travelledpath.add(currentlatlng);
-                        MarkerOptions current = new MarkerOptions()
-                                .position(currentlatlng)
-                                .flat(true)
-                                .rotation(bearing)
-                                .anchor(.5f,.5f)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-                        if (currentmarker != null)
-                            currentmarker.remove();
-                        currentmarker = mMap.addMarker(current);
-                        if(isRecentered) {
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+                    MarkerOptions current = new MarkerOptions()
+                            .position(currentlatlng)
+                            .flat(true)
+                            .rotation(bearing)
+                            .anchor(.5f, .5f)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
+                    if (currentmarker != null)
+                        currentmarker.remove();
+                    currentmarker = mMap.addMarker(current);
+                    if (isRecentered) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+                    }
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", blmod.getBookingid());
+                        params.put("lat", currentlatlng.latitude);
+                        params.put("lng", currentlatlng.longitude);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    socket.emit("locationUpdate:Booking", params);
+                    locationInProcess = false;
+
+                    /*if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true, 10)) {
+                        double dist = 0;
+                        if (waypoints.size() != 0) {
+                            int index = waypoints.size() - 1;
+                            dist = distance((double) waypoints.get(index).latitude, (double) waypoints.get(index).longitude, (double) currentlatlng.latitude, (double) currentlatlng.longitude);
                         }
-
-                        //}
-                        if (mapRoute == null) {
-                            if (waypoints == null)
-                                waypoints = new ArrayList<>();
+                        if (dist > 100) {
+                            if (waypoints.size() >= 10)
+                                waypoints.remove(0);
                             waypoints.add(currentlatlng);
-                            pickupLatLng = currentlatlng;
                             new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-                        } else if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true,10)) {
-                            if (waypoints == null) {
-                                waypoints = new ArrayList<>();
-                                waypoints.add(currentlatlng);
-                            }else {
-                                double dist =0;
-                                if(waypoints.size()!=0){
-                                    int index = waypoints.size()-1;
-                                    dist = distance((double) waypoints.get(index).latitude,(double) waypoints.get(index).longitude,(double) currentlatlng.latitude,(double) currentlatlng.longitude);
-                                }
-                                if(dist>100) {
-                                    if (waypoints.size() >= 10)
-                                        waypoints.remove(0);
-                                    waypoints.add(currentlatlng);
-                                    new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-                                }else{
-                                    JSONObject params = new JSONObject();
-                                    try {
-                                        params.put("id", blmod.getBookingid());
-                                        params.put("lat", currentlatlng.latitude);
-                                        params.put("lng", currentlatlng.longitude);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    socket.emit("locationUpdate:Booking", params);
-                                    locationInProcess = false;
-                                }
-                            }
-
-
                         } else {
                             JSONObject params = new JSONObject();
                             try {
@@ -605,11 +530,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                             socket.emit("locationUpdate:Booking", params);
                             locationInProcess = false;
                         }
-                    } else {
-                        Log.d("Map1:", "Current location not fetched");
-                        locationInProcess = false;
-                        Toast.makeText(Map1.this, "Current location not fetched", Toast.LENGTH_LONG).show();
-                    }
+                    }*/
+
                 }
             }
         }
@@ -643,48 +565,23 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     public void onTaskDone(Object... values) {
-        String s = "";
         try {
             if (values != null) {
                 if (values.length == 0) {
-
                 } else {
                     if (currentPolyline != null)
                         currentPolyline.remove();
-                    /*if (travelled_polyline == null) {
-                        travelledoptions = new PolylineOptions();
-                        travelledoptions.width(30);
-                        travelledoptions.color(ContextCompat.getColor(Map1.this, R.color.greenLight));
-                        travelled_polyline = mMap.addPolyline(travelledoptions);
-                        //travelled_polyline.remove();
-                    }
-
-                    travelled_polyline.setPoints(travelledpath);*/
-                    //int size = values.length;
                     currentPolyline = mMap.addPolyline((PolylineOptions) values[0]);
                     distance1 = (long) values[1];
                     duration = (long) values[2];
                     mapRoute = (ArrayList<LatLng>) values[3];
-                    s = (String) values[4];
+                    parserstring = (String) values[4];
+                    startLocationUpdates();
                 }
             }
-            JSONObject params = new JSONObject();
-            try {
-                params.put("id", blmod.getBookingid());
-                params.put("lat", currentlatlng.latitude);
-                params.put("lng", currentlatlng.longitude);
-                if (s != "") {
-                    params.put("path", s);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            socket.emit("locationUpdate:Booking", params);
-            locationInProcess = false;
         }catch (Exception e){
             e.printStackTrace();
         }
-        //startLocationUpdates();
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
@@ -739,8 +636,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             JSONObject params = new JSONObject();
             params.put("booking_id", blmod.getBookingid());
             socket.emit("subscribe:Booking", params);
-            startLocationUpdates();
-
+            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
         }catch (URISyntaxException e){
             e.printStackTrace();
         }catch (JSONException e){
