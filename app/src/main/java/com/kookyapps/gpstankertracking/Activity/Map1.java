@@ -442,7 +442,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
-                .setInterval(FASTEST_INTERVAL);
+                .setInterval(FASTEST_INTERVAL)
+                .setSmallestDisplacement(10);
 
         if (!permissionGranted) {
             return;
@@ -501,37 +502,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         params.put("id", blmod.getBookingid());
                         params.put("lat", currentlatlng.latitude);
                         params.put("lng", currentlatlng.longitude);
+                        params.put("bearing",bearing);
+                        if (parserstring != "") {
+                            params.put("parser", parserstring);
+                            parserstring = "";
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     socket.emit("locationUpdate:Booking", params);
                     locationInProcess = false;
-
-                    /*if (!PolyUtil.isLocationOnPath(currentlatlng, mapRoute, true, 10)) {
-                        double dist = 0;
-                        if (waypoints.size() != 0) {
-                            int index = waypoints.size() - 1;
-                            dist = distance((double) waypoints.get(index).latitude, (double) waypoints.get(index).longitude, (double) currentlatlng.latitude, (double) currentlatlng.longitude);
-                        }
-                        if (dist > 100) {
-                            if (waypoints.size() >= 10)
-                                waypoints.remove(0);
-                            waypoints.add(currentlatlng);
-                            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-                        } else {
-                            JSONObject params = new JSONObject();
-                            try {
-                                params.put("id", blmod.getBookingid());
-                                params.put("lat", currentlatlng.latitude);
-                                params.put("lng", currentlatlng.longitude);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            socket.emit("locationUpdate:Booking", params);
-                            locationInProcess = false;
-                        }
-                    }*/
-
                 }
             }
         }
