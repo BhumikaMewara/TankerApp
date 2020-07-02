@@ -65,6 +65,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -504,7 +505,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         params.put("lng", currentlatlng.longitude);
                         params.put("bearing",bearing);
                         if (parserstring != "") {
-                            params.put("parser", parserstring);
+                            params.put("path", parserstring);
                             parserstring = "";
                         }
                     } catch (JSONException e) {
@@ -556,6 +557,22 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     duration = (long) values[2];
                     mapRoute = (ArrayList<LatLng>) values[3];
                     parserstring = (String) values[4];
+                    mMap.setOnMarkerClickListener(Map1.this);
+                    mMap.setOnCameraMoveStartedListener(Map1.this);
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", blmod.getBookingid());
+                        params.put("lat", currentlatlng.latitude);
+                        params.put("lng", currentlatlng.longitude);
+                        params.put("bearing",bearing);
+                        if (parserstring != "") {
+                            params.put("path", parserstring);
+                            parserstring = "";
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    socket.emit("locationUpdate:Booking", params);
                     startLocationUpdates();
                 }
             }
@@ -1003,6 +1020,58 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             isRecentered = true;
         }
         return false;
+    }
+
+    private void snapToRoad() {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            GETAPIRequest getapiRequest = new GETAPIRequest();
+            String url = getSnapUrl(0,100,true);
+            HeadersUtil headparam = new HeadersUtil();
+            getapiRequest.request(Map1.this, snapToRoadListener, url,headparam);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    FetchDataListener snapToRoadListener = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+
+
+        }
+
+        @Override
+        public void onFetchFailure(String msg) {
+
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
+
+    private String getSnapUrl(int lowerbound,int upperbound,boolean isInterpolate) {
+        String path = "path=";
+        String interpolate = "interpolate=";
+        if(isInterpolate)
+            interpolate = interpolate+"true";
+        else
+            interpolate = interpolate+"false";
+
+        String parameters = "";
+
+        parameters = path + "&" + interpolate;
+
+        for(int i=lowerbound;i<upperbound;i++){
+            if(i==lowerbound)
+                path = path+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
+            else
+                path = path+"|"+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
+        }
+        String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
+        Log.d("FetchUrl:",url);
+        return url;
     }
 
 }
