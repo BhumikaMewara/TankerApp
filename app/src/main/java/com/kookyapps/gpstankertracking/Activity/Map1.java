@@ -133,7 +133,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     Double toLat , toLong,fromLat,fromLong,currentLat,currentLong,geofenceDist;
 
     Animation slideUp, slideDown;
-    Boolean t =false,    permissionGranted = false,fromBuildMethod=false, locationCahnge1st=true;
+    Boolean t =false,    permissionGranted = false,fromBuildMethod=false, pathfetched=false;
     BookingListModal blmod;
     private String parserstring="";
     static String notificationCount;
@@ -474,45 +474,57 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         return;
                     }
                     if (location.hasBearing())
-                        bearing = location.getBearing()+90;
+                        bearing = location.getBearing() + 90;
                     if (currentlatlng != null)
                         prevlatlng = currentlatlng;
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     currentlatlng = new LatLng(lt, lg);
-                    if (travelledpath == null) {
-                        travelledpath = new ArrayList<>();
-                    } else {
-                        travelled_distance = travelled_distance + distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    }
-                    travelledpath.add(currentlatlng);
-                    MarkerOptions current = new MarkerOptions()
-                            .position(currentlatlng)
-                            .flat(true)
-                            .rotation(bearing)
-                            .anchor(.5f, .5f)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-                    if (currentmarker != null)
-                        currentmarker.remove();
-                    currentmarker = mMap.addMarker(current);
-                    if (isRecentered) {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
-                    }
-                    JSONObject params = new JSONObject();
-                    try {
-                        params.put("id", blmod.getBookingid());
-                        params.put("lat", currentlatlng.latitude);
-                        params.put("lng", currentlatlng.longitude);
-                        params.put("bearing",bearing);
-                        if (parserstring != "") {
-                            params.put("path", parserstring);
-                            parserstring = "";
+                    double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
+                    if(enddist<1000)
+                        showEndTrip();
+                    else
+                        hideEndTrip();
+                    double dist = 0;
+                    if(!pathfetched)
+                        dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
+                    if (dist > 150 || !pathfetched) {
+                        travelled_distance = travelled_distance + dist;
+                        if (travelledpath == null) {
+                            travelledpath = new ArrayList<>();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        travelledpath.add(currentlatlng);
+                        MarkerOptions current = new MarkerOptions()
+                                .position(currentlatlng)
+                                .flat(true)
+                                .rotation(bearing)
+                                .anchor(.5f, .5f)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
+                        if (currentmarker != null)
+                            currentmarker.remove();
+                        currentmarker = mMap.addMarker(current);
+                        if (isRecentered) {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+                        }
+                        if (!pathfetched) {
+                            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+                            stopUpdate();
+                            pathfetched = true;
+                        } else {
+                            JSONObject params = new JSONObject();
+                            try {
+                                params.put("id", blmod.getBookingid());
+                                params.put("lat", currentlatlng.latitude);
+                                params.put("lng", currentlatlng.longitude);
+                                params.put("bearing", bearing);
+                            } catch (JSONException e) {
+                                locationInProcess = false;
+                                e.printStackTrace();
+                            }
+                            socket.emit("locationUpdate:Booking", params);
+                            locationInProcess = false;
+                        }
                     }
-                    socket.emit("locationUpdate:Booking", params);
-                    locationInProcess = false;
                 }
             }
         }
@@ -525,19 +537,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mMap = googleMap;
         LatLng jodhpur = new LatLng(26.283779, 73.021964);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(jodhpur));
-
-        locationCahnge1st = false;
         pickupLatLng = new LatLng(fromLat,fromLong);
         dropLatLng = new LatLng(toLat,toLong);
         MarkerOptions pickupop,dropop,currentop;
         pickupop = new MarkerOptions()
                 .position(pickupLatLng)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.hydrant_pickuppoint_map));
-
         dropop = new MarkerOptions()
                 .position(dropLatLng)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_map));
-
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 15));
@@ -557,27 +565,24 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     duration = (long) values[2];
                     mapRoute = (ArrayList<LatLng>) values[3];
                     parserstring = (String) values[4];
-                    mMap.setOnMarkerClickListener(Map1.this);
-                    mMap.setOnCameraMoveStartedListener(Map1.this);
                     JSONObject params = new JSONObject();
-                    try {
-                        params.put("id", blmod.getBookingid());
-                        params.put("lat", currentlatlng.latitude);
-                        params.put("lng", currentlatlng.longitude);
-                        params.put("bearing",bearing);
-                        if (parserstring != "") {
-                            params.put("path", parserstring);
-                            parserstring = "";
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    params.put("id", blmod.getBookingid());
+                    params.put("lat", currentlatlng.latitude);
+                    params.put("lng", currentlatlng.longitude);
+                    params.put("bearing", bearing);
+                    if (parserstring != "") {
+                        params.put("path", parserstring);
+                        parserstring = "";
                     }
                     socket.emit("locationUpdate:Booking", params);
-                    startLocationUpdates();
                 }
             }
+            locationInProcess = false;
+            requestUpdate();
         }catch (Exception e){
             e.printStackTrace();
+            locationInProcess = false;
+            requestUpdate();
         }
     }
 
@@ -633,7 +638,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             JSONObject params = new JSONObject();
             params.put("booking_id", blmod.getBookingid());
             socket.emit("subscribe:Booking", params);
-            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+            startLocationUpdates();
         }catch (URISyntaxException e){
             e.printStackTrace();
         }catch (JSONException e){
@@ -1073,5 +1078,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         Log.d("FetchUrl:",url);
         return url;
     }
+
+    public void showEndTrip(){}
+    public void hideEndTrip(){}
 
 }
