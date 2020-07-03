@@ -65,6 +65,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
 import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
@@ -91,6 +92,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 /*import com.github.nkzawa.emitter.Emitter;
@@ -173,7 +175,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     ArrayList<LatLng> mapRoute=null;
     private List<BookingListModal> requestlist;
     boolean isRequestingLocation = false;
-
+    private ArrayList<SnappedPoint> snappedPoints = null;
     double travelled_distance=0;
     PolylineOptions travelledoptions = null;
     // The minimum distance to change updates in meters
@@ -196,7 +198,14 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     String init_type,bkngid;
     boolean isMarkerRotating = false;
 
+    private int OFFSET=0;
+    private final int PAGINATION_OVERLAP = 3,PAGE_SIZE = 95;
+
     LatLng prevlatlng = null;
+    int lowerbound=-1,upperbound=-1;
+    double snappedDistance=0;
+    JSONArray snappedArray;
+    JSONObject finalsnap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -685,7 +694,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 startActivity(i);
                 break;
             case R.id.rl_map_bottomLayout_text:
-
                 if (checkPermission()) {
                     cameraAccepted = true;
                 } else {
@@ -693,14 +701,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
                 if (cameraAccepted) {
                     stopUpdate();
-                    Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
+                    snapToRoad();
                 } else {
                     requestPermission();
                 }
-
-                /*i = new Intent(this,EnterOTP.class);
-                startActivity(i);*/
             case R.id.rl_map_seemore:
                 if (t) {
                     scrolldetails.setVisibility(View.VISIBLE);
@@ -713,7 +717,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     seemoreImg.setImageResource(R.drawable.see_more_map);
                     scrolldetails.animate().translationY(-1000);
                     scrolldetails.setVisibility(View.GONE);
-                    //seemore.setVisibility(View.VISIBLE);
                     t = true;
                 }
                 break;
@@ -721,7 +724,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 Log.i("trip","clicked");
                 i = new Intent(this, TripDetails.class);
                 startActivity(i);
-
                 break;
             case R.id.lh_map_logoutLayout:
                 Log.i("logout","clicked");
@@ -742,11 +744,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             Log.i("Token:",token);
             HeadersUtil headparam = new HeadersUtil(token);
             postapiRequest.request(Map1.this,logoutListner,url,headparam,jsonBodyObj);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     FetchDataListener logoutListner = new FetchDataListener() {
@@ -805,6 +805,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }else{
                     requestUpdate();
                 }
+                break;
             case LOC_REQUEST:
                 checkLocation();
                 break;
@@ -821,7 +822,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             jsonBodyObj.put("lang",locale);
             POSTAPIRequest postapiRequest = new POSTAPIRequest();
             String url = URLs.BASE_URL + URLs.LANGUAGE_CHANGED;
-
             Log.i("url", String.valueOf(url));
             Log.i("Request", String.valueOf(postapiRequest));
             String token = SessionManagement.getUserToken(this);
@@ -842,7 +842,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
                         Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
-
                     }
                 }
             } catch (JSONException e){
@@ -1028,10 +1027,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     }
 
     private void snapToRoad() {
-        JSONObject jsonBodyObj = new JSONObject();
         try {
+            if(OFFSET>0)
+                OFFSET-=PAGINATION_OVERLAP;
+            lowerbound = OFFSET;
+            upperbound = Math.min(OFFSET + PAGE_SIZE, travelledpath.size());
             GETAPIRequest getapiRequest = new GETAPIRequest();
-            String url = getSnapUrl(0,100,true);
+            String url = getSnapUrl(lowerbound,upperbound,false);
             HeadersUtil headparam = new HeadersUtil();
             getapiRequest.request(Map1.this, snapToRoadListener, url,headparam);
         } catch (JSONException e) {
@@ -1041,18 +1043,66 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     FetchDataListener snapToRoadListener = new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject data) {
-
-
+            Log.d("SnapRoadResponse:",data.toString());
+            try {
+                if (data.has("error")) {
+                    Toast.makeText(Map1.this,"Error in snap to road.",Toast.LENGTH_LONG);
+                } else {
+                    if(snappedPoints==null)
+                        snappedPoints = new ArrayList<SnappedPoint>();
+                    if(snappedArray == null)
+                        snappedArray = new JSONArray();
+                    JSONArray snaps = data.getJSONArray("snappedPoints");
+                    boolean passedOverlap = false;
+                    for(int i=0;i<snaps.length();i++){
+                        SnappedPoint point = new SnappedPoint();
+                        JSONObject snap = snaps.getJSONObject(i);
+                        JSONObject location = snap.getJSONObject("location");
+                        point.setLatitude(Float.parseFloat(location.getString("latitude")));
+                        point.setLongitude(Float.parseFloat(location.getString("longitude")));
+                        point.setPlaceid(snap.getString("placeId"));
+                        if(snap.has("originalIndex"))
+                            point.setOriginalindex(Integer.parseInt(snap.getString("originalIndex")));
+                        if (OFFSET == 0 || point.getOriginalindex() >= PAGINATION_OVERLAP - 1) {
+                            passedOverlap = true;
+                        }
+                        if (passedOverlap) {
+                            snappedPoints.add(point);
+                            snappedArray.put(snap);
+                            int size = snappedPoints.size();
+                            if(size>1)
+                                snappedDistance = snappedDistance+distance(snappedPoints.get(size-1).getLatitude(),snappedPoints.get(size-1).getLongitude(),snappedPoints.get(size).getLatitude(),snappedPoints.get(size).getLongitude());
+                        }
+                    }
+                    OFFSET = upperbound;
+                    if(OFFSET<travelledpath.size())
+                        snapToRoad();
+                    else{
+                        JSONObject params = new JSONObject();
+                        finalsnap = new JSONObject();
+                        finalsnap.put("snappedpoits",snappedArray);
+                        try {
+                            params.put("id", blmod.getBookingid());
+                            params.put("snap",finalsnap);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        socket.emit("locationUpdate:Booking", params);
+                        Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onFetchFailure(String msg) {
-
         }
 
         @Override
         public void onFetchStart() {
-
         }
     };
 
@@ -1063,11 +1113,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             interpolate = interpolate+"true";
         else
             interpolate = interpolate+"false";
-
         String parameters = "";
-
         parameters = path + "&" + interpolate;
-
         for(int i=lowerbound;i<upperbound;i++){
             if(i==lowerbound)
                 path = path+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
@@ -1078,8 +1125,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         Log.d("FetchUrl:",url);
         return url;
     }
-
     public void showEndTrip(){}
     public void hideEndTrip(){}
-
 }

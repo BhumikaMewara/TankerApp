@@ -426,22 +426,19 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                                 if(obj.getInt("error")==0){
                                     SessionManagement.setOngoingBooking(TankerStartingPic.this,blmod.getBookingid());
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
-
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
                                     intent.putExtra("Bookingdata",blmod);
-
                                     startActivity(intent);
                                     finish();
                                 }else{
                                     RequestQueueService.showAlert(obj.getString("code"), TankerStartingPic.this);
                                     captureImgBtn.setClickable(true);
-                                 //   requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                                    //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                                 }
                             }else{
                                 RequestQueueService.showAlert("Error! No data fetched", TankerStartingPic.this);
                                 captureImgBtn.setClickable(true);
                                 //requestLayout.setBackgroundResource(R.drawable.straight_corners);
-
                             }
                         } catch (JSONException e) {
                             RequestQueueService.showAlert("Something went wrong", TankerStartingPic.this);
@@ -495,13 +492,6 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                 return imageMap;
             }
 
-            /*@Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.put("lat",String.valueOf( currentlatlng.latitude));
-                params.put("lng",String.valueOf(currentlatlng.longitude));
-                return params;
-            }*/
         };
 
         volleyMultipartRequest.setRetryPolicy(new DefaultRetryPolicy(
@@ -554,24 +544,16 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
             checkLocation();
             gpsTracker.getLocation();
             if (gpsTracker.getIsGPSTrackingEnabled()){
-
                 String stringLatitude = String.valueOf(gpsTracker.latitude);
                 lat.setText(stringLatitude);
-
                 String stringLongitude = String.valueOf(gpsTracker.longitude);
                 lon.setText(stringLongitude);
-
-            }
-            else
-            {
+            } else {
                 // can't get location
                 // GPS or Network is not enabled
                 // Ask user to enable GPS/network in settings
                 gpsTracker.showSettingsAlert();
             }
-
-            //buildGoogleApiClient();
-            //createPickUpLocations();
         }
     }
     private boolean checkLocation() {
