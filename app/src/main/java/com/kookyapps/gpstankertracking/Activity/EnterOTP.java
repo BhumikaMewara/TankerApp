@@ -66,6 +66,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     String init_type;
     static String notificationCount;
     BroadcastReceiver mRegistrationBroadcastReceiver;
+    String finalsnap = null,snappedDistance = null;
 
 
 
@@ -78,6 +79,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
     //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
+        finalsnap = b.getString("snapped_path");
+        snappedDistance = b.getString("snapped_distance");
        leftbit = Utils.decodeBase64(imageencoded);
         initView();
     }
@@ -363,6 +366,8 @@ private  void validateOTP(){
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 params.put("otp",OTP);
+                params.put("snapped_path",finalsnap.toString());
+                params.put("distance_travelled",snappedDistance);
                 /*params.put("lat",String.valueOf( currentlatlng.latitude));
                 params.put("lng",String.valueOf(currentlatlng.longitude));*/
                 return params;

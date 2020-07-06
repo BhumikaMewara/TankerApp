@@ -67,6 +67,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
 import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
+import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.TaskLoadedCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -206,6 +207,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     double snappedDistance=0;
     JSONArray snappedArray;
     JSONObject finalsnap;
+    boolean path_snapped = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -484,8 +486,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     }
                     if (location.hasBearing())
                         bearing = location.getBearing() + 90;
-                    if (currentlatlng != null)
-                        prevlatlng = currentlatlng;
+
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     currentlatlng = new LatLng(lt, lg);
@@ -494,8 +495,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         showEndTrip();
                     else
                         hideEndTrip();
+
+                    if (currentlatlng != null)
+                        prevlatlng = currentlatlng;
+
                     double dist = 0;
-                    if(!pathfetched)
+                    if(pathfetched)
                         dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
                     if (dist > 150 || !pathfetched) {
                         travelled_distance = travelled_distance + dist;
@@ -515,6 +520,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         if (isRecentered) {
                             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
                         }
+
                         if (!pathfetched) {
                             new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
                             stopUpdate();
@@ -533,6 +539,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                             socket.emit("locationUpdate:Booking", params);
                             locationInProcess = false;
                         }
+
                     }
                 }
             }
@@ -799,6 +806,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     intent.putExtra("Bitmap", bitmap);
                     intent.putExtra("Bookingdata", blmod);
                     intent.putExtra("init_type", Constants.TRIP_END_IMG);
+                    intent.putExtra("snapped_path",finalsnap.toString());
+                    intent.putExtra("snapped_distance",String.valueOf(snappedDistance));
                     startActivity(intent);
                     finish();
                     //break;
@@ -986,7 +995,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         intent.putExtra("booking_id", bkngid);
         startActivity(intent);
         finish();*/
-        super.onBackPressed();
+        if(path_snapped){
+            RequestQueueService.showAlert("","Procced to end activity",this);
+        }else {
+            super.onBackPressed();
+        }
     }
 
     public void requestUpdate(){
@@ -1028,14 +1041,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     private void snapToRoad() {
         try {
-            if(OFFSET>0)
-                OFFSET-=PAGINATION_OVERLAP;
-            lowerbound = OFFSET;
-            upperbound = Math.min(OFFSET + PAGE_SIZE, travelledpath.size());
-            GETAPIRequest getapiRequest = new GETAPIRequest();
-            String url = getSnapUrl(lowerbound,upperbound,false);
-            HeadersUtil headparam = new HeadersUtil();
-            getapiRequest.request(Map1.this, snapToRoadListener, url,headparam);
+            if(!path_snapped) {
+                if (OFFSET > 0)
+                    OFFSET -= PAGINATION_OVERLAP;
+                lowerbound = OFFSET;
+                upperbound = Math.min(OFFSET + PAGE_SIZE, travelledpath.size());
+                GETAPIRequest getapiRequest = new GETAPIRequest();
+                String url = getSnapUrl(lowerbound, upperbound, false);
+                HeadersUtil headparam = new HeadersUtil();
+                getapiRequest.request(Map1.this, snapToRoadListener, url, headparam);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1080,14 +1095,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     else{
                         JSONObject params = new JSONObject();
                         finalsnap = new JSONObject();
-                        finalsnap.put("snappedpoits",snappedArray);
-                        try {
+                        finalsnap.put("snappedpoints",snappedArray);
+                        /*try {
                             params.put("id", blmod.getBookingid());
                             params.put("snap",finalsnap);
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                        socket.emit("locationUpdate:Booking", params);
+                        }*/
+                        path_snapped=true;
+                        //socket.emit("locationUpdate:Booking", params);
                         Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
                     }

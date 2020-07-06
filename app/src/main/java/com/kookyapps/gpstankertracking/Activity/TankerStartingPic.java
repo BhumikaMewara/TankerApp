@@ -90,6 +90,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
     public static final int CALL_PERMISSION_REQUEST_CODE = 300;
     ArrayList<String> allpermissionsrequired;
     GPSTracker gpsTracker;
+    String finalsnap = null,snappedDistance = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +101,10 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         //leftbit=addStampToImage(leftbit);
         blmod = b.getParcelable("Bookingdata");
         init_type=b.getString("init_type");
+        if(b.containsKey("snapped_path")) {
+            finalsnap = b.getString("snapped_path");
+            snappedDistance = b.getString("snapped_distance");
+        }
         gpsTracker = new GPSTracker(this);
         //leftbit = Utils.decodeBase64(imageencoded);
        // addPermission();
@@ -300,6 +305,8 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
               //  i.putExtra("Bitmap",imageencoded);
                 i.putExtra("Bookingdata",blmod);
+                i.putExtra("snapped_path",finalsnap);
+                i.putExtra("snapped_distance",snappedDistance);
 
                 startActivity(i);
                 finish();
