@@ -305,8 +305,10 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
               //  i.putExtra("Bitmap",imageencoded);
                 i.putExtra("Bookingdata",blmod);
-                i.putExtra("snapped_path",finalsnap);
-                i.putExtra("snapped_distance",snappedDistance);
+                if(finalsnap!=null) {
+                    i.putExtra("snapped_path", finalsnap);
+                    i.putExtra("snapped_distance", snappedDistance);
+                }
 
                 startActivity(i);
                 finish();

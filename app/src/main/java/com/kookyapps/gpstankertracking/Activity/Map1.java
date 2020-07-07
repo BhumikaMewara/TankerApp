@@ -16,6 +16,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -65,6 +66,8 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
 import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
@@ -115,6 +118,7 @@ import com.kookyapps.gpstankertracking.fcm.Config;
 import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 
 
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +222,22 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         blmod = b.getParcelable("Bookingdata");
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
+        try {
+            if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
+                if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_ID)))
+                    if (travelledpath == null) {
+                        travelledpath = new ArrayList<>();
+                        Gson gson = new Gson();
+                        String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH);
+                        Type type = new TypeToken<ArrayList<LatLng>>() {}.getType();
+                        travelledpath = gson.fromJson(json, type);
+                        SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_TRIP_TAG);
+                    }
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         //gpsTracker = new GPSTracker(this);
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
@@ -227,13 +247,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             switchCompat.setChecked(false);
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
-
         fromLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlatitude())));
         fromLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlongitude())));
         toLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getTolatitude())));
         toLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getTologitude())));
        // geofenceDist=Double.parseDouble(blmod.getGeofence_in_meter());
-
         allpermissionsrequired = new ArrayList<>();
         allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -251,11 +269,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
         title.setText(R.string.title_activity_maps);
-
         trips=(TextView)findViewById(R.id.tv_map_tripText);
         language=(TextView)findViewById(R.id.tv_map_language);
         logout=(TextView)findViewById(R.id.tv_map_logout);
-
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
@@ -281,12 +297,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 super.onDrawerSlide(drawerView, slideOffset);
             }
         };
-
         navdrawer.setDrawerElevation(0f);
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
-
-
         distance.setText(blmod.getDistance());
         toolbarmenuLayout=(RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu);
         toolbarmenuLayout.setOnClickListener(new View.OnClickListener() {
@@ -302,14 +315,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         logoutLayout.setOnClickListener(this);
         fullname=(TextView)findViewById(R.id.tv_map_drawer_fullName);
         username=(TextView)findViewById(R.id.tv_map_drawer_username);
-
         fullname.setText(SessionManagement.getName(Map1.this));
         username.setText(SessionManagement.getUserId(Map1.this));
-
-
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_pickup_map);
-
-
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
             clearNotificationCount();
@@ -340,7 +348,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             }
         };
 
-
         switchCompat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -365,7 +372,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
             }
         });
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         checkAndRequestPermissions(this,allpermissionsrequired);
     }
@@ -455,7 +461,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
                 .setInterval(FASTEST_INTERVAL);
-
         if (!permissionGranted) {
             return;
         }
@@ -465,7 +470,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     private LocationCallback mlocationCallback = new LocationCallback(){
         @Override
         public void onLocationResult(LocationResult locationResult) {
-
             if (!locationInProcess) {
                 locationInProcess = true;
                 if (locationResult == null) {
@@ -498,48 +502,40 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     if (currentlatlng != null)
                         prevlatlng = currentlatlng;
 
+                    MarkerOptions current = new MarkerOptions()
+                            .position(currentlatlng)
+                            .flat(true)
+                            .rotation(bearing)
+                            .anchor(.5f, .5f)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
+                    if (currentmarker != null)
+                        currentmarker.remove();
+                    currentmarker = mMap.addMarker(current);
+                    if (isRecentered) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
+                    }
+
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", blmod.getBookingid());
+                        params.put("lat", currentlatlng.latitude);
+                        params.put("lng", currentlatlng.longitude);
+                        params.put("bearing", bearing);
+                        socket.emit("locationUpdate:Booking", params);
+                    } catch (Exception e) {
+                        locationInProcess = false;
+                        e.printStackTrace();
+                    }
                     double dist = 0;
-                    if(pathfetched)
-                        dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    if (dist > 150 || !pathfetched) {
+                    dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
+                    if (dist > 150) {
                         travelled_distance = travelled_distance + dist;
                         if (travelledpath == null) {
                             travelledpath = new ArrayList<>();
                         }
                         travelledpath.add(currentlatlng);
-                        MarkerOptions current = new MarkerOptions()
-                                .position(currentlatlng)
-                                .flat(true)
-                                .rotation(bearing)
-                                .anchor(.5f, .5f)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
-                        if (currentmarker != null)
-                            currentmarker.remove();
-                        currentmarker = mMap.addMarker(current);
-                        if (isRecentered) {
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
-                        }
-
-                        if (!pathfetched) {
-                            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
-                            stopUpdate();
-                            pathfetched = true;
-                        } else {
-                            JSONObject params = new JSONObject();
-                            try {
-                                params.put("id", blmod.getBookingid());
-                                params.put("lat", currentlatlng.latitude);
-                                params.put("lng", currentlatlng.longitude);
-                                params.put("bearing", bearing);
-                            } catch (JSONException e) {
-                                locationInProcess = false;
-                                e.printStackTrace();
-                            }
-                            socket.emit("locationUpdate:Booking", params);
-                            locationInProcess = false;
-                        }
-
                     }
+                    locationInProcess = false;
                 }
             }
         }
@@ -565,6 +561,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mMap.addMarker(dropop);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 15));
         initSocket();
+        if (!pathfetched) {
+            new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
+            locationInProcess = true;
+            pathfetched = true;
+        }
     }
 
     @Override
@@ -582,18 +583,19 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     parserstring = (String) values[4];
                     JSONObject params = new JSONObject();
                     params.put("id", blmod.getBookingid());
-                    params.put("lat", currentlatlng.latitude);
-                    params.put("lng", currentlatlng.longitude);
-                    params.put("bearing", bearing);
+                    params.put("lat", pickupLatLng.latitude);
+                    params.put("lng", pickupLatLng.longitude);
                     if (parserstring != "") {
                         params.put("path", parserstring);
                         parserstring = "";
                     }
                     socket.emit("locationUpdate:Booking", params);
+                    startLocationUpdates();
                 }
             }
             locationInProcess = false;
-            requestUpdate();
+            prevlatlng = pickupLatLng;
+            //requestUpdate();
         }catch (Exception e){
             e.printStackTrace();
             locationInProcess = false;
@@ -653,7 +655,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             JSONObject params = new JSONObject();
             params.put("booking_id", blmod.getBookingid());
             socket.emit("subscribe:Booking", params);
-            startLocationUpdates();
         }catch (URISyntaxException e){
             e.printStackTrace();
         }catch (JSONException e){
@@ -707,10 +708,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
                 if (cameraAccepted) {
                     stopUpdate();
-                    snapToRoad();
+                    if(travelledpath==null){
+                        Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
+                    }else
+                        snapToRoad();
                 } else {
                     requestPermission();
                 }
+                break;
             case R.id.rl_map_seemore:
                 if (t) {
                     scrolldetails.setVisibility(View.VISIBLE);
@@ -805,8 +811,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     intent.putExtra("Bitmap", bitmap);
                     intent.putExtra("Bookingdata", blmod);
                     intent.putExtra("init_type", Constants.TRIP_END_IMG);
-                    intent.putExtra("snapped_path",finalsnap.toString());
-                    intent.putExtra("snapped_distance",String.valueOf(snappedDistance));
+                    if(finalsnap!=null) {
+                        intent.putExtra("snapped_path", finalsnap.toString());
+                        intent.putExtra("snapped_distance", String.valueOf(snappedDistance));
+                    }
                     startActivity(intent);
                     finish();
                     //break;
@@ -957,6 +965,16 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     protected void onDestroy() {
+        if(!path_snapped){
+            Gson gson = new Gson();
+            String json = gson.toJson(travelledpath);
+            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH,json);
+            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_ID,blmod.getBookingid());
+        }else{
+            if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH)){
+                SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_TRIP_TAG);
+            }
+        }
         socket.disconnect();
         socket.off("aborted:Booking");
         stopUpdate();
@@ -1130,13 +1148,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         else
             interpolate = interpolate+"false";
         String parameters = "";
-        parameters = path + "&" + interpolate;
         for(int i=lowerbound;i<upperbound;i++){
             if(i==lowerbound)
                 path = path+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
             else
                 path = path+"|"+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
         }
+        parameters = path + "&" + interpolate;
         String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
         Log.d("FetchUrl:",url);
         return url;
