@@ -454,8 +454,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
-                .setInterval(FASTEST_INTERVAL)
-                .setSmallestDisplacement(10);
+                .setInterval(FASTEST_INTERVAL);
 
         if (!permissionGranted) {
             return;
@@ -485,7 +484,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         return;
                     }
                     if (location.hasBearing())
-                        bearing = location.getBearing() + 90;
+                        bearing = location.getBearing()+90;
 
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
@@ -1110,6 +1109,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
             }catch (Exception e){
                 e.printStackTrace();
+                Toast.makeText(Map1.this,"Error in snap to road",Toast.LENGTH_LONG);
             }
         }
 
