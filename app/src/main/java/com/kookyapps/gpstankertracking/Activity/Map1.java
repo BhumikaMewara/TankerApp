@@ -712,6 +712,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 } else {
                     requestPermission();
                 }
+                break;
             case R.id.rl_map_seemore:
                 if (t) {
                     scrolldetails.setVisibility(View.VISIBLE);
