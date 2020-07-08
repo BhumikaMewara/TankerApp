@@ -113,7 +113,10 @@ public class GETAPIRequest {
                     String errorMessage      = "";
                     try {
                         JSONObject errorJson = new JSONObject(volley_error.getMessage().toString());
-                        if(errorJson.has("error")) errorMessage = errorJson.getString("errorCode");
+                        if(errorJson.has("error")) {
+                            JSONObject err  = errorJson.getJSONObject("error");
+                            errorMessage = err.getString("message");
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

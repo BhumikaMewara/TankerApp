@@ -16,6 +16,7 @@ public class Constants {
     public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
     public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
+    public static final String SHARED_PREF_TRIP_TAG="trip_pref";
 
     public static final String SHARED_PREF_IMAGE_TAG="image_tag";
 
@@ -32,6 +33,8 @@ public class Constants {
     public static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     public static final String SHARED_NOTIFICATION_UPDATE_KEY  = "notification_update";
     public static final String SHARED_END_IMAGE_KEY="image_key";
+    public static final String SHARED_TRIP_TRAVELLED_PATH="travelled_path";
+    public static final String SHARED_TRIP_ID="booking_id";
 
 
 
