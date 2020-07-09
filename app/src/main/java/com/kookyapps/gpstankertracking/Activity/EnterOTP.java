@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -35,8 +36,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
+import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
+import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
+import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
+import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
@@ -45,10 +50,12 @@ import com.kookyapps.gpstankertracking.Utils.Utils;
 import com.kookyapps.gpstankertracking.Utils.VolleyMultipartRequest;
 import com.kookyapps.gpstankertracking.fcm.Config;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -64,9 +71,16 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     BookingListModal blmod;
     Bitmap leftbit;
     String init_type;
+    private ArrayList<SnappedPoint> snappedPoints = null;
     static String notificationCount;
     BroadcastReceiver mRegistrationBroadcastReceiver;
-    String finalsnap = null,snappedDistance = null;
+    int lowerbound=-1,upperbound=-1;
+    double snappedDistance=0;
+    JSONArray snappedArray;
+    JSONObject finalsnap;
+    private int OFFSET=0;
+    private final int PAGINATION_OVERLAP = 3,PAGE_SIZE = 95;
+
 
 
 
@@ -79,10 +93,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
     //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
-        if(b.containsKey("snapped_path")) {
+        /*if(b.containsKey("snapped_path")) {
             finalsnap = b.getString("snapped_path");
             snappedDistance = b.getString("snapped_distance");
-        }
+        }*/
        leftbit = Utils.decodeBase64(imageencoded);
         initView();
     }
@@ -159,7 +173,12 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
             case R.id.lh_enterOtp_verify:
                 verifyLayout.setClickable(false);
                 validateOTP();
-                uploadBitmap();
+                if(Constants.ongoingBookingId.equals(blmod.getBookingid()))
+                    if(Constants.isPathSnapped)
+                        uploadBitmap();
+                    else
+                        snapToRoad();
+
                 break;
                 /*   i = new Intent(this, TripComplete.class);
 
@@ -297,6 +316,10 @@ private  void validateOTP(){
                                     Intent intent = new Intent(EnterOTP.this,TripComplete.class);
                                     intent.putExtra("Bookingdata",blmod);
                                     intent.putExtra("init_type", init_type);
+                                    Constants.isTripOngoing = false;
+                                    Constants.ongoingBookingId = "";
+                                    Constants.isPathSnapped = false;
+                                    Constants.travelled_path = null;
                                     startActivity(intent);
                                     finish();
                                 }else{
@@ -370,7 +393,7 @@ private  void validateOTP(){
                 params.put("otp",OTP);
                 if(finalsnap!=null) {
                     params.put("snapped_path", finalsnap.toString());
-                    params.put("distance_travelled", snappedDistance);
+                    params.put("distance_travelled", String.valueOf(snappedDistance));
                 }
                 /*params.put("lat",String.valueOf( currentlatlng.latitude));
                 params.put("lng",String.valueOf(currentlatlng.longitude));*/
@@ -478,5 +501,135 @@ private  void validateOTP(){
         resources.updateConfiguration(config, dm);
     }
 
+    private void snapToRoad() {
+        try {
+            if(!Constants.isPathSnapped) {
+                if (OFFSET > 0)
+                    OFFSET -= PAGINATION_OVERLAP;
+                lowerbound = OFFSET;
+                upperbound = Math.min(OFFSET + PAGE_SIZE, Constants.travelled_path.size());
+                GETAPIRequest getapiRequest = new GETAPIRequest();
+                String url = getSnapUrl(lowerbound, upperbound, false);
+                HeadersUtil headparam = new HeadersUtil();
+                getapiRequest.request(EnterOTP.this, snapToRoadListener, url, headparam);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    FetchDataListener snapToRoadListener = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            Log.d("SnapRoadResponse:",data.toString());
+            try {
+                if (data.has("error")) {
+                    Toast.makeText(EnterOTP.this,"Error in snap to road.",Toast.LENGTH_LONG);
+                } else {
+                    /*if(snappedPoints==null)
+                        snappedPoints = new ArrayList<SnappedPoint>();*/
+                    if(snappedArray == null)
+                        snappedArray = new JSONArray();
+                    JSONArray snaps = data.getJSONArray("snappedPoints");
+                    boolean passedOverlap = false;
+                    for(int i=0;i<snaps.length();i++){
+                        SnappedPoint point = new SnappedPoint();
+                        JSONObject snap = snaps.getJSONObject(i);
+                        JSONObject location = snap.getJSONObject("location");
+                        point.setLatitude(Float.parseFloat(location.getString("latitude")));
+                        point.setLongitude(Float.parseFloat(location.getString("longitude")));
+                        point.setPlaceid(snap.getString("placeId"));
+                        if(snap.has("originalIndex"))
+                            point.setOriginalindex(Integer.parseInt(snap.getString("originalIndex")));
+                        if (OFFSET == 0 || point.getOriginalindex() >= PAGINATION_OVERLAP - 1) {
+                            passedOverlap = true;
+                        }
+                        if (passedOverlap) {
+                            snappedPoints.add(point);
+                            snappedArray.put(snap);
+                            int size = snappedPoints.size();
+                            if(size>1)
+                                snappedDistance = snappedDistance+distance(snappedPoints.get(size-1).getLatitude(),snappedPoints.get(size-1).getLongitude(),snappedPoints.get(size).getLatitude(),snappedPoints.get(size).getLongitude());
+                        }
+                    }
+                    OFFSET = upperbound;
+                    if(OFFSET<Constants.travelled_path.size())
+                        snapToRoad();
+                    else{
+                        finalsnap = new JSONObject();
+                        finalsnap.put("snappedpoints",snappedArray);
+                        /*try {
+                            params.put("id", blmod.getBookingid());
+                            params.put("snap",finalsnap);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }*/
+                        Constants.isPathSnapped=true;
+                        uploadBitmap();
+
+                        //socket.emit("locationUpdate:Booking", params);
+
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(EnterOTP.this,"Error in snap to road",Toast.LENGTH_LONG);
+            }
+        }
+
+        @Override
+        public void onFetchFailure(String msg) {
+        }
+
+        @Override
+        public void onFetchStart() {
+        }
+    };
+
+    private String getSnapUrl(int lowerbound,int upperbound,boolean isInterpolate) {
+        String path = "path=";
+        String interpolate = "interpolate=";
+        if(isInterpolate)
+            interpolate = interpolate+"true";
+        else
+            interpolate = interpolate+"false";
+        String parameters = "";
+        for(int i=lowerbound;i<upperbound;i++){
+            if(i==lowerbound)
+                path = path+Constants.travelled_path.get(i).latitude+","+Constants.travelled_path.get(i).longitude;
+            else
+                path = path+"|"+Constants.travelled_path.get(i).latitude+","+Constants.travelled_path.get(i).longitude;
+        }
+        parameters = path + "&" + interpolate;
+        String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
+        Log.d("FetchUrl:",url);
+        return url;
+    }
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist=dist/0.62137;
+        dist=dist*1609.34;
+
+
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
 
 }
