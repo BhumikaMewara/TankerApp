@@ -1,5 +1,6 @@
 package com.kookyapps.gpstankertracking.Activity;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -29,9 +30,11 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 
 
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -146,7 +149,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     static String notificationCount;
     ArrayList<String> allpermissionsrequired;
     static ArrayList<LatLng> waypoints = null;
-    ArrayList<LatLng> travelledpath =null;
+
     private LocationManager locationManager;
     private GoogleApiClient mGoogleApiClient;
     long distance1=0,duration=0;
@@ -222,7 +225,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         blmod = b.getParcelable("Bookingdata");
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
-        try {
+        /*try {
             if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
                 if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_ID)))
                     if (travelledpath == null) {
@@ -237,7 +240,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
+        Constants.ongoingBookingId = bkngid;
+        Constants.isTripOngoing = true;
         //gpsTracker = new GPSTracker(this);
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
@@ -505,9 +510,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     MarkerOptions current = new MarkerOptions()
                             .position(currentlatlng)
                             .flat(true)
-                            .rotation(bearing)
                             .anchor(.5f, .5f)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.truck_map));
+                            .icon(bitmapDescriptorFromVector(Map1.this,R.drawable.ic_truck_icon));
                     if (currentmarker != null)
                         currentmarker.remove();
                     currentmarker = mMap.addMarker(current);
@@ -530,10 +534,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
                     if (dist > 150) {
                         travelled_distance = travelled_distance + dist;
-                        if (travelledpath == null) {
-                            travelledpath = new ArrayList<>();
+                        if (Constants.travelled_path == null) {
+                            Constants.travelled_path  = new ArrayList<>();
                         }
-                        travelledpath.add(currentlatlng);
+                        Constants.travelled_path .add(currentlatlng);
                     }
                     locationInProcess = false;
                 }
@@ -560,6 +564,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mMap.addMarker(pickupop);
         mMap.addMarker(dropop);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 15));
+        mMap.setOnCameraMoveStartedListener(Map1.this);
+        mMap.setOnMarkerClickListener(Map1.this);
         initSocket();
         if (!pathfetched) {
             new FetchURL(Map1.this).execute(getUrl(pickupLatLng, dropLatLng, "driving"), "driving");
@@ -708,11 +714,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
                 if (cameraAccepted) {
                     stopUpdate();
-                    if(travelledpath==null){
+                    Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
+                    /*if(travelledpath==null){
                         Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
                     }else
-                        snapToRoad();
+                        snapToRoad();*/
                 } else {
                     requestPermission();
                 }
@@ -811,10 +819,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     intent.putExtra("Bitmap", bitmap);
                     intent.putExtra("Bookingdata", blmod);
                     intent.putExtra("init_type", Constants.TRIP_END_IMG);
-                    if(finalsnap!=null) {
+                    /*if(finalsnap!=null) {
                         intent.putExtra("snapped_path", finalsnap.toString());
                         intent.putExtra("snapped_distance", String.valueOf(snappedDistance));
-                    }
+                    }*/
                     startActivity(intent);
                     finish();
                     //break;
@@ -965,7 +973,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     protected void onDestroy() {
-        if(!path_snapped){
+        /*if(!path_snapped){
             Gson gson = new Gson();
             String json = gson.toJson(travelledpath);
             SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH,json);
@@ -974,7 +982,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH)){
                 SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_TRIP_TAG);
             }
-        }
+        }*/
         socket.disconnect();
         socket.off("aborted:Booking");
         stopUpdate();
@@ -1056,7 +1064,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         return false;
     }
 
-    private void snapToRoad() {
+    /*private void snapToRoad() {
         try {
             if(!path_snapped) {
                 if (OFFSET > 0)
@@ -1113,12 +1121,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         JSONObject params = new JSONObject();
                         finalsnap = new JSONObject();
                         finalsnap.put("snappedpoints",snappedArray);
-                        /*try {
+                        *//*try {
                             params.put("id", blmod.getBookingid());
                             params.put("snap",finalsnap);
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }*/
+                        }*//*
                         path_snapped=true;
                         //socket.emit("locationUpdate:Booking", params);
                         Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -1158,7 +1166,18 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
         Log.d("FetchUrl:",url);
         return url;
-    }
+    }*/
     public void showEndTrip(){}
     public void hideEndTrip(){}
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_truck_icon);
+        background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        vectorDrawable.setBounds(40, 20, vectorDrawable.getIntrinsicWidth() + 40, vectorDrawable.getIntrinsicHeight() + 20);
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        //vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
 }
