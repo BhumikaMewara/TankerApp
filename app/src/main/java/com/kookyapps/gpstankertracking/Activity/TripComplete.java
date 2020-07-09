@@ -1,6 +1,7 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
@@ -20,6 +21,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
@@ -40,7 +49,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class TripComplete extends AppCompatActivity implements View.OnClickListener {
+public class TripComplete extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText;
     //ImageView calltous;
@@ -50,6 +59,11 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     BookingListModal blmod;
     static String notificationCount;
     Bundle b;
+    SupportMapFragment mapFragment;
+    RelativeLayout maplayout;
+    ArrayList<LatLng>finalpath = null;
+    GoogleMap mMap;
+
     BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
@@ -79,6 +93,8 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
 
             notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
             notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
+        maplayout = (RelativeLayout)findViewById(R.id.rl_tripComplete_map);
+        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_tripcomplete_map);
 
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
@@ -269,6 +285,23 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                             RequestQueueService.showAlert("Error! No Data Found", TripComplete.this);
                         }
 
+                        if(data.has("snapped_path")){
+                            String snapstring = data.getString("snapped_path");
+                            JSONObject snap = new JSONObject(snapstring);
+                            JSONArray snaparray = snap.getJSONArray("snappedpoints");
+                            if(finalpath == null)
+                                finalpath = new ArrayList<>();
+                            for(int i=0;i<snaparray.length();i++){
+                                JSONObject point = snaparray.getJSONObject(i);
+                                JSONObject location = point.getJSONObject("location");
+                                double lat = Double.parseDouble(location.getString("latitude"));
+                                double longi = Double.parseDouble(location.getString("longitude"));
+                                LatLng temp = new LatLng(lat,longi);
+                                finalpath.add(temp);
+                            }
+                            mapFragment.getMapAsync(TripComplete.this);
+                        }
+
 
                         // finish();
                     }
@@ -378,6 +411,29 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        maplayout.setVisibility(View.VISIBLE);
+        PolylineOptions op = new PolylineOptions();
+        op.addAll(finalpath);
+        op.width(30);
+        op.color(ContextCompat.getColor(TripComplete.this,R.color.greenLight));
+        mMap.addPolyline(op);
+        LatLng pickupLatLng = finalpath.get(0);
+        LatLng dropLatLng = finalpath.get(finalpath.size()-1);
+        MarkerOptions pickupop,dropop,currentop;
+        pickupop = new MarkerOptions()
+                .position(pickupLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.hydrant_pickuppoint_map));
+        dropop = new MarkerOptions()
+                .position(dropLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_map));
+        mMap.addMarker(pickupop);
+        mMap.addMarker(dropop);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 18));
     }
 }
 

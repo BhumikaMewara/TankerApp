@@ -26,9 +26,8 @@
         android:id="@+id/sv_tripcomplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_background_main"
         android:layout_below="@+id/rl_trip_complete_toolbarLayout"
-
+        android:layout_above="@+id/rl_tripComplete_map"
         >
         <RelativeLayout
             android:layout_width="match_parent"
@@ -265,11 +264,26 @@
     </ScrollView>
 
         <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="3dp"
+            android:visibility="gone"
+            android:id="@+id/rl_tripComplete_map"
+            android:layout_above="@+id/trip_complete_layout">
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/fg_tripcomplete_map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/trip_complete_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sv_tripcomplete"
-            android:layout_marginTop="20dp"
+            android:layout_above="@+id/rl_complete_bottom_btn"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:background="@color/colorwhite"
@@ -307,6 +321,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/rl_complete_bottom_btn"
     android:layout_alignParentBottom="true">
     <RelativeLayout
         android:layout_width="match_parent"

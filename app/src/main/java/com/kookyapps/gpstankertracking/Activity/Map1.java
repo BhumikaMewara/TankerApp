@@ -290,6 +290,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         language=(TextView)findViewById(R.id.tv_map_language);
         logout=(TextView)findViewById(R.id.tv_map_logout);
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
+        bottom.setVisibility(View.GONE);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
         seemore.setOnClickListener(this);
@@ -551,13 +552,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         }
                         Constants.travelled_path .add(currentlatlng);
                     }
-                    else{
+                    /*else{
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
-                    }
+                    }*/
                     locationInProcess = false;
                 }
             }
@@ -1186,8 +1187,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         Log.d("FetchUrl:",url);
         return url;
     }*/
-    public void showEndTrip(){}
-    public void hideEndTrip(){}
+    public void showEndTrip(){
+        bottom.setVisibility(View.VISIBLE);
+    }
+    public void hideEndTrip(){
+        bottom.setVisibility(View.GONE);
+    }
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
         Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_truck_icon);
         background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
