@@ -44,6 +44,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
@@ -329,6 +330,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
 
         }
+
     }
 
     private Bitmap captureScreenShot() {
@@ -597,5 +599,13 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        if(Constants.travelled_path!=null&&init_type.equals(Constants.TRIP_END_IMG)){
+            Gson gson = new Gson();
+            String json = gson.toJson(Constants.travelled_path);
+            SharedPrefUtil.setPreferences(TankerStartingPic.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
+        }
+        super.onDestroy();
+    }
 }

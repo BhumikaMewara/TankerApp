@@ -93,10 +93,14 @@ public class GETAPIRequest {
                         try {
                             Log.d("Response",response.toString());
                             if (listener != null) {
-                                if(response.getInt("error")!= 1) {
+                                if(response.has("error")) {
+                                    if (response.getInt("error") != 1) {
+                                        listener.onFetchComplete(response);
+                                    } else {
+                                        listener.onFetchFailure(response.getString("error"));
+                                    }
+                                }else{
                                     listener.onFetchComplete(response);
-                                }else {
-                                    listener.onFetchFailure(response.getString("error"));
                                 }
                             }
                         }catch (JSONException e){

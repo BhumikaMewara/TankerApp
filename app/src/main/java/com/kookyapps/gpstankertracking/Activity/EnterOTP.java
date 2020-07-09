@@ -34,6 +34,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
@@ -55,6 +58,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -79,7 +83,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     JSONArray snappedArray;
     JSONObject finalsnap;
     private int OFFSET=0;
-    private final int PAGINATION_OVERLAP = 3,PAGE_SIZE = 95;
+    private final int PAGINATION_OVERLAP = 3,PAGE_SIZE = 70;
 
 
 
@@ -91,6 +95,22 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         Intent i = getIntent();
         Bundle b = i.getExtras();
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
+        try {
+            if(Constants.travelled_path==null) {
+                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SessionManagement.getOngoingBooking(EnterOTP.this))) {
+                        Gson gson = new Gson();
+                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH);
+                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        }.getType();
+                        Constants.travelled_path = gson.fromJson(json, type);
+                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
         /*if(b.containsKey("snapped_path")) {
@@ -173,7 +193,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
             case R.id.lh_enterOtp_verify:
                 verifyLayout.setClickable(false);
                 validateOTP();
-                if(Constants.ongoingBookingId.equals(blmod.getBookingid()))
+                if(blmod.getBookingid().equals(SessionManagement.getOngoingBooking(EnterOTP.this)))
                     if(Constants.isPathSnapped)
                         uploadBitmap();
                     else
@@ -306,11 +326,13 @@ private  void validateOTP(){
                 new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
+                        Log.d("End Trip:",response.toString());
                         try {
                             JSONObject obj = new JSONObject(new String(response.data));
                             if(obj!=null){
                                 if(obj.getInt("error")==0){
-                                    SessionManagement.setOngoingBooking(EnterOTP.this,blmod.getBookingid());
+                                    //SessionManagement.setOngoingBooking(EnterOTP.this,blmod.getBookingid());
+                                    SessionManagement.setOngoingBooking(EnterOTP.this,"");
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_BOOKING_TAG);
                                     Intent intent = new Intent(EnterOTP.this,TripComplete.class);
@@ -393,7 +415,7 @@ private  void validateOTP(){
                 params.put("otp",OTP);
                 if(finalsnap!=null) {
                     params.put("snapped_path", finalsnap.toString());
-                    params.put("distance_travelled", String.valueOf(snappedDistance));
+                    params.put("distance_traveled", String.valueOf(snappedDistance));
                 }
                 /*params.put("lat",String.valueOf( currentlatlng.latitude));
                 params.put("lng",String.valueOf(currentlatlng.longitude));*/
@@ -527,8 +549,8 @@ private  void validateOTP(){
                 if (data.has("error")) {
                     Toast.makeText(EnterOTP.this,"Error in snap to road.",Toast.LENGTH_LONG);
                 } else {
-                    /*if(snappedPoints==null)
-                        snappedPoints = new ArrayList<SnappedPoint>();*/
+                    if(snappedPoints==null)
+                        snappedPoints = new ArrayList<SnappedPoint>();
                     if(snappedArray == null)
                         snappedArray = new JSONArray();
                     JSONArray snaps = data.getJSONArray("snappedPoints");
@@ -550,7 +572,7 @@ private  void validateOTP(){
                             snappedArray.put(snap);
                             int size = snappedPoints.size();
                             if(size>1)
-                                snappedDistance = snappedDistance+distance(snappedPoints.get(size-1).getLatitude(),snappedPoints.get(size-1).getLongitude(),snappedPoints.get(size).getLatitude(),snappedPoints.get(size).getLongitude());
+                                snappedDistance = snappedDistance+distance(snappedPoints.get(size-2).getLatitude(),snappedPoints.get(size-2).getLongitude(),snappedPoints.get(size-1).getLatitude(),snappedPoints.get(size-1).getLongitude());
                         }
                     }
                     OFFSET = upperbound;
@@ -597,9 +619,9 @@ private  void validateOTP(){
         String parameters = "";
         for(int i=lowerbound;i<upperbound;i++){
             if(i==lowerbound)
-                path = path+Constants.travelled_path.get(i).latitude+","+Constants.travelled_path.get(i).longitude;
+                path = path+Constants.travelled_path.get(i).latitude+"%2C"+Constants.travelled_path.get(i).longitude;
             else
-                path = path+"|"+Constants.travelled_path.get(i).latitude+","+Constants.travelled_path.get(i).longitude;
+                path = path+"%7C"+Constants.travelled_path.get(i).latitude+"%2C"+Constants.travelled_path.get(i).longitude;
         }
         parameters = path + "&" + interpolate;
         String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
@@ -632,4 +654,13 @@ private  void validateOTP(){
         return (rad * 180.0 / Math.PI);
     }
 
+    @Override
+    protected void onDestroy() {
+        if(Constants.travelled_path!=null) {
+            Gson gson = new Gson();
+            String json = gson.toJson(Constants.travelled_path);
+            SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
+        }
+        super.onDestroy();
+    }
 }

@@ -214,7 +214,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     double snappedDistance=0;
     JSONArray snappedArray;
     JSONObject finalsnap;
-    boolean path_snapped = false;
+    //boolean path_snapped = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,23 +225,35 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         blmod = b.getParcelable("Bookingdata");
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
-        /*try {
-            if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
-                if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_ID)))
-                    if (travelledpath == null) {
-                        travelledpath = new ArrayList<>();
+        //SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
+        try {
+            if(Constants.travelled_path==null) {
+                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SessionManagement.getOngoingBooking(Map1.this))) {
                         Gson gson = new Gson();
                         String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<LatLng>>() {}.getType();
-                        travelledpath = gson.fromJson(json, type);
-                        SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_TRIP_TAG);
+                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        }.getType();
+                        Constants.travelled_path = gson.fromJson(json, type);
+                        SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
                     }
+                }
 
+                /*else {
+                    Constants.travelled_path = new ArrayList<>();
+                    Constants.travelled_path.add(new LatLng(-35.27801, 149.12958));
+                    Constants.travelled_path.add(new LatLng(-35.28032, 149.12907));
+                    Constants.travelled_path.add(new LatLng(-35.28099, 149.12929));
+                    Constants.travelled_path.add(new LatLng(-35.28144, 149.12984));
+                    Constants.travelled_path.add(new LatLng(-35.28194, 149.13003));
+                    Constants.travelled_path.add(new LatLng(-35.28282, 149.12956));
+                    Constants.travelled_path.add(new LatLng(-35.28302, 149.12881));
+                    Constants.travelled_path.add(new LatLng(-35.28473, 149.12836));
+                }*/
             }
         }catch (Exception e){
             e.printStackTrace();
-        }*/
-        Constants.ongoingBookingId = bkngid;
+        }
         Constants.isTripOngoing = true;
         //gpsTracker = new GPSTracker(this);
         switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
@@ -533,6 +545,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     double dist = 0;
                     dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
                     if (dist > 150) {
+                        travelled_distance = travelled_distance + dist;
+                        if (Constants.travelled_path == null) {
+                            Constants.travelled_path  = new ArrayList<>();
+                        }
+                        Constants.travelled_path .add(currentlatlng);
+                    }
+                    else{
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
@@ -973,22 +992,21 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     protected void onDestroy() {
-        /*if(!path_snapped){
+        if(Constants.travelled_path!=null) {
             Gson gson = new Gson();
-            String json = gson.toJson(travelledpath);
-            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH,json);
-            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_ID,blmod.getBookingid());
-        }else{
-            if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_TRIP_TRAVELLED_PATH)){
-                SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_TRIP_TAG);
-            }
-        }*/
+            String json = gson.toJson(Constants.travelled_path);
+            SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
+        }
         socket.disconnect();
         socket.off("aborted:Booking");
         stopUpdate();
         super.onDestroy();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 
     public void showlanguage(){
         if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
@@ -1020,11 +1038,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         intent.putExtra("booking_id", bkngid);
         startActivity(intent);
         finish();*/
-        if(path_snapped){
+        super.onBackPressed();
+        /*if(Constants.isPathSnapped){
             RequestQueueService.showAlert("","Procced to end activity",this);
         }else {
             super.onBackPressed();
-        }
+        }*/
     }
 
     public void requestUpdate(){

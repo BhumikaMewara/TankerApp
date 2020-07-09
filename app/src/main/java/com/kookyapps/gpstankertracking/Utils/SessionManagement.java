@@ -20,7 +20,6 @@ public class SessionManagement {
     private static final String BOOKING = "booking";
     private static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     private static final String LANGUAGE_PATH = "languagePath";
-
     private static final String IS_ONLINE = "is_online";
 
 
