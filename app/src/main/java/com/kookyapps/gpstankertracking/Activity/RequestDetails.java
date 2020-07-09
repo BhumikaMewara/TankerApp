@@ -1,6 +1,7 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -36,6 +38,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +89,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     TextView bookingid, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
     ImageView calltous;
     ImageView menunotification;
+    ProgressBar progressBar;
     RelativeLayout menuback, bottom, notificationLayout, toolbarNotiCountLayout;
     String init_type, bkngid;
     static String notificationCount;
@@ -105,6 +109,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_details);
+
         initViews();
         bookingByIdApiCalling();
 
@@ -116,7 +121,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     public void initViews() {
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
-
+        progressBar=(ProgressBar) findViewById(R.id.pb_requestDetails_progressbar);
         pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
         bookingid = (TextView) findViewById(R.id.tv_bookingdetail_bookingid);
         distancetext = (TextView) findViewById(R.id.tv_bookingdetail_distance);
@@ -173,9 +178,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         menuback.setOnClickListener(this);
         menunotification = (ImageView) findViewById(R.id.iv_tb_with_bck_arrow_notification);
         notificationLayout.setOnClickListener(this);
-        bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout);
+        bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout_text);
         bottom.setOnClickListener(this);
-        bottom.setClickable(true);
+        //bottom.setClickable(false);
         bottomtext = (TextView) findViewById(R.id.tv_result_details_bottomlayout_text);
 
 
@@ -223,7 +228,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         intent = new Intent(RequestDetails.this,Notifications.class);
                         startActivity(intent);
                         break;
-            case R.id.rl_result_details_bottomLayout:
+            case R.id.rl_result_details_bottomLayout_text:
                         if (init_type.equals(Constants.REQUEST_DETAILS)){
                         bookingacceptedapiCalling();
                         bottom.setClickable(false);
@@ -468,6 +473,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 if (mydata != null) {
                     if (mydata.getInt("error") == 0) {
 
+                        progressBar.setVisibility(View.GONE);
+                        bottom.setVisibility(View.VISIBLE);
+                        bottom.setClickable(true);
+
                         Intent intent = new Intent(getApplicationContext() , FirstActivity.class);
                         intent.putExtra("curretTab",1);
                         startActivity(intent);
@@ -477,10 +486,16 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
                     } else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);
+                        progressBar.setVisibility(View.GONE);
+                        bottom.setVisibility(View.VISIBLE);
+                        bottom.setClickable(true);
                     }
                 }
             } catch (JSONException e) {
                 RequestQueueService.showAlert("Error! No Data Found",RequestDetails.this);
+                progressBar.setVisibility(View.GONE);
+                bottom.setVisibility(View.VISIBLE);
+                bottom.setClickable(true);
                 e.printStackTrace();
             }
 
@@ -489,6 +504,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         @Override
         public void onFetchFailure(String msg) {
             RequestQueueService.showAlert(msg,RequestDetails.this);
+            progressBar.setVisibility(View.GONE);
+            bottom.setVisibility(View.VISIBLE);
+            bottom.setClickable(true);
         }
 
         @Override
@@ -524,6 +542,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         JSONObject data = mydata.getJSONObject("data");
                         blmod = new BookingListModal();
                         if (data != null) {
+
+                            bottom.setVisibility(View.VISIBLE);
+                            bottom.setClickable(true);
+                            progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
                             if(status.equals("0") || status.equals("5")||status.equals("6")){
@@ -559,6 +581,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 distancetext.setText(blmod.getDistance());
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in distance Found", RequestDetails.this);
+                                progressBar.setVisibility(View.GONE);
+                                bottom.setVisibility(View.VISIBLE);
+                                bottom.setClickable(true);
                             }
                             JSONObject drop_point = data.getJSONObject("drop_point");
                             if (drop_point != null) {
@@ -576,9 +601,18 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                         blmod.setTolatitude(coordinates.getString(1)); //lat
                                     }else {
                                         RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this); }
+                                    progressBar.setVisibility(View.GONE);
+                                    bottom.setVisibility(View.VISIBLE);
+                                    bottom.setClickable(true);
                                 }else { RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this); }
+                                progressBar.setVisibility(View.GONE);
+                                bottom.setVisibility(View.VISIBLE);
+                                bottom.setClickable(true);
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in drop_point Found", RequestDetails.this);
+                                progressBar.setVisibility(View.GONE);
+                                bottom.setVisibility(View.VISIBLE);
+                                bottom.setClickable(true);
                             }
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
                             {
@@ -598,12 +632,21 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                             blmod.setFromlatitude(coordinates.getString(1)); //lat
                                         } else {
                                             RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this);
+                                            progressBar.setVisibility(View.GONE);
+                                            bottom.setVisibility(View.VISIBLE);
+                                            bottom.setClickable(true);
                                         }
                                     } else {
                                         RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this);
+                                        progressBar.setVisibility(View.GONE);
+                                        bottom.setVisibility(View.VISIBLE);
+                                        bottom.setClickable(true);
                                     }
                                 } else {
                                     RequestQueueService.showAlert("Error! No Data in pick_point Found", RequestDetails.this);
+                                    progressBar.setVisibility(View.GONE);
+                                    bottom.setVisibility(View.VISIBLE);
+                                    bottom.setClickable(true);
                                 }
                             }
                             if (init_type.equals(Constants.REQUEST_DETAILS)) {
@@ -627,14 +670,23 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
+                            progressBar.setVisibility(View.GONE);
+                            bottom.setVisibility(View.VISIBLE);
+                            bottom.setClickable(true);
                         }
                     }
                     else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);
+                        progressBar.setVisibility(View.GONE);
+                        bottom.setVisibility(View.VISIBLE);
+                        bottom.setClickable(true);
                     }
                 }
             } catch (JSONException e) {
                 RequestQueueService.showAlert("Error! No Data Found",RequestDetails.this);
+                progressBar.setVisibility(View.GONE);
+                bottom.setVisibility(View.VISIBLE);
+                bottom.setClickable(true);
                 e.printStackTrace();
             }
 
@@ -643,6 +695,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         @Override
         public void onFetchFailure(String msg) {
             RequestQueueService.showAlert(msg,RequestDetails.this);
+            progressBar.setVisibility(View.GONE);
+            bottom.setVisibility(View.VISIBLE);
+            bottom.setClickable(true);
         }
 
         @Override
@@ -739,6 +794,26 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
    @Override
    public void onBackPressed() {
-       super.onBackPressed();
-   }
+       if (SessionManagement.isOngoing(getApplicationContext())){
+           AlertDialog.Builder builder = new AlertDialog.Builder(RequestDetails.this);
+           builder.setTitle("Alert !");
+           builder.setMessage("Do you want to exit ?");
+           builder.setCancelable(false);
+           builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which)
+               { finish();
+               }
+           });
+           builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which)
+               {dialog.cancel(); }
+           });
+           AlertDialog alertDialog = builder.create();
+           alertDialog.show();
+       }else {
+           super.onBackPressed();
+       }
+    }
 }
