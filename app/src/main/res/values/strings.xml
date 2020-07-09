@@ -32,8 +32,8 @@
     <string name="notifications">Notifications</string>
     <string name="booking_list">Booking List</string>
     <string name="request_list">Request List</string>
-    <string name="request_details">Request Deatils</string>
-    <string name="booking_details">Booking Deatils</string>
+    <string name="request_details">Request Details</string>
+    <string name="booking_details">Booking Details</string>
 
     <string name="distance">Distance</string>
     <string name="from">From</string>
