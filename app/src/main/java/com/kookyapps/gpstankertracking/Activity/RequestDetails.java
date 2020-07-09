@@ -109,13 +109,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_details);
-
         initViews();
         bookingByIdApiCalling();
-
-
-
-
     }
 
     public void initViews() {
@@ -130,8 +125,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         controllername = (TextView) findViewById(R.id.tv_bookingdetail_drivername);
         contact_no = (TextView) findViewById(R.id.tv_bookingdetail_contact);
         message = (TextView) findViewById(R.id.tv_bookingdetail_message);
-
-
         toolbarNotiCountLayout = (RelativeLayout) findViewById(R.id.rl_toolbar_notificationcount);
         notificationLayout = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
         notificationCountText = (TextView) findViewById(R.id.tv_toolbar_notificationcount);
@@ -542,13 +535,12 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         JSONObject data = mydata.getJSONObject("data");
                         blmod = new BookingListModal();
                         if (data != null) {
-
                             bottom.setVisibility(View.VISIBLE);
                             bottom.setClickable(true);
                             progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
-                            if(status.equals("0") || status.equals("5")||status.equals("6")){
+                            if(status.equals("0") || status.equals("5")||status.equals("6")&& init_type.equals(Constants.BOOKING_START)){
                                 SessionManagement.removeOngoingBooking(RequestDetails.this);
                                 Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -694,10 +686,29 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onFetchFailure(String msg) {
-            RequestQueueService.showAlert(msg,RequestDetails.this);
-            progressBar.setVisibility(View.GONE);
-            bottom.setVisibility(View.VISIBLE);
-            bottom.setClickable(true);
+            try {
+                JSONObject er = new JSONObject(msg);
+                String code = er.getString("code");
+                if(code.equals("not_found")){
+                    SessionManagement.removeOngoingBooking(RequestDetails.this);
+                    Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    RequestDetails.this.finish();
+
+                }else {
+                    RequestQueueService.showAlert(msg, RequestDetails.this);
+                    progressBar.setVisibility(View.GONE);
+                    bottom.setVisibility(View.VISIBLE);
+                    bottom.setClickable(true);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                RequestQueueService.showAlert(msg, RequestDetails.this);
+                progressBar.setVisibility(View.GONE);
+                bottom.setVisibility(View.VISIBLE);
+                bottom.setClickable(true);
+            }
         }
 
         @Override
