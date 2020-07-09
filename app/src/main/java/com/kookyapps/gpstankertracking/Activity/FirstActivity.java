@@ -404,7 +404,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             jsonBodyObj.put("lat", stringLatitude);
             jsonBodyObj.put("lng", stringLongitude);
             jsonBodyObj.put("status", currentStatus);
-
             POSTAPIRequest postapiRequest = new POSTAPIRequest();
             String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
             Log.i("url", String.valueOf(url));
@@ -413,7 +412,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             Log.i("Token:", token);
             HeadersUtil headparam = new HeadersUtil(token);
             postapiRequest.request(FirstActivity.this, updateLocationListner, url, headparam, jsonBodyObj);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -426,7 +424,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
                         Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
-
                     }
                 }
             } catch (JSONException e){

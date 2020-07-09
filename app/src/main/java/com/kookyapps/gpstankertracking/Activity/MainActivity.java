@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     userdetail.getString("token"),
                                     userdetail.getJSONObject("settings").getString("language"),
                                     userdetail.getString("location"),
-                                    userdetail.getString("activity_status"),"9");
+                                    userdetail.getString("activity_status"),userdetail.getString("notification_count"));
                             SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
                             //String s = userdetail.getString("status");
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);

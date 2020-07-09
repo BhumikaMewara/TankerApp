@@ -1,6 +1,7 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -792,6 +794,26 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
    @Override
    public void onBackPressed() {
-       super.onBackPressed();
-   }
+       if (SessionManagement.isOngoing(getApplicationContext())){
+           AlertDialog.Builder builder = new AlertDialog.Builder(RequestDetails.this);
+           builder.setTitle("Alert !");
+           builder.setMessage("Do you want to exit ?");
+           builder.setCancelable(false);
+           builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which)
+               { finish();
+               }
+           });
+           builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which)
+               {dialog.cancel(); }
+           });
+           AlertDialog alertDialog = builder.create();
+           alertDialog.show();
+       }else {
+           super.onBackPressed();
+       }
+    }
 }

@@ -74,7 +74,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
-        createNotificationData();
+        //createNotificationData();
         initViews();
         Intent intent = getIntent();
         Bundle b = intent.getExtras();

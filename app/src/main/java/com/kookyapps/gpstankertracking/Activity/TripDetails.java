@@ -102,10 +102,10 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         totalKm=(TextView)findViewById(R.id.tv_trip_details_totalKM_value);
         nodata = (TextView)findViewById(R.id.tv_trip_details_nodata);
         nodata.setVisibility(View.GONE);
-bookingid=findViewById(R.id.tv_trip_details_bookingid_title);
-distance=findViewById(R.id.tv_trip_details_distance);
-from=findViewById(R.id.tv_trip_details_fromtitle);
-to=findViewById(R.id.tv_trip_details_totitle);
+        bookingid=findViewById(R.id.tv_trip_details_bookingid_title);
+        distance=findViewById(R.id.tv_trip_details_distance);
+        from=findViewById(R.id.tv_trip_details_fromtitle);
+        to=findViewById(R.id.tv_trip_details_totitle);
 
 
        /* date=findViewById(R.id.tv_currentDay);
@@ -241,11 +241,11 @@ FetchDataListener tripListener= new FetchDataListener() {
             if (data != null) {
                 if (data.getInt("error")==0) {
 
-                    TripDetailsModal tdmod = new TripDetailsModal();
-                    tdmod.setTotaltrip(data.getString("total"));
-                    total_trip.setText(tdmod.getTotaltrip());
-                    tdmod.setTotal_distance(data.getString("total_distance"));
-                    totalKm.setText(tdmod.getTotal_distance());
+                    //TripDetailsModal tdmod = new TripDetailsModal();
+                    //tdmod.setTotaltrip(data.getString("total"));
+                    total_trip.setText(data.getString("total"));
+                    //tdmod.setTotal_distance(data.getString("total_distance"));
+                    totalKm.setText(data.getString("total_distance"));
 
 
                     ArrayList<TripDetailsModal> tripList=new ArrayList<>();
@@ -263,7 +263,7 @@ FetchDataListener tripListener= new FetchDataListener() {
                         isListNull = false;
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject jsonObject = (JSONObject) array.get(i);
-
+                            TripDetailsModal tdmod = new TripDetailsModal();
                             tdmod.setBookingid(jsonObject.getString("_id"));
                             tdmod.setFromtime(jsonObject.getString("trip_start_at"));
                             tdmod.setTotime(jsonObject.getString("trip_end_at"));
@@ -291,8 +291,6 @@ FetchDataListener tripListener= new FetchDataListener() {
                             }
                             JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                             if (pickup != null) {
-
-
                                 tdmod.setFromlocation(pickup.getString("location"));
                                 tdmod.setFrom_address(pickup.getString("address"));
                                 JSONObject geometry=pickup.getJSONObject("geometry");
