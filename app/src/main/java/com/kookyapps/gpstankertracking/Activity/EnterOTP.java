@@ -342,6 +342,7 @@ private  void validateOTP(){
                                     Constants.ongoingBookingId = "";
                                     Constants.isPathSnapped = false;
                                     Constants.travelled_path = null;
+                                    SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
                                     startActivity(intent);
                                     finish();
                                 }else{
