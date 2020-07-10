@@ -82,7 +82,14 @@
                                 android:layout_marginTop="10dp"/>
                             -->
 
+                            <ProgressBar
+                                android:id="@+id/enterotp_progressbar"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center"/>
+
                             <LinearLayout
+                                android:id="@+id/lh_enterotp_edittext_layout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
@@ -146,11 +153,9 @@
                                     android:layout_height="42sp"
                                     android:inputType="number"
                                     android:maxLength="1"
-                                    android:gravity="center"
-                                    />
-
-
+                                    android:gravity="center" />
                             </LinearLayout>
+
 
 
 

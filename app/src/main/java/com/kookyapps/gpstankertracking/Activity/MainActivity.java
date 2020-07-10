@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText usernameET,passwordET;
     ImageView usernameImg,passwordImg;
     LinearLayout signIn;
+    ProgressBar progressBar;
     String username , password;
 
     @Override
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         passwordET=(EditText)      findViewById(R.id.et_main_password);
         usernameImg=(ImageView)    findViewById(R.id.iv_main_usernameImg);
         passwordImg=(ImageView)    findViewById(R.id.iv_main_passwordImg);
+        progressBar=(ProgressBar)  findViewById(R.id.main_progressBar);
+        progressBar.setVisibility(View.GONE);
         signIn=(LinearLayout)      findViewById(R.id.lh_main_signIn);
         signIn.setOnClickListener(this);
     }
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         username = usernameET.getText().toString();
         password = passwordET.getText().toString();
         loginApiCalling();
+        progressBar.setVisibility(View.VISIBLE);
         break;
         }
     }
@@ -117,20 +122,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //String s = userdetail.getString("status");
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);
                             //i.putExtra("status",s);
+                            progressBar.setVisibility(View.GONE);
                             startActivity(i);
                             finish();
                         }
                         else {
                             RequestQueueService.showAlert("Error! No data fetched", MainActivity.this);
                             signIn.setClickable(true);
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 } else {
                     RequestQueueService.showAlert("Error! No data fetched", MainActivity.this);
-                    signIn.setClickable(true);}
+                    signIn.setClickable(true);
+                    progressBar.setVisibility(View.GONE);}
             }catch (Exception e){
                 RequestQueueService.showAlert("Something went wrong", MainActivity.this);
                 signIn.setClickable(true);
+                progressBar.setVisibility(View.GONE);
                 e.printStackTrace();
             }
         }
@@ -140,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //RequestQueueService.cancelProgressDialog();
             RequestQueueService.showAlert(msg,MainActivity.this);
             signIn.setClickable(true);
+            progressBar.setVisibility(View.GONE);
         }
 
         @Override

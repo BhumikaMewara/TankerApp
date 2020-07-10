@@ -108,6 +108,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         to=findViewById(R.id.tv_trip_details_totitle);
 
 
+
        /* date=findViewById(R.id.tv_currentDay);
         time=findViewById(R.id.tv_currentDate);*/
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);

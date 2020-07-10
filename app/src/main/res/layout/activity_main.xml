@@ -117,6 +117,15 @@
             android:layout_marginRight="20dp"
             android:padding="20dp"
             >
+            <ProgressBar
+                android:id="@+id/main_progressBar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                >
+
+            </ProgressBar>
             <LinearLayout
                 android:id="@+id/lh_main_password"
                 android:layout_width="match_parent"

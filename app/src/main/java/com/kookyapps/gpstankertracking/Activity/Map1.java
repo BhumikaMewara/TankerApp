@@ -545,20 +545,20 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     }
                     double dist = 0;
                     dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    if (dist > 150) {
+                    if (dist > 80) {
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
                     }
-                    /*else{
+                    else{
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
-                    }*/
+                    }
                     locationInProcess = false;
                 }
             }

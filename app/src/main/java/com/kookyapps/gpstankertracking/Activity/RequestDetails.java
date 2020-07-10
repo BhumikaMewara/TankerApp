@@ -223,9 +223,11 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         break;
             case R.id.rl_result_details_bottomLayout_text:
                         if (init_type.equals(Constants.REQUEST_DETAILS)){
-                        bookingacceptedapiCalling();
-                        bottom.setClickable(false);
+                            bookingacceptedapiCalling();
+                            bottom.setClickable(false);
+                            progressBar.setVisibility(View.VISIBLE);
                         }else if (init_type.equals(Constants.BOOKING_START)) {
+                            progressBar.setVisibility(View.VISIBLE);
                             if (can_start.equals("true")) {
                                 if (checkPermission()) {
                                 cameraAccepted = true;
@@ -246,13 +248,12 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 intent.putExtra("Bookingdata",blmod);
                                 intent.putExtra("init_type", Constants.BOOKING_START);
                                 intent.putExtra("booking_id", bkngid);
+                                progressBar.setVisibility(View.GONE);
                                 startActivity(intent);
                                 finish();
                             }
                         }
                         break;
-
-
         }
     }
 
@@ -308,6 +309,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
         if (resultCode!=0) {
+            progressBar.setVisibility(View.VISIBLE);
+
             Bundle b = data.getExtras();
             if (resultCode != REQUEST_IMAGE_CAPTURE && b.containsKey("data")) {
 
@@ -540,7 +543,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
-                            if(status.equals("0") || status.equals("5")||status.equals("6")&& init_type.equals(Constants.BOOKING_START)){
+                            if((status.equals("0") || status.equals("5")||status.equals("6"))&& init_type.equals(Constants.BOOKING_START)){
                                 SessionManagement.removeOngoingBooking(RequestDetails.this);
                                 Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

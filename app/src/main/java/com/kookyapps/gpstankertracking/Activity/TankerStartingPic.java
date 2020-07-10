@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,6 +86,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
     boolean photo_taken,cameraAccepted=false,permissionGranted = false;
     BookingListModal blmod;
     Bitmap leftbit;
+    ProgressBar progressBar;
     private LocationManager locationManager;
     private LatLng currentlatlng=null;
     public static final int PERMISSION_REQUEST_CODE = 200;
@@ -175,6 +177,8 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         latLongLayout=      (RelativeLayout)findViewById(R.id.rl_tankr_strt_latLon);
         retake=             (LinearLayout)findViewById(R.id.ll_tanker_starting_pic_retake);
         imgInfoLayout=      (RelativeLayout)findViewById(R.id.image_with_infoLayout);
+        progressBar=        (ProgressBar)findViewById(R.id.tanker_starting_progressbar);
+        progressBar.setVisibility(View.GONE);
         retake.setOnClickListener(this);
 
 
@@ -294,8 +298,8 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         Intent i ;
         switch (view.getId()){
             case R.id.ib_tnkr_strt_capture:
+                progressBar.setVisibility(View.VISIBLE);
                 leftbit = captureScreenShot();
-
                 //store(leftbit,blmod.getBookingid()+ ".png");
                 imageencoded=Utils.encodeTobase64(leftbit);
                 SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY,imageencoded);
@@ -309,12 +313,13 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                     i.putExtra("snapped_path", finalsnap);
                     i.putExtra("snapped_distance", snappedDistance);
                 }*/
-
+                    progressBar.setVisibility(View.GONE);
                 startActivity(i);
                 finish();
                 }
                 else{
-                uploadBitmap();
+                    progressBar.setVisibility(View.VISIBLE);
+                    uploadBitmap();
                 }
                 /*i = new Intent(this, RequestDetails.class);
                 startActivity(i);*/
@@ -438,22 +443,26 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
                                     intent.putExtra("Bookingdata",blmod);
+                                    progressBar.setVisibility(View.GONE);
                                     startActivity(intent);
                                     finish();
                                 }else{
                                     RequestQueueService.showAlert(obj.getString("code"), TankerStartingPic.this);
                                     captureImgBtn.setClickable(true);
+                                    progressBar.setVisibility(View.GONE);
                                     //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                                 }
                             }else{
                                 RequestQueueService.showAlert("Error! No data fetched", TankerStartingPic.this);
                                 captureImgBtn.setClickable(true);
+                                progressBar.setVisibility(View.GONE);
                                 //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                             }
                         } catch (JSONException e) {
                             RequestQueueService.showAlert("Something went wrong", TankerStartingPic.this);
                             e.printStackTrace();
                             captureImgBtn.setClickable(true);
+                            progressBar.setVisibility(View.GONE);
                             //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                         }
                     }
@@ -464,6 +473,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                         Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         captureImgBtn.setClickable(true);
+                        progressBar.setVisibility(View.GONE);
                         //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                     }
                 }) {

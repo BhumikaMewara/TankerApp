@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,6 +70,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     EditText otpcode, editText_one, editText_two, editText_three, editText_four, editText_five, editText_six;
     TextView title, message, verify, resend,pageTitle,notificationCountText;
     ImageView msg_icon;
+    ProgressBar progressBar;
     LinearLayout verifyLayout;
     RelativeLayout back, noti,notificationCountLayout;
     String imageencoded ,bkngid,OTP;
@@ -130,6 +132,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         verify = (TextView) findViewById(R.id.tv_enterOtp_verifyText);
         msg_icon = (ImageView) findViewById(R.id.iv_enterOtp_message);
         otpcode = (EditText) findViewById(R.id.ed_enterOtp_otp);
+        progressBar=(ProgressBar)findViewById(R.id.enterotp_progressbar);
+        progressBar.setVisibility(View.GONE);
         verifyLayout = (LinearLayout) findViewById(R.id.lh_enterOtp_verify);
         resend = (TextView) findViewById(R.id.tv_enterOtp_resendText);
         back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
@@ -192,6 +196,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         switch (view.getId()) {
             case R.id.lh_enterOtp_verify:
                 verifyLayout.setClickable(false);
+                progressBar.setVisibility(View.VISIBLE);
                 validateOTP();
                 if(blmod.getBookingid().equals(SessionManagement.getOngoingBooking(EnterOTP.this)))
                     if(Constants.isPathSnapped)
@@ -343,6 +348,7 @@ private  void validateOTP(){
                                     Constants.isPathSnapped = false;
                                     Constants.travelled_path = null;
                                     SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
+                                    progressBar.setVisibility(View.GONE);
                                     startActivity(intent);
                                     finish();
                                 }else{
@@ -350,11 +356,13 @@ private  void validateOTP(){
                                     //RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
                                     RequestQueueService.showAlert("Error in response", EnterOTP.this);
                                     verifyLayout.setClickable(true);
+                                    progressBar.setVisibility(View.GONE);
                                     //   requestLayout.setBackgroundResource(R.drawable.straight_corners);
                                 }
                             }else{
                                 RequestQueueService.showAlert("Error! No data fetched", EnterOTP.this);
                                 verifyLayout.setClickable(true);
+                                progressBar.setVisibility(View.GONE);
                                 //requestLayout.setBackgroundResource(R.drawable.straight_corners);
 
                             }
@@ -362,6 +370,7 @@ private  void validateOTP(){
                             RequestQueueService.showAlert("Something went wrong", EnterOTP.this);
                             e.printStackTrace();
                             verifyLayout.setClickable(true);
+                            progressBar.setVisibility(View.GONE);
                             //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                         }
                     }
@@ -372,6 +381,7 @@ private  void validateOTP(){
                         Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         verifyLayout.setClickable(true);
+                        progressBar.setVisibility(View.GONE);
                         //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                     }
                 }) {
