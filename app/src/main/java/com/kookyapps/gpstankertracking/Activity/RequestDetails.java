@@ -50,6 +50,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.kookyapps.gpstankertracking.Adapters.BookingListAdapter;
 import com.kookyapps.gpstankertracking.Adapters.RequestListAdapter;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
@@ -84,17 +92,25 @@ import java.util.Map;
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.CALL_PERMISSION_REQUEST_CODE;
 import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
 
-public class RequestDetails extends AppCompatActivity implements View.OnClickListener {
+public class RequestDetails extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     TextView bookingid, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
     ImageView calltous;
     ImageView menunotification;
     ProgressBar progressBar;
+
+    SupportMapFragment mapFragment;
+    RelativeLayout maplayout;
+    ArrayList<LatLng>finalpath = null;
+    static Context context;
+    GoogleMap mMap;
+
     RelativeLayout menuback, bottom, notificationLayout, toolbarNotiCountLayout;
     String init_type, bkngid;
     static String notificationCount;
     BookingListModal blmod;
     ArrayList<String> imagearray;
+
     String imageencoded, can_accept, can_end, can_start,currentPhotoPath;
     boolean cameraAccepted, callaccepted;
     BroadcastReceiver mRegistrationBroadcastReceiver;
@@ -115,6 +131,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
     public void initViews() {
         init_type = getIntent().getExtras().getString("init_type");
+
         bkngid = getIntent().getExtras().getString("booking_id");
         progressBar=(ProgressBar) findViewById(R.id.pb_requestDetails_progressbar);
         pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
@@ -164,6 +181,15 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         } else {
             calltous.setEnabled(false);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MAKE_CALL_PERMISSION_REQUEST_CODE);
+        }
+
+        maplayout = (RelativeLayout)findViewById(R.id.rl_requestDetail_map);
+        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_requesttDeatils_map);
+
+        if (init_type.equals(Constants.Trip)){
+            maplayout.setVisibility(View.VISIBLE);
+        }else {
+            maplayout.setVisibility(View.GONE);
         }
 
 
@@ -543,22 +569,19 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
-                            if((status.equals("0") || status.equals("5")||status.equals("6"))&& init_type.equals(Constants.BOOKING_START)){
+                            if((status.equals("0") || status.equals("5")||status.equals("6"))&& init_type.equals(Constants.Trip)){
                                 SessionManagement.removeOngoingBooking(RequestDetails.this);
                                 Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 RequestDetails.this.finish();
-                            }
-                            bookingid.setText(blmod.getBookingid());
-
+                            }bookingid.setText(blmod.getBookingid());
                             if (data.getString("message").equals("")){
                                 message.setText("No message");
                             }else {
                                 blmod.setMessage(data.getString("message"));
                                 message.setText(blmod.getMessage());
-                            }
-                            blmod.setPhone_country_code(data.getString("phone_country_code"));
+                            }blmod.setPhone_country_code(data.getString("phone_country_code"));
                             blmod.setPhone(data.getString("phone"));
                             contact_no.setText("+" + blmod.getPhone_country_code() + blmod.getPhone());
                             blmod.setController_name(data.getString("controller_name"));
@@ -574,17 +597,14 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 distance.getString("value");
                                 blmod.setDistance(distance.getString("text"));
                                 distancetext.setText(blmod.getDistance());
-                            } else {
+                            }else {
                                 RequestQueueService.showAlert("Error! No Data in distance Found", RequestDetails.this);
                                 progressBar.setVisibility(View.GONE);
                                 bottom.setVisibility(View.VISIBLE);
                                 bottom.setClickable(true);
-                            }
-                            JSONObject drop_point = data.getJSONObject("drop_point");
+                            }JSONObject drop_point = data.getJSONObject("drop_point");
                             if (drop_point != null) {
                                 drop_point.getString("location");
-
-
                                 blmod.setToaddress(drop_point.getString("address"));
                                 drop.setText(blmod.getToaddress());
                                 JSONObject geomaetry = drop_point.getJSONObject("geometry");
@@ -595,12 +615,13 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                         blmod.setTologitude(coordinates.getString(0)); // lng
                                         blmod.setTolatitude(coordinates.getString(1)); //lat
                                     }else {
-                                        RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this); }
-                                    progressBar.setVisibility(View.GONE);
+                                        RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this);
+                                    }progressBar.setVisibility(View.GONE);
                                     bottom.setVisibility(View.VISIBLE);
                                     bottom.setClickable(true);
-                                }else { RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this); }
-                                progressBar.setVisibility(View.GONE);
+                                }else {
+                                    RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this);
+                                }progressBar.setVisibility(View.GONE);
                                 bottom.setVisibility(View.VISIBLE);
                                 bottom.setClickable(true);
                             } else {
@@ -610,14 +631,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 bottom.setClickable(true);
                             }
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
-                            {
-                                if (pickup_point != null) {
+                            { if (pickup_point != null) {
                                     blmod.setFromlocation(pickup_point.getString("location"));
-
                                     blmod.setFromaddress(pickup_point.getString("address"));
                                     pickup.setText(blmod.getFromaddress());
-
-
                                     JSONObject geomaetry = pickup_point.getJSONObject("geometry");
                                     if (geomaetry != null) {
                                         geomaetry.getString("type");
@@ -647,7 +664,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             if (init_type.equals(Constants.REQUEST_DETAILS)) {
                                 pagetitle.setText(getString(R.string.request_details));
                                 bottomtext.setText(getString(R.string.accept));
-
                             } else if (init_type.equals(Constants.BOOKING_START)) {
                                 if (can_start.equals("true")){
                                     pagetitle.setText(getString(R.string.booking_details));
@@ -662,14 +678,31 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 bottom.setVisibility(View.GONE);
                                 pagetitle.setText(getString(R.string.trip_details));
                             }
-
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
                             progressBar.setVisibility(View.GONE);
                             bottom.setVisibility(View.VISIBLE);
                             bottom.setClickable(true);
                         }
+
+                        if(data.has("snapped_path")){
+                            String snapstring = data.getString("snapped_path");
+                            JSONObject snap = new JSONObject(snapstring);
+                            JSONArray snaparray = snap.getJSONArray("snappedpoints");
+                            if(finalpath == null)
+                                finalpath = new ArrayList<>();
+                            for(int i=0;i<snaparray.length();i++){
+                                JSONObject point = snaparray.getJSONObject(i);
+                                JSONObject location = point.getJSONObject("location");
+                                double lat = Double.parseDouble(location.getString("latitude"));
+                                double longi = Double.parseDouble(location.getString("longitude"));
+                                LatLng temp = new LatLng(lat,longi);
+                                finalpath.add(temp);
+                            }
+                            mapFragment.getMapAsync(RequestDetails.this);
+                        }
                     }
+
                     else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);
                         progressBar.setVisibility(View.GONE);
@@ -829,5 +862,28 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
        }else {
            super.onBackPressed();
        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        maplayout.setVisibility(View.VISIBLE);
+        PolylineOptions op = new PolylineOptions();
+        op.addAll(finalpath);
+        op.width(30);
+        op.color(ContextCompat.getColor(RequestDetails.this,R.color.greenLight));
+        mMap.addPolyline(op);
+        LatLng pickupLatLng = finalpath.get(0);
+        LatLng dropLatLng = finalpath.get(finalpath.size()-1);
+        MarkerOptions pickupop,dropop,currentop;
+        pickupop = new MarkerOptions()
+                .position(pickupLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.hydrant_pickuppoint_map));
+        dropop = new MarkerOptions()
+                .position(dropLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_map));
+        mMap.addMarker(pickupop);
+        mMap.addMarker(dropop);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 18));
     }
 }

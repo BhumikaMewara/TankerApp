@@ -7,6 +7,10 @@
     android:background="@color/colorGreyLight"
     tools:context=".Activity.MainActivity">
 
+
+
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,30 +22,39 @@
         android:background="@color/grey">
 
 
-        <RelativeLayout
+
+
+
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@color/grey">
-        <RelativeLayout
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/group">
-
-
-
-        <TextView
-            android:id="@+id/tv_main_signInTitle"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="SIGN IN"
-            android:layout_marginLeft="30dp"
-            android:layout_centerVertical="true"
-            android:textColor="@color/greenLight"
-            />
+            android:background="@color/colorGreyLight">
+            <RelativeLayout
+                android:layout_width="180dp"
+                android:layout_height="50dp"
+                android:id="@+id/rl_login_login_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/group"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_main_signInTitle"
+                    android:text="SIGN IN"
+                    android:textSize="14sp"
+                    android:textColor="@color/greenLight"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"/>
+            </RelativeLayout>
 
-    </RelativeLayout>
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
@@ -108,6 +121,18 @@
 
 
         </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <ProgressBar
+                android:id="@+id/main_progressBar"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerInParent="true"
+                ></ProgressBar>
+        </RelativeLayout>
         <LinearLayout
             android:id="@+id/lv_main_password"
             android:layout_width="match_parent"
@@ -117,15 +142,7 @@
             android:layout_marginRight="20dp"
             android:padding="20dp"
             >
-            <ProgressBar
-                android:id="@+id/main_progressBar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
-                >
 
-            </ProgressBar>
             <LinearLayout
                 android:id="@+id/lh_main_password"
                 android:layout_width="match_parent"
@@ -160,6 +177,8 @@
                 android:hint="Enter Password"
                 android:inputType="textWebPassword"
                 android:layout_marginRight="25dp"/>
+
+
         </LinearLayout>
     </LinearLayout>
     

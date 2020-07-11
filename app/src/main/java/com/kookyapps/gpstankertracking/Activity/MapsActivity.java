@@ -995,26 +995,6 @@ public class MapsActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
 
@@ -1048,17 +1028,6 @@ public class MapsActivity extends AppCompatActivity implements View.OnClickListe
             });
         }
     };
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     protected void onDestroy() {

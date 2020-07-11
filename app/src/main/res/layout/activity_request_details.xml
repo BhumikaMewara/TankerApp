@@ -14,13 +14,18 @@
         layout="@layout/toolbar_with_bk_arrow"
         android:id="@+id/include_bookingdetails"/>
 
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/include_bookingdetails"
+    >
 
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/include_bookingdetails"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/rl_requestDetail_map"
         android:layout_marginTop="5dp"
         android:background="@drawable/gradient_background_main">
 
@@ -42,7 +47,7 @@
                 android:id="@+id/iv_bookingdetail_bookingid_call"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_alignBottom="@+id/tv_bookingdetail_bookingid"
+                android:layout_alignBottom="@+id/tv_bookingdetail_contact"
                 android:layout_alignParentRight="true"
                 android:layout_marginEnd="15dp"
                 android:src="@drawable/phone_icon" />
@@ -287,19 +292,34 @@
     </ScrollView>
 
     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="3dp"
+        android:visibility="gone"
+        android:id="@+id/rl_requestDetail_map"
+        android:layout_above="@+id/rl_result_details_bottomLayout">
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fg_requesttDeatils_map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:id="@+id/rl_result_details_bottomLayout">
 
-    <RelativeLayout
+        <RelativeLayout
         android:id="@+id/rl_result_details_bottomLayout_text"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/greenLight"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent">
-        <TextView
+            <TextView
             android:id="@+id/tv_result_details_bottomlayout_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -308,18 +328,20 @@
             android:textColor="@color/colorwhite"
             android:textSize="13dp"
             android:gravity="center"/>
-        <RelativeLayout
+
+            <RelativeLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:id="@+id/rl_result_details_bottomLayout_icon"
             android:layout_alignParentRight="true"
             android:background="@color/greenDark">
-            <ImageView
+                <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:id="@+id/iv_result_details_bottomLayout_icon"
                 android:src="@drawable/forwordarrow"
                 android:layout_centerInParent="true"/>
+            </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>
