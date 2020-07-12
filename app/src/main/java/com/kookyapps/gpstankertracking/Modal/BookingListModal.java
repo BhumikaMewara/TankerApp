@@ -10,9 +10,15 @@ public class BookingListModal implements Parcelable {
     String fromlatitude, fromlongitude, tolatitude, tologitude;
     String phone_country_code, phone, controller_name, geofence_in_meter, message;
     String driver_name,can_start,can_accept,can_end;
+    String tankerBookingid;
 
 
 
+
+
+
+    public String getTankerBookingid() { return tankerBookingid; }
+    public void setTankerBookingid(String tankerBookingid) { this.tankerBookingid = tankerBookingid; }
 
     public String getDriver_name() { return driver_name; }
     public void setDriver_name(String driver_name) { this.driver_name = driver_name; }

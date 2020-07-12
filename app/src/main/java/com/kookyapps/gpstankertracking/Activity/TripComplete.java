@@ -72,14 +72,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_trip_complete);
         initViews();
         bookingByIdApiCalling();
-        if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.ENGLISH_LANGUAGE)){
-            Log.i("language",SessionManagement.getLanguage(this));
-            //switchCompat.setChecked(true);
-            setAppLocale(Constants.ENGLISH_LANGUAGE);
-        }else{
-            setAppLocale(Constants.HINDI_LANGUAGE);
-
-        }
 
     }
     public void initViews(){
@@ -93,8 +85,8 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
 
             notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
             notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
-        maplayout = (RelativeLayout)findViewById(R.id.rl_tripComplete_map);
-        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_tripcomplete_map);
+            maplayout = (RelativeLayout)findViewById(R.id.rl_tripComplete_map);
+            mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_tripcomplete_map);
 
         int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
@@ -103,30 +95,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             notificationCountText.setText(String.valueOf(noticount));
             notificationCountLayout.setVisibility(View.VISIBLE);
         }
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripComplete.this));
-                    setNotificationCount(count+1,false);
 
-                }
-                else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
-                    if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
-                        setAppLocale(Constants.HINDI_LANGUAGE);
-                        finish();
-                        //startActivity(getIntent());
-
-                    }else{
-                        setAppLocale(Constants.ENGLISH_LANGUAGE);
-                        finish();
-                        startActivity(getIntent());
-                    }
-                }
-            }
-        };
 
         bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
             distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
@@ -141,6 +110,26 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             bottom.setOnClickListener(this);
             pagetitle.setText(getString(R.string.trip_complete));
 
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripComplete.this));
+                    setNotificationCount(count+1,false);
+                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
+                        setAppLocale(Constants.HINDI_LANGUAGE);
+                        finish();
+                    }else{
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
+                        finish();
+                        startActivity(getIntent());
+                    }
+                }
+            }
+        };
 
 
     }
@@ -196,7 +185,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                         blmod = new BookingListModal();
                         if (data != null) {
                             blmod.setBookingid(data.getString("_id"));
-                            bookingid.setText(blmod.getBookingid());
+                            //bookingid.setText(blmod.getTankerBookingid());
 
                             if (data.getString("message").equals("")){
                                 message.setText("No message");
@@ -252,6 +241,9 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in drop_point Found", TripComplete.this);
                             }
+
+                            blmod.setTankerBookingid(data.getString("booking_id"));
+                            bookingid.setText(blmod.getTankerBookingid());
 
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
                             {
@@ -391,6 +383,15 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+    }
+
     private void setAppLocale(String localeCode){
         Resources resources = getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
@@ -402,6 +403,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         }
         resources.updateConfiguration(config, dm);
     }
+
 
 
     @Override

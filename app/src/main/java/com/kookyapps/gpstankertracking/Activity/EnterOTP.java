@@ -178,13 +178,19 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
-
+                        finish();
                     }else{
                         setAppLocale(Constants.ENGLISH_LANGUAGE);
+                        finish();
+                        startActivity(getIntent());
                     }
                 }
             }
         };
+
+
+
+
 
 
 
@@ -521,6 +527,15 @@ private  void validateOTP(){
         }
     }
 
+
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+    }
 
     private void setAppLocale(String localeCode){
         Resources resources = getResources();

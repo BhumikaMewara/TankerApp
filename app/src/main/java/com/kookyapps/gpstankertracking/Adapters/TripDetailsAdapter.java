@@ -148,7 +148,8 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             case ITEM:
                 final TripDetViewHolder mVH = (TripDetViewHolder) holder;
-                mVH.bookingid.setText(tripList.get(position).getBookingid());
+                //mVH.bookingid.setText(tripList.get(position).getBookingid());
+                mVH.bookingid.setText(tripList.get(position).getTankerBookingid());
                 mVH.distance.setText(tripList.get(position).getDistance());
                 mVH.fromtime.setText(tripList.get(position).getFromtime());
                 mVH.totime.setText(tripList.get(position).getTotime());

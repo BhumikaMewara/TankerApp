@@ -203,7 +203,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     private boolean locationInProcess = false;
     private final int LOC_REQUEST = 10101;
     private final int CAMERA_CAPTURE_REQUEST = 10102;
-    String init_type,bkngid;
+    String init_type,bkngid,tanker_id;
     boolean isMarkerRotating = false;
 
     private int OFFSET=0;
@@ -225,6 +225,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         blmod = b.getParcelable("Bookingdata");
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
+        tanker_id=getIntent().getExtras().getString("tankerBookingId");
+
+
         //SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
         try {
             if(Constants.travelled_path==null) {
@@ -276,9 +279,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
        initViews();
     }
 
-
-
-
     public void initViews(){
         notifications = (RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu_notification);
         notifications.setOnClickListener(this);
@@ -300,8 +300,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         scrolldetails=(ScrollView)findViewById(R.id.sv_map_detailsScroll);
         slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
         slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+
         bookingid=(TextView)findViewById(R.id.tv_map_bookingid_text);
-        bookingid.setText(blmod.getBookingid());
+        bookingid.setText(tanker_id);
         dropPoint=(TextView)findViewById(R.id.tv_map_drop_text);
         dropPoint.setText(blmod.getToaddress());
         contanctno=(TextView)findViewById(R.id.tv_map_contact_text);
@@ -512,7 +513,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     currentlatlng = new LatLng(lt, lg);
                     double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
-                    if(enddist<1000)
+
+                    //if(enddist<Integer.valueOf(blmod.getGeofence_in_meter()))
+                    if (enddist<1000)
                         showEndTrip();
                     else
                         hideEndTrip();
@@ -1187,9 +1190,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         Log.d("FetchUrl:",url);
         return url;
     }*/
-    public void showEndTrip(){
-        bottom.setVisibility(View.VISIBLE);
-    }
+    public void showEndTrip(){ bottom.setVisibility(View.VISIBLE); }
     public void hideEndTrip(){
         bottom.setVisibility(View.GONE);
     }

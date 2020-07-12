@@ -106,7 +106,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     GoogleMap mMap;
 
     RelativeLayout menuback, bottom, notificationLayout, toolbarNotiCountLayout;
-    String init_type, bkngid;
+    String init_type, bkngid,tanker_id;
     static String notificationCount;
     BookingListModal blmod;
     ArrayList<String> imagearray;
@@ -274,6 +274,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 intent.putExtra("Bookingdata",blmod);
                                 intent.putExtra("init_type", Constants.BOOKING_START);
                                 intent.putExtra("booking_id", bkngid);
+                                intent.putExtra("tankerBookingId",blmod.getTankerBookingid());
+
                                 progressBar.setVisibility(View.GONE);
                                 startActivity(intent);
                                 finish();
@@ -575,7 +577,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 RequestDetails.this.finish();
-                            }bookingid.setText(blmod.getBookingid());
+                            }
+                            //bookingid.setText(blmod.getBookingid());
                             if (data.getString("message").equals("")){
                                 message.setText("No message");
                             }else {
@@ -607,6 +610,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 drop_point.getString("location");
                                 blmod.setToaddress(drop_point.getString("address"));
                                 drop.setText(blmod.getToaddress());
+                                blmod.setGeofence_in_meter(drop_point.getString("geofence_in_meter"));
                                 JSONObject geomaetry = drop_point.getJSONObject("geometry");
                                 if (geomaetry != null) {
                                     geomaetry.getString("type");
@@ -630,6 +634,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 bottom.setVisibility(View.VISIBLE);
                                 bottom.setClickable(true);
                             }
+
+                            blmod.setTankerBookingid(data.getString("booking_id"));
+                            bookingid.setText(blmod.getTankerBookingid());
+
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
                             { if (pickup_point != null) {
                                     blmod.setFromlocation(pickup_point.getString("location"));

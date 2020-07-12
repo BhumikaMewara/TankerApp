@@ -181,6 +181,9 @@ public void bookinglistApiCalling(){
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in drop_point", getActivity());
                                 }
+
+                                tdmod.setTankerBookingid(jsonObject.getString("booking_id"));
+
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                                 if (pickup != null) {
                                     tdmod.setFromlocation(pickup.getString("location"));

@@ -4,9 +4,13 @@ public class TripDetailsModal {
     String bookingid,distance,fromlocation,tolocation,fromtime,totime,fromlatitude,fromlongitude, tolatitude, tologitude;
     String from_address,to_address;
     String totaltrip,total_distance;
+    String tankerBookingid;
 
 
 
+
+    public String getTankerBookingid() { return tankerBookingid; }
+    public void setTankerBookingid(String tankerBookingid) { this.tankerBookingid = tankerBookingid; }
     public String getFrom_address() { return from_address;}
     public void setFrom_address(String from_address) { this.from_address = from_address; }
     public String getTo_address() { return to_address; }

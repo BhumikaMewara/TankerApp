@@ -290,6 +290,8 @@ FetchDataListener tripListener= new FetchDataListener() {
                             } else {
                                 RequestQueueService.showAlert("Error! no for for drop_point found", TripDetails.this);
                             }
+                            tdmod.setTankerBookingid(jsonObject.getString("booking_id"));
+
                             JSONObject pickup = jsonObject.getJSONObject("pickup_point");
                             if (pickup != null) {
                                 tdmod.setFromlocation(pickup.getString("location"));

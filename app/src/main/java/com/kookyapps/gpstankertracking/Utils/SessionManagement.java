@@ -108,6 +108,7 @@ public class SessionManagement {
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,NAME);
     }
 
+
     public static String getLanguage(Context con){
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG,LANGUAGE);
 

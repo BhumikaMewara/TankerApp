@@ -180,6 +180,7 @@ public class RequestList extends Fragment {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
                                 tdmod.setBookingid(jsonObject.getString("_id"));
+
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
@@ -202,6 +203,8 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data in  drop_point", getActivity());
                                 }
+
+                                tdmod.setTankerBookingid(jsonObject.getString("booking_id"));
 
 
                                 JSONObject pickup = jsonObject.getJSONObject("pickup_point");

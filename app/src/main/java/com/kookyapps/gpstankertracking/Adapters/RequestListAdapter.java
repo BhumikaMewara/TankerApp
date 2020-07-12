@@ -118,7 +118,8 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
 
             case ITEM:
                 final BookingViewHolder mVH = (BookingViewHolder)holder;
-                mVH.bookingid.setText(requestlist.get(position).getBookingid());
+                //mVH.bookingid.setText(requestlist.get(position).getBookingid());
+                mVH.bookingid.setText(requestlist.get(position).getTankerBookingid());
                 mVH.distance.setText(requestlist.get(position).getDistance());
                 mVH.fromtime.setText(requestlist.get(position).getFromtime());
                 mVH.totime.setText(requestlist.get(position).getTotime());
