@@ -111,7 +111,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         notificationprogress = (ProgressBar)findViewById(R.id.pg_notification);
         notificationprogress.setVisibility(View.VISIBLE);
 
-        adapter = new NotificationsAdapter(Notifications.this,Constants.REQUEST_DETAILS);
+        adapter = new NotificationsAdapter(Notifications.this,Constants.NOTIFICATION_INIT);
         mLayoutManager = new LinearLayoutManager(this);
         notificationlistview.setLayoutManager(mLayoutManager);
         notificationlistview.setItemAnimator(new DefaultItemAnimator());
@@ -261,7 +261,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                                     }else{
                                         bmod.setText(jsonObject.getJSONObject("text").getString("en"));
                                     }
-
                                         if (jsonObject.has("title")) {
                                             if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
                                             bmod.setTitle(jsonObject.getJSONObject("title").getString("hi"));

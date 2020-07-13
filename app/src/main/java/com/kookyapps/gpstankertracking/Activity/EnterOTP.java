@@ -99,10 +99,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
         try {
             if(Constants.travelled_path==null) {
-                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
-                    if (blmod.getBookingid().equals(SessionManagement.getOngoingBooking(EnterOTP.this))) {
+                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
-                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH);
+                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
                         Type type = new TypeToken<ArrayList<LatLng>>() {
                         }.getType();
                         Constants.travelled_path = gson.fromJson(json, type);
@@ -343,9 +343,8 @@ private  void validateOTP(){
                             if(obj!=null){
                                 if(obj.getInt("error")==0){
                                     //SessionManagement.setOngoingBooking(EnterOTP.this,blmod.getBookingid());
-                                    SessionManagement.setOngoingBooking(EnterOTP.this,"");
+                                    //SessionManagement.setOngoingBooking(EnterOTP.this,"");
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
-                                    SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_BOOKING_TAG);
                                     Intent intent = new Intent(EnterOTP.this,TripComplete.class);
                                     intent.putExtra("Bookingdata",blmod);
                                     intent.putExtra("init_type", init_type);
@@ -353,7 +352,10 @@ private  void validateOTP(){
                                     Constants.ongoingBookingId = "";
                                     Constants.isPathSnapped = false;
                                     Constants.travelled_path = null;
-                                    SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
+                                    if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                                        SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG);
+                                    if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
                                     progressBar.setVisibility(View.GONE);
                                     startActivity(intent);
                                     finish();
@@ -487,14 +489,26 @@ private  void validateOTP(){
         notificationCountText.setText("");
         notificationCountLayout.setVisibility(View.GONE);
     }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        try {
+            if(Constants.travelled_path==null) {
+                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
+                        Gson gson = new Gson();
+                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
+                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        }.getType();
+                        Constants.travelled_path = gson.fromJson(json, type);
+                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
@@ -504,7 +518,7 @@ private  void validateOTP(){
         if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)) {
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else {
-            setAppLocale(Constants.HINDI_LANGUAGE);
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
@@ -607,12 +621,6 @@ private  void validateOTP(){
                     else{
                         finalsnap = new JSONObject();
                         finalsnap.put("snappedpoints",snappedArray);
-                        /*try {
-                            params.put("id", blmod.getBookingid());
-                            params.put("snap",finalsnap);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }*/
                         Constants.isPathSnapped=true;
                         uploadBitmap();
 
@@ -681,12 +689,24 @@ private  void validateOTP(){
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
         if(Constants.travelled_path!=null) {
             Gson gson = new Gson();
             String json = gson.toJson(Constants.travelled_path);
-            SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
+            SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
     }
 }

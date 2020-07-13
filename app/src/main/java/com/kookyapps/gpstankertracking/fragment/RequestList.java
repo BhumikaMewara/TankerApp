@@ -98,7 +98,7 @@ public class RequestList extends Fragment {
 
 
         noRequest=(TextView)root.findViewById(R.id.tv_requestlist_nodata);
-        mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_DETAILS);
+        mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_INIT);
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

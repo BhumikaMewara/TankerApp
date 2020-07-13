@@ -126,11 +126,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
                     @Override
                     public void onClick(View view) {
 
-                        String type = current.getNotificationtype(), detail_init_type;
+                        String detail_init_type,type = current.getNotificationtype();
                         if(type.equals("BOOKING_REQUEST")) {
-                            detail_init_type = Constants.REQUEST_DETAILS;
+                            detail_init_type = Constants.REQUEST_INIT;
                         } else {
-                            detail_init_type = Constants.BOOKING_START;
+                            detail_init_type = Constants.BOOKING_INIT;
                         }
                         Intent i = new Intent(context, RequestDetails.class);
                         i.putExtra("init_type", detail_init_type);

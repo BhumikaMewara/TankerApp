@@ -347,7 +347,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onBackPressed() {
-    photo_taken=false;
+        photo_taken=false;
         super.onBackPressed();
 
 
@@ -439,7 +439,9 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                             JSONObject obj = new JSONObject(new String(response.data));
                             if(obj!=null){
                                 if(obj.getInt("error")==0){
-                                    SessionManagement.setOngoingBooking(TankerStartingPic.this,blmod.getBookingid());
+                                    //SessionManagement.setOngoingBooking(TankerStartingPic.this,blmod.getBookingid());
+                                    SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID,blmod.getBookingid());
+                                    SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_DRIVER_ID,SessionManagement.getUserId(TankerStartingPic.this));
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
                                     intent.putExtra("Bookingdata",blmod);
@@ -611,11 +613,6 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
     @Override
     protected void onDestroy() {
-        if(Constants.travelled_path!=null&&init_type.equals(Constants.TRIP_END_IMG)){
-            Gson gson = new Gson();
-            String json = gson.toJson(Constants.travelled_path);
-            SharedPrefUtil.setPreferences(TankerStartingPic.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
-        }
         super.onDestroy();
     }
 }

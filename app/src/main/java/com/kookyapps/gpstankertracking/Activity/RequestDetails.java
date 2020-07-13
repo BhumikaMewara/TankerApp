@@ -186,7 +186,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         maplayout = (RelativeLayout)findViewById(R.id.rl_requestDetail_map);
         mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_requesttDeatils_map);
 
-        if (init_type.equals(Constants.Trip)){
+        if (init_type.equals(Constants.TRIP_INIT)){
             maplayout.setVisibility(View.VISIBLE);
         }else {
             maplayout.setVisibility(View.GONE);
@@ -238,50 +238,48 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     @Override
         public void onClick(View view) {
         Intent intent;
-        switch (view.getId()){
-              case R.id.rl_toolbarmenu_backimglayout:
-                    onBackPressed();
-                    break;
+        switch (view.getId()) {
+            case R.id.rl_toolbarmenu_backimglayout:
+                onBackPressed();
+                break;
 
-              case R.id.rl_toolbar_with_back_notification:
-                        intent = new Intent(RequestDetails.this,Notifications.class);
-                        startActivity(intent);
-                        break;
+            case R.id.rl_toolbar_with_back_notification:
+                intent = new Intent(RequestDetails.this, Notifications.class);
+                startActivity(intent);
+                break;
             case R.id.rl_result_details_bottomLayout_text:
-                        if (init_type.equals(Constants.REQUEST_DETAILS)){
-                            bookingacceptedapiCalling();
-                            bottom.setClickable(false);
-                            progressBar.setVisibility(View.VISIBLE);
-                        }else if (init_type.equals(Constants.BOOKING_START)) {
-                            progressBar.setVisibility(View.VISIBLE);
-                            if (can_start.equals("true")) {
-                                if (checkPermission()) {
-                                cameraAccepted = true;
-                                } else {
-                                    requestPermission();
-                                }
-                                if (cameraAccepted) {
-                                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                    if (camera_intent.resolveActivity(getPackageManager()) != null) {
-                                        startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
-                                    }
-                                } else {
-                                    requestPermission();
-                                }
-                            }
-                            else{
-                                intent = new Intent(RequestDetails.this,Map1.class);
-                                intent.putExtra("Bookingdata",blmod);
-                                intent.putExtra("init_type", Constants.BOOKING_START);
-                                intent.putExtra("booking_id", bkngid);
-                                intent.putExtra("tankerBookingId",blmod.getTankerBookingid());
-
-                                progressBar.setVisibility(View.GONE);
-                                startActivity(intent);
-                                finish();
-                            }
+                if (init_type.equals(Constants.REQUEST_INIT)) {
+                    bookingacceptedapiCalling();
+                    bottom.setClickable(false);
+                    progressBar.setVisibility(View.VISIBLE);
+                } else if (!init_type.equals(Constants.TRIP_INIT)) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    if (can_start.equals("true")) {
+                        if (checkPermission()) {
+                            cameraAccepted = true;
+                        } else {
+                            requestPermission();
                         }
-                        break;
+                        if (cameraAccepted) {
+                            Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            if (camera_intent.resolveActivity(getPackageManager()) != null) {
+                                startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
+                            }
+                        } else {
+                            requestPermission();
+                        }
+                    } else {
+                        intent = new Intent(RequestDetails.this, Map1.class);
+                        intent.putExtra("Bookingdata", blmod);
+                        intent.putExtra("init_type", Constants.BOOKING_INIT);
+                        intent.putExtra("booking_id", bkngid);
+                        intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
+                        progressBar.setVisibility(View.GONE);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                break;
         }
     }
 
@@ -571,12 +569,17 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
-                            if((status.equals("0") || status.equals("5")||status.equals("6"))&& init_type.equals(Constants.Trip)){
-                                SessionManagement.removeOngoingBooking(RequestDetails.this);
-                                Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                RequestDetails.this.finish();
+                            if((status.equals("0") || status.equals("5")||status.equals("6"))){
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
+                                if(init_type.equals(Constants.SPLASH_INIT)) {
+                                    Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    RequestDetails.this.finish();
+                                }
                             }
                             //bookingid.setText(blmod.getBookingid());
                             if (data.getString("message").equals("")){
@@ -669,10 +672,13 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                     bottom.setClickable(true);
                                 }
                             }
-                            if (init_type.equals(Constants.REQUEST_DETAILS)) {
+                            if (init_type.equals(Constants.REQUEST_INIT)) {
                                 pagetitle.setText(getString(R.string.request_details));
                                 bottomtext.setText(getString(R.string.accept));
-                            } else if (init_type.equals(Constants.BOOKING_START)) {
+                            }else if (init_type.equals(Constants.TRIP_INIT)){
+                                bottom.setVisibility(View.GONE);
+                                pagetitle.setText(getString(R.string.trip_details));
+                            }else{
                                 if (can_start.equals("true")){
                                     pagetitle.setText(getString(R.string.booking_details));
                                     bottomtext.setText(getString(R.string.start));
@@ -682,9 +688,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 }else {
                                     bottom.setVisibility(View.GONE);
                                 }
-                            }else if (init_type.equals(Constants.TRIP_DETAILS)){
-                                bottom.setVisibility(View.GONE);
-                                pagetitle.setText(getString(R.string.trip_details));
                             }
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
@@ -734,7 +737,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 JSONObject er = new JSONObject(msg);
                 String code = er.getString("code");
                 if(code.equals("not_found")){
-                    SessionManagement.removeOngoingBooking(RequestDetails.this);
+                    //SessionManagement.removeOngoingBooking(RequestDetails.this);
+                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
                     Intent intent = new Intent(RequestDetails.this,FirstActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -849,7 +853,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
    @Override
    public void onBackPressed() {
-       if (SessionManagement.isOngoing(getApplicationContext())){
+       if (init_type.equals(Constants.SPLASH_INIT)){
            AlertDialog.Builder builder = new AlertDialog.Builder(RequestDetails.this);
            builder.setTitle("Alert !");
            builder.setMessage("Do you want to exit ?");

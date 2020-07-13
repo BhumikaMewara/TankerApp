@@ -157,7 +157,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
 
 
-        adapter = new TripDetailsAdapter(this,TripDetails.this,Constants.TRIP_DETAILS);
+        adapter = new TripDetailsAdapter(this,TripDetails.this,Constants.TRIP_INIT);
 
         mLayoutManager = new LinearLayoutManager(this);
         trip_details_listView.setLayoutManager(mLayoutManager);

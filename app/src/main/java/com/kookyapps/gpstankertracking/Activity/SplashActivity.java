@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
                         Log.i("splash","open map");
                         String booking_id = SessionManagement.getOngoingBooking(SplashActivity.this);
                         Intent i = new Intent(SplashActivity.this, RequestDetails.class);
-                        i.putExtra("init_type", Constants.BOOKING_START);
+                        i.putExtra("init_type", Constants.SPLASH_INIT);
                         i.putExtra("booking_id", booking_id);
                         startActivity(i);
                         finish();

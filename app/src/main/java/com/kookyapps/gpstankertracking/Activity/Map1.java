@@ -226,15 +226,22 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         init_type = getIntent().getExtras().getString("init_type");
         bkngid = getIntent().getExtras().getString("booking_id");
         tanker_id=getIntent().getExtras().getString("tankerBookingId");
-
-
-        //SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
+        Constants.isTripOngoing = true;
+        //gpsTracker = new GPSTracker(this);
+        switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
+        if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
+            switchCompat.setChecked(true);
+            setAppLocale(Constants.HINDI_LANGUAGE);
+        }else {
+            switchCompat.setChecked(false);
+            setAppLocale(Constants.ENGLISH_LANGUAGE);
+        }
         try {
-            if(Constants.travelled_path==null) {
-                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH)) {
-                    if (blmod.getBookingid().equals(SessionManagement.getOngoingBooking(Map1.this))) {
+            if(Constants.travelled_path==null||Constants.travelled_path.size()==0) {
+                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
-                        String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH);
+                        String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
                         Type type = new TypeToken<ArrayList<LatLng>>() {
                         }.getType();
                         Constants.travelled_path = gson.fromJson(json, type);
@@ -253,19 +260,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     Constants.travelled_path.add(new LatLng(-35.28302, 149.12881));
                     Constants.travelled_path.add(new LatLng(-35.28473, 149.12836));
                 }*/
+            }else{
+                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
+                        SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
+                    }
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
-        Constants.isTripOngoing = true;
-        //gpsTracker = new GPSTracker(this);
-        switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
-        if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
-            switchCompat.setChecked(true);
-            setAppLocale(Constants.HINDI_LANGUAGE);
-        }else {
-            switchCompat.setChecked(false);
-            setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
         fromLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlatitude())));
         fromLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlongitude())));
@@ -548,20 +551,20 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     }
                     double dist = 0;
                     dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    if (dist > 80) {
+                    if (dist > 100) {
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
                     }
-                    else{
+                    /*else{
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
-                    }
+                    }*/
                     locationInProcess = false;
                 }
             }
@@ -595,6 +598,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             locationInProcess = true;
             pathfetched = true;
         }
+        if(Constants.travelled_path==null){
+            Constants.travelled_path = new ArrayList<>();
+        }
+        Constants.travelled_path.add(pickupLatLng);
     }
 
     @Override
@@ -842,6 +849,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     intent.putExtra("Bitmap", bitmap);
                     intent.putExtra("Bookingdata", blmod);
                     intent.putExtra("init_type", Constants.TRIP_END_IMG);
+                    stopUpdate();
+                    //Constants.travelled_path.add(dropLatLng);
                     /*if(finalsnap!=null) {
                         intent.putExtra("snapped_path", finalsnap.toString());
                         intent.putExtra("snapped_distance", String.valueOf(snappedDistance));
@@ -938,16 +947,46 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         notificationCountText.setText("");
         toolbarNotiCountLayout.setVisibility(View.GONE);
     }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-    }
+
     @Override
     protected void onResume() {
         super.onResume();
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
+        try {
+            if(Constants.travelled_path==null||Constants.travelled_path.size()==0) {
+                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
+                        Gson gson = new Gson();
+                        String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
+                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        }.getType();
+                        Constants.travelled_path = gson.fromJson(json, type);
+                        SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
+                    }
+                }
+
+                /*else {
+                    Constants.travelled_path = new ArrayList<>();
+                    Constants.travelled_path.add(new LatLng(-35.27801, 149.12958));
+                    Constants.travelled_path.add(new LatLng(-35.28032, 149.12907));
+                    Constants.travelled_path.add(new LatLng(-35.28099, 149.12929));
+                    Constants.travelled_path.add(new LatLng(-35.28144, 149.12984));
+                    Constants.travelled_path.add(new LatLng(-35.28194, 149.13003));
+                    Constants.travelled_path.add(new LatLng(-35.28282, 149.12956));
+                    Constants.travelled_path.add(new LatLng(-35.28302, 149.12881));
+                    Constants.travelled_path.add(new LatLng(-35.28473, 149.12836));
+                }*/
+            }else{
+                if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
+                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
+                        SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)) {
@@ -995,21 +1034,52 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     };
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
         if(Constants.travelled_path!=null) {
-            Gson gson = new Gson();
-            String json = gson.toJson(Constants.travelled_path);
-            SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_TRIP_TRAVELLED_PATH, json);
+            if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
+                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path.size()){
+                    Gson gson = new Gson();
+                    String json = gson.toJson(Constants.travelled_path);
+                    SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                }
+            }else{
+                Gson gson = new Gson();
+                String json = gson.toJson(Constants.travelled_path);
+                SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+            }
         }
-        socket.disconnect();
-        socket.off("aborted:Booking");
-        stopUpdate();
-        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
+        if(Constants.travelled_path!=null) {
+            if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
+                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path.size()){
+                    Gson gson = new Gson();
+                    String json = gson.toJson(Constants.travelled_path);
+                    SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                }
+            }else{
+                Gson gson = new Gson();
+                String json = gson.toJson(Constants.travelled_path);
+                SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+            }
+        }
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        socket.disconnect();
+        socket.off("aborted:Booking");
+        stopUpdate();
+        super.onDestroy();
     }
 
     public void showlanguage(){
@@ -1037,17 +1107,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     public void onBackPressed() {
-        /*Intent intent = new Intent(Map1.this,RequestDetails.class);
-        intent.putExtra("init_type", Constants.BOOKING_START);
-        intent.putExtra("booking_id", bkngid);
-        startActivity(intent);
-        finish();*/
-        super.onBackPressed();
-        /*if(Constants.isPathSnapped){
-            RequestQueueService.showAlert("","Procced to end activity",this);
-        }else {
-            super.onBackPressed();
-        }*/
+        RequestQueueService.showAlert("","Can not close in middle of trip",Map1.this);
     }
 
     public void requestUpdate(){
@@ -1087,109 +1147,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         return false;
     }
 
-    /*private void snapToRoad() {
-        try {
-            if(!path_snapped) {
-                if (OFFSET > 0)
-                    OFFSET -= PAGINATION_OVERLAP;
-                lowerbound = OFFSET;
-                upperbound = Math.min(OFFSET + PAGE_SIZE, travelledpath.size());
-                GETAPIRequest getapiRequest = new GETAPIRequest();
-                String url = getSnapUrl(lowerbound, upperbound, false);
-                HeadersUtil headparam = new HeadersUtil();
-                getapiRequest.request(Map1.this, snapToRoadListener, url, headparam);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    FetchDataListener snapToRoadListener = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject data) {
-            Log.d("SnapRoadResponse:",data.toString());
-            try {
-                if (data.has("error")) {
-                    Toast.makeText(Map1.this,"Error in snap to road.",Toast.LENGTH_LONG);
-                } else {
-                    if(snappedPoints==null)
-                        snappedPoints = new ArrayList<SnappedPoint>();
-                    if(snappedArray == null)
-                        snappedArray = new JSONArray();
-                    JSONArray snaps = data.getJSONArray("snappedPoints");
-                    boolean passedOverlap = false;
-                    for(int i=0;i<snaps.length();i++){
-                        SnappedPoint point = new SnappedPoint();
-                        JSONObject snap = snaps.getJSONObject(i);
-                        JSONObject location = snap.getJSONObject("location");
-                        point.setLatitude(Float.parseFloat(location.getString("latitude")));
-                        point.setLongitude(Float.parseFloat(location.getString("longitude")));
-                        point.setPlaceid(snap.getString("placeId"));
-                        if(snap.has("originalIndex"))
-                            point.setOriginalindex(Integer.parseInt(snap.getString("originalIndex")));
-                        if (OFFSET == 0 || point.getOriginalindex() >= PAGINATION_OVERLAP - 1) {
-                            passedOverlap = true;
-                        }
-                        if (passedOverlap) {
-                            snappedPoints.add(point);
-                            snappedArray.put(snap);
-                            int size = snappedPoints.size();
-                            if(size>1)
-                                snappedDistance = snappedDistance+distance(snappedPoints.get(size-1).getLatitude(),snappedPoints.get(size-1).getLongitude(),snappedPoints.get(size).getLatitude(),snappedPoints.get(size).getLongitude());
-                        }
-                    }
-                    OFFSET = upperbound;
-                    if(OFFSET<travelledpath.size())
-                        snapToRoad();
-                    else{
-                        JSONObject params = new JSONObject();
-                        finalsnap = new JSONObject();
-                        finalsnap.put("snappedpoints",snappedArray);
-                        *//*try {
-                            params.put("id", blmod.getBookingid());
-                            params.put("snap",finalsnap);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }*//*
-                        path_snapped=true;
-                        //socket.emit("locationUpdate:Booking", params);
-                        Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
-                    }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                Toast.makeText(Map1.this,"Error in snap to road",Toast.LENGTH_LONG);
-            }
-        }
-
-        @Override
-        public void onFetchFailure(String msg) {
-        }
-
-        @Override
-        public void onFetchStart() {
-        }
-    };
-
-    private String getSnapUrl(int lowerbound,int upperbound,boolean isInterpolate) {
-        String path = "path=";
-        String interpolate = "interpolate=";
-        if(isInterpolate)
-            interpolate = interpolate+"true";
-        else
-            interpolate = interpolate+"false";
-        String parameters = "";
-        for(int i=lowerbound;i<upperbound;i++){
-            if(i==lowerbound)
-                path = path+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
-            else
-                path = path+"|"+travelledpath.get(i).latitude+","+travelledpath.get(i).longitude;
-        }
-        parameters = path + "&" + interpolate;
-        String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
-        Log.d("FetchUrl:",url);
-        return url;
-    }*/
     public void showEndTrip(){ bottom.setVisibility(View.VISIBLE); }
     public void hideEndTrip(){
         bottom.setVisibility(View.GONE);

@@ -78,7 +78,7 @@ public class BookingList extends Fragment {
         recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_bookinglist);
         progressBar = (RelativeLayout) root.findViewById(R.id.fg_booking_progresbar);
         noBooking=(TextView)root.findViewById(R.id.tv_bookinglist_nodata);
-        mAdapter = new RequestListAdapter(context,getActivity(), Constants.BOOKING_START);
+        mAdapter = new RequestListAdapter(context,getActivity(), Constants.BOOKING_INIT);
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
