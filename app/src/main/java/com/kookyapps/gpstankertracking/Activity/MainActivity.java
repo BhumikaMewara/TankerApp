@@ -65,19 +65,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.lh_main_signIn:
             signIn.setClickable(false);
-        username = usernameET.getText().toString();
-        password = passwordET.getText().toString();
-        loginApiCalling();
-        progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+
+        if (validate()){
+
+            loginApiCalling();
+        }
+
+
         break;
         }
     }
+
     @Override
     public void onBackPressed() {
 
         super.onBackPressed();
     }
+    private boolean validate(){
+        username = usernameET.getText().toString();
+        password = passwordET.getText().toString();
+        if (usernameET.getText().toString().equals("")) {
+            progressBar.setVisibility(View.GONE);
+            RequestQueueService.showAlert("Enter Username",MainActivity.this);
+            signIn.setClickable(true);
+            return false;
+
+        }
+        if (passwordET.getText().toString().equals("")) {
+            progressBar.setVisibility(View.GONE);
+            RequestQueueService.showAlert("Enter Password",MainActivity.this);
+            signIn.setClickable(true);
+            return false;
+        }
+        if (passwordET.getText().toString().length()<8){
+            progressBar.setVisibility(View.GONE);
+            RequestQueueService.showAlert("Password should be of atleast 8 letters long ",MainActivity.this);
+            signIn.setClickable(true);
+            return false;
+        }
+
+        return true;
+    }
     public void loginApiCalling(){
+        username = usernameET.getText().toString();
+        password = passwordET.getText().toString();
         JSONObject jsonBodyObj = new JSONObject();
 
         try {
