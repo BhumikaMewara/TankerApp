@@ -482,7 +482,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
-                .setInterval(FASTEST_INTERVAL);
+                .setInterval(FASTEST_INTERVAL)
+                .setSmallestDisplacement(30);
         if (!permissionGranted) {
             return;
         }
@@ -510,7 +511,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         return;
                     }
                     if (location.hasBearing())
-                        bearing = location.getBearing()+90;
+                        bearing = location.getBearing();
 
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
@@ -529,7 +530,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     MarkerOptions current = new MarkerOptions()
                             .position(currentlatlng)
                             .flat(true)
-                            .anchor(.5f, .5f)
+                            .anchor(.5f, 0f)
                             .icon(bitmapDescriptorFromVector(Map1.this,R.drawable.ic_truck_icon));
                     if (currentmarker != null)
                         currentmarker.remove();
@@ -551,20 +552,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     }
                     double dist = 0;
                     dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    if (dist > 100) {
+                    if (dist > 30) {
                         travelled_distance = travelled_distance + dist;
                         if (Constants.travelled_path == null) {
                             Constants.travelled_path  = new ArrayList<>();
                         }
                         Constants.travelled_path .add(currentlatlng);
                     }
-                    /*else{
-                        travelled_distance = travelled_distance + dist;
-                        if (Constants.travelled_path == null) {
-                            Constants.travelled_path  = new ArrayList<>();
-                        }
-                        Constants.travelled_path .add(currentlatlng);
-                    }*/
                     locationInProcess = false;
                 }
             }
