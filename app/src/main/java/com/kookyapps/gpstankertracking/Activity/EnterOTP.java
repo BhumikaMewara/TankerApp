@@ -204,7 +204,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 verifyLayout.setClickable(false);
                 progressBar.setVisibility(View.VISIBLE);
                 validateOTP();
-                if(blmod.getBookingid().equals(SessionManagement.getOngoingBooking(EnterOTP.this)))
+                if(blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)))
                     if(Constants.isPathSnapped)
                         uploadBitmap();
                     else
