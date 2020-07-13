@@ -10,6 +10,7 @@ import android.util.Log;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -21,13 +22,13 @@ public class SplashActivity extends AppCompatActivity {
 
         if (SessionManagement.checkSignIn(this)) {
 
-            if (SessionManagement.isOngoing(this)){
+            if (SharedPrefUtil.hasKey(SplashActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         Log.i("splash","open map");
-                        String booking_id = SessionManagement.getOngoingBooking(SplashActivity.this);
+                        String booking_id = SharedPrefUtil.getStringPreferences(SplashActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID);
                         Intent i = new Intent(SplashActivity.this, RequestDetails.class);
                         i.putExtra("init_type", Constants.SPLASH_INIT);
                         i.putExtra("booking_id", booking_id);
