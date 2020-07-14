@@ -237,29 +237,17 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
         try {
-            if(Constants.travelled_path==null||Constants.travelled_path.size()==0) {
+            if(Constants.travelled_path1==null||Constants.travelled_path1.size()==0) {
                 if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
                         String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        Type type = new TypeToken<ArrayList<Location>>() {
                         }.getType();
-                        Constants.travelled_path = gson.fromJson(json, type);
+                        Constants.travelled_path1 = gson.fromJson(json, type);
                         SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
                     }
                 }
-
-                /*else {
-                    Constants.travelled_path = new ArrayList<>();
-                    Constants.travelled_path.add(new LatLng(-35.27801, 149.12958));
-                    Constants.travelled_path.add(new LatLng(-35.28032, 149.12907));
-                    Constants.travelled_path.add(new LatLng(-35.28099, 149.12929));
-                    Constants.travelled_path.add(new LatLng(-35.28144, 149.12984));
-                    Constants.travelled_path.add(new LatLng(-35.28194, 149.13003));
-                    Constants.travelled_path.add(new LatLng(-35.28282, 149.12956));
-                    Constants.travelled_path.add(new LatLng(-35.28302, 149.12881));
-                    Constants.travelled_path.add(new LatLng(-35.28473, 149.12836));
-                }*/
             }else{
                 if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
@@ -482,8 +470,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
-                .setInterval(FASTEST_INTERVAL)
-                .setSmallestDisplacement(30);
+                .setInterval(FASTEST_INTERVAL);
         if (!permissionGranted) {
             return;
         }
@@ -500,33 +487,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    // ...
-                    if (!location.hasAccuracy()) {
-                        locationInProcess = false;
-                        return;
-                    }
-                    if (location.getAccuracy() > 50) {
-                        locationInProcess = false;
-                        return;
-                    }
-                    if (location.hasBearing())
-                        bearing = location.getBearing();
-
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     currentlatlng = new LatLng(lt, lg);
-                    double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
-
-                    //if(enddist<Integer.valueOf(blmod.getGeofence_in_meter()))
-                    if (enddist<1000)
-                        showEndTrip();
-                    else
-                        hideEndTrip();
-
-                    if (currentlatlng != null)
-                        prevlatlng = currentlatlng;
-
                     MarkerOptions current = new MarkerOptions()
                             .position(currentlatlng)
                             .flat(true)
@@ -538,7 +501,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     if (isRecentered) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentlatlng, 18));
                     }
-
                     JSONObject params = new JSONObject();
                     try {
                         params.put("id", blmod.getBookingid());
@@ -550,15 +512,12 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         locationInProcess = false;
                         e.printStackTrace();
                     }
-                    double dist = 0;
-                    dist = distance(prevlatlng.latitude, prevlatlng.longitude, currentlatlng.latitude, currentlatlng.longitude);
-                    if (dist > 30) {
-                        travelled_distance = travelled_distance + dist;
-                        if (Constants.travelled_path == null) {
-                            Constants.travelled_path  = new ArrayList<>();
-                        }
-                        Constants.travelled_path .add(currentlatlng);
-                    }
+                    Constants.travelled_path1 .add(location);
+                    double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
+                    if (enddist<1000)
+                        showEndTrip();
+                    else
+                        hideEndTrip();
                     locationInProcess = false;
                 }
             }
@@ -592,10 +551,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             locationInProcess = true;
             pathfetched = true;
         }
-        if(Constants.travelled_path==null){
-            Constants.travelled_path = new ArrayList<>();
+        if(Constants.travelled_path1==null){
+            Constants.travelled_path1 = new ArrayList<>();
         }
-        Constants.travelled_path.add(pickupLatLng);
+        Location loc = new Location("");
+        loc.setLatitude(pickupLatLng.latitude);
+        loc.setLongitude(pickupLatLng.longitude);
+        Constants.travelled_path1.add(loc);
     }
 
     @Override
@@ -863,9 +825,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
-
-
     public void languageChangeApi() {
         JSONObject jsonBodyObj = new JSONObject();
         try {
@@ -882,7 +841,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
     FetchDataListener languageChangeListner = new FetchDataListener() {
         @Override
@@ -948,29 +906,17 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
         try {
-            if(Constants.travelled_path==null||Constants.travelled_path.size()==0) {
+            if(Constants.travelled_path1==null||Constants.travelled_path1.size()==0) {
                 if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
                         String json = SharedPrefUtil.getStringPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        Type type = new TypeToken<ArrayList<Location>>() {
                         }.getType();
-                        Constants.travelled_path = gson.fromJson(json, type);
+                        Constants.travelled_path1 = gson.fromJson(json, type);
                         SharedPrefUtil.deletePreference(Map1.this, Constants.SHARED_PREF_TRIP_TAG);
                     }
                 }
-
-                /*else {
-                    Constants.travelled_path = new ArrayList<>();
-                    Constants.travelled_path.add(new LatLng(-35.27801, 149.12958));
-                    Constants.travelled_path.add(new LatLng(-35.28032, 149.12907));
-                    Constants.travelled_path.add(new LatLng(-35.28099, 149.12929));
-                    Constants.travelled_path.add(new LatLng(-35.28144, 149.12984));
-                    Constants.travelled_path.add(new LatLng(-35.28194, 149.13003));
-                    Constants.travelled_path.add(new LatLng(-35.28282, 149.12956));
-                    Constants.travelled_path.add(new LatLng(-35.28302, 149.12881));
-                    Constants.travelled_path.add(new LatLng(-35.28473, 149.12836));
-                }*/
             }else{
                 if (SharedPrefUtil.hasKey(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
@@ -1029,19 +975,19 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     protected void onPause() {
-        if(Constants.travelled_path!=null) {
+        if(Constants.travelled_path1!=null) {
             if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
-                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path.size()){
+                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path1.size()){
                     Gson gson = new Gson();
-                    String json = gson.toJson(Constants.travelled_path);
+                    String json = gson.toJson(Constants.travelled_path1);
                     SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
                 }
             }else{
                 Gson gson = new Gson();
-                String json = gson.toJson(Constants.travelled_path);
+                String json = gson.toJson(Constants.travelled_path1);
                 SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
             }
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
@@ -1050,19 +996,19 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     @Override
     protected void onStop() {
-        if(Constants.travelled_path!=null) {
+        if(Constants.travelled_path1!=null) {
             if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
-                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path.size()){
+                if(SharedPrefUtil.getIntegerPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path1.size()){
                     Gson gson = new Gson();
-                    String json = gson.toJson(Constants.travelled_path);
+                    String json = gson.toJson(Constants.travelled_path1);
                     SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                    SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
                 }
             }else{
                 Gson gson = new Gson();
-                String json = gson.toJson(Constants.travelled_path);
+                String json = gson.toJson(Constants.travelled_path1);
                 SharedPrefUtil.setPreferences(Map1.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path.size());
+                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
             }
         }
         super.onStop();

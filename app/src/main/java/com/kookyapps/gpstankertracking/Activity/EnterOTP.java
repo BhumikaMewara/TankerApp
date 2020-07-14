@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -98,14 +99,14 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         Bundle b = i.getExtras();
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
         try {
-            if(Constants.travelled_path==null) {
+            if(Constants.travelled_path1==null) {
                 if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
                         String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        Type type = new TypeToken<ArrayList<Location>>() {
                         }.getType();
-                        Constants.travelled_path = gson.fromJson(json, type);
+                        Constants.travelled_path1 = gson.fromJson(json, type);
                         SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
                     }
                 }
@@ -251,11 +252,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
 
     @Override
     public void afterTextChanged(Editable editable) {
-
-       // editText_one.setFocusable(false);
-      //  editText_three.requestFocus();
-//asdasdasd
-//moveToNext();
         Log.i("setText",String.valueOf(editable.length()));
         if (editable.length() == 1) {
 
@@ -351,7 +347,7 @@ private  void validateOTP(){
                                     Constants.isTripOngoing = false;
                                     Constants.ongoingBookingId = "";
                                     Constants.isPathSnapped = false;
-                                    Constants.travelled_path = null;
+                                    Constants.travelled_path1 = null;
                                     if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
                                         SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG);
                                     if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
@@ -434,7 +430,7 @@ private  void validateOTP(){
                 params.put("otp",OTP);
                 if(finalsnap!=null) {
                     params.put("snapped_path", finalsnap.toString());
-                    params.put("distance_traveled", String.valueOf(snappedDistance));
+                    params.put("distance_traveled", String.format("%.2f",String.valueOf(snappedDistance)));
                 }
                 /*params.put("lat",String.valueOf( currentlatlng.latitude));
                 params.put("lng",String.valueOf(currentlatlng.longitude));*/
@@ -494,14 +490,14 @@ private  void validateOTP(){
     protected void onResume() {
         super.onResume();
         try {
-            if(Constants.travelled_path==null) {
+            if(Constants.travelled_path1==null) {
                 if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
                     if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
                         Gson gson = new Gson();
                         String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<LatLng>>() {
+                        Type type = new TypeToken<ArrayList<Location>>() {
                         }.getType();
-                        Constants.travelled_path = gson.fromJson(json, type);
+                        Constants.travelled_path1 = gson.fromJson(json, type);
                         SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
                     }
                 }
@@ -569,9 +565,9 @@ private  void validateOTP(){
                 if (OFFSET > 0)
                     OFFSET -= PAGINATION_OVERLAP;
                 lowerbound = OFFSET;
-                upperbound = Math.min(OFFSET + PAGE_SIZE, Constants.travelled_path.size());
+                upperbound = Math.min(OFFSET + PAGE_SIZE, Constants.travelled_path1.size());
                 GETAPIRequest getapiRequest = new GETAPIRequest();
-                String url = getSnapUrl(lowerbound, upperbound, false);
+                String url = getSnapUrl(lowerbound, upperbound, true);
                 HeadersUtil headparam = new HeadersUtil();
                 getapiRequest.request(EnterOTP.this, snapToRoadListener, url, headparam);
             }
@@ -616,16 +612,13 @@ private  void validateOTP(){
                         }
                     }
                     OFFSET = upperbound;
-                    if(OFFSET<Constants.travelled_path.size())
+                    if(OFFSET<Constants.travelled_path1.size())
                         snapToRoad();
                     else{
                         finalsnap = new JSONObject();
                         finalsnap.put("snappedpoints",snappedArray);
                         Constants.isPathSnapped=true;
                         uploadBitmap();
-
-                        //socket.emit("locationUpdate:Booking", params);
-
                     }
                 }
             }catch (Exception e){
@@ -652,10 +645,43 @@ private  void validateOTP(){
             interpolate = interpolate+"false";
         String parameters = "";
         for(int i=lowerbound;i<upperbound;i++){
-            if(i==lowerbound)
-                path = path+Constants.travelled_path.get(i).latitude+"%2C"+Constants.travelled_path.get(i).longitude;
-            else
-                path = path+"%7C"+Constants.travelled_path.get(i).latitude+"%2C"+Constants.travelled_path.get(i).longitude;
+            Location cur = Constants.travelled_path1.get(i);
+            if(i==0){
+                String lat = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLatitude())));
+                String lng = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLongitude())));
+                path = path+lat+"%2C"+lng;
+            }else if((i+1)== Constants.travelled_path1.size()){
+                String lat = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLatitude())));
+                String lng = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLongitude())));
+                path = path+"%7C"+lat+"%2C"+lng;
+            }else{
+                Double dist = distance(Constants.travelled_path1.get(i-1).getLatitude(),Constants.travelled_path1.get(i-1).getLongitude(),Constants.travelled_path1.get(i+1).getLatitude(),Constants.travelled_path1.get(i+1).getLongitude());
+                if(!cur.hasAccuracy()){
+                    continue;
+                }else if(cur.getAccuracy()>50){
+                    if(dist>100){
+                        String lat = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLatitude())));
+                        String lng = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLongitude())));
+                        if(i==lowerbound)
+                            path = path+lat+"%2C"+lng;
+                        else
+                            path = path+"%7C"+lat+"%2C"+lng;
+                    }else{
+                        continue;
+                    }
+                }else{
+                    if(dist>30){
+                        String lat = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLatitude())));
+                        String lng = String.format("%.5f",Double.parseDouble(String.valueOf(cur.getLongitude())));
+                        if(i==lowerbound)
+                            path = path+lat+"%2C"+lng;
+                        else
+                            path = path+"%7C"+lat+"%2C"+lng;
+                    }else{
+                        continue;
+                    }
+                }
+            }
         }
         parameters = path + "&" + interpolate;
         String url = "https://roads.googleapis.com/v1/snapToRoads?"+ parameters + "&key=" + getString(R.string.google_maps_key);
@@ -690,10 +716,20 @@ private  void validateOTP(){
 
     @Override
     protected void onPause() {
-        if(Constants.travelled_path!=null) {
-            Gson gson = new Gson();
-            String json = gson.toJson(Constants.travelled_path);
-            SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+        if(Constants.travelled_path1!=null) {
+            if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
+                if(SharedPrefUtil.getIntegerPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path1.size()){
+                    Gson gson = new Gson();
+                    String json = gson.toJson(Constants.travelled_path1);
+                    SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                    SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
+                }
+            }else{
+                Gson gson = new Gson();
+                String json = gson.toJson(Constants.travelled_path1);
+                SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
+                SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
+            }
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onPause();

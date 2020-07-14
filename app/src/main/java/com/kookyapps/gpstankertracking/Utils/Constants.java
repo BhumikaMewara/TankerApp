@@ -1,5 +1,7 @@
 package com.kookyapps.gpstankertracking.Utils;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.kookyapps.gpstankertracking.R;
 
@@ -11,6 +13,7 @@ public class Constants {
     public static boolean isPathSnapped = false;
     public static String ongoingBookingId = null;
     public static ArrayList<LatLng> travelled_path = null;
+    public static ArrayList<Location> travelled_path1 = null;
 
 
     public static final String REQUEST_INIT= "request_init";
