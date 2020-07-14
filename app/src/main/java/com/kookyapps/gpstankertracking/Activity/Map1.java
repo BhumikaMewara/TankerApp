@@ -519,7 +519,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
 
                     //if(enddist<Integer.valueOf(blmod.getGeofence_in_meter()))
-                    if (enddist<1000)
+                    if (enddist<Integer.parseInt(blmod.getGeofence_in_meter()))
                         showEndTrip();
                     else
                         hideEndTrip();
