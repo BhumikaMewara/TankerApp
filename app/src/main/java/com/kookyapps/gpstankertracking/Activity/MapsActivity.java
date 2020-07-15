@@ -1020,7 +1020,7 @@ public class MapsActivity extends AppCompatActivity implements View.OnClickListe
                     JSONObject response = (JSONObject)args[0];
                     try {
                         Log.i("response","Booking Aborted "+response.getString("id"));
-                        SessionManagement.removeOngoingBooking(MapsActivity.this);
+                        //SessionManagement.removeOngoingBooking(MapsActivity.this);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

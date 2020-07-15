@@ -21,11 +21,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
     ArrayList<NotificationModal> notificationlist;
     Context context;
     private String init_type;
-
+    public static int readPos = -1;
+    private static boolean readCalled = false;
     private static final int ITEM = 0;
     private static final int LOADING = 1;
     private boolean isLoadingAdded = false;
-
+    String detail_init_type = "";
 
    /* public NotificationsAdapter(Context context,ArrayList<NotificationModal> notificationlist){
         this.context = context;
@@ -67,12 +68,17 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.rl_notificationitem_layout:
-                    notificationlayout.setClickable(false);
-
-                    if(context instanceof Notifications)
-                        ((Notifications)context).readNotificationApiCall(notificationlist.get(getAdapterPosition()).getNotifiactionid());
-
-
+                    if(context instanceof Notifications && !readCalled) {
+                        readCalled = true;
+                        readPos = getAdapterPosition();
+                        String type = notificationlist.get(readPos).getNotificationtype();
+                        if(type.equals("BOOKING_REQUEST")) {
+                            detail_init_type = Constants.REQUEST_INIT;
+                        } else {
+                            detail_init_type = Constants.BOOKING_INIT;
+                        }
+                        ((Notifications) context).readNotificationApiCall(notificationlist.get(getAdapterPosition()).getNotifiactionid());
+                    }
                     break;
             }
         }
@@ -112,33 +118,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 final NotificationViewHolder mVH = (NotificationViewHolder) holder;
                 mVH.notificationheading.setText(notificationlist.get(position).getTitle());
                 mVH.notificationmsg.setText(notificationlist.get(position).getText());
-//                String type = notificationlist.get(position).getNotificationtype();
-//                if (type.equals("BOOKING_REQUEST"))
-
-               /* if(notificationlist.get(position).getIsread().equals("0")){
-                    mVH.notificationlayout.setBackground(context.getDrawable(R.drawable.notification_read_background));
-                }
-                else {
-                    mVH.notificationlayout.setBackground(context.getDrawable(R.drawable.notification_unread_background));
-                }*/
-
-                mVH.notificationlayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        String detail_init_type,type = current.getNotificationtype();
-                        if(type.equals("BOOKING_REQUEST")) {
-                            detail_init_type = Constants.REQUEST_INIT;
-                        } else {
-                            detail_init_type = Constants.BOOKING_INIT;
-                        }
-                        Intent i = new Intent(context, RequestDetails.class);
-                        i.putExtra("init_type", detail_init_type);
-                        i.putExtra("booking_id", current.getBookingid());
-                        context.startActivity(i);
-                    }
-                });
-
                 break;
             case LOADING:
                 break;
@@ -202,6 +181,25 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void clearNotifications(){
     notificationlist.clear();
         notifyDataSetChanged();
+    }
+
+    public void setReadCalled(boolean t){
+        readCalled = false;
+        if(readPos!=-1&&t){
+            if(init_type!="") {
+                Intent i = new Intent(context, RequestDetails.class);
+                i.putExtra("init_type", detail_init_type);
+                i.putExtra("booking_id", notificationlist.get(readPos).getBookingid());
+                notificationlist.remove(readPos);
+                notifyItemRemoved(readPos);
+                readPos =-1;
+                detail_init_type="";
+                context.startActivity(i);
+            }
+
+        }
+
+
     }
 
 }

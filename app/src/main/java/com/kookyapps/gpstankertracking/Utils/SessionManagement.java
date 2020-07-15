@@ -34,31 +34,6 @@ public class SessionManagement {
         }
     }
 
-    public static boolean isOngoing(Context con){
-        if (SharedPrefUtil.hasKey(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING)){
-//            return SharedPrefUtil.getBooleanPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING);
-            if (SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING).equals("")){
-                return false;
-            }
-            return true;
-        }else {
-            return false;
-        }
-    }
-
-    public static void setOngoingBooking(Context con, String id){
-        SharedPrefUtil.setPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING,id);
-    }
-
-    public static String getOngoingBooking(Context con){
-        return SharedPrefUtil.getStringPreferences(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING);
-    }
-    public static void  removeOngoingBooking(Context con){
-         SharedPrefUtil.removePreferenceKey(con,Constants.SHARED_PREF_BOOKING_TAG,BOOKING);
-    }
-
-
-
     public static void createLoginSession(Context con, Boolean islogin, String user_id, String phcode, String phoneno, String username,String token,String language,String location,String status,String noticount){
 
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG,IS_LOGGEDIN,islogin);

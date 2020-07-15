@@ -929,8 +929,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                             Alert("This trip has been cancelled by admin",Map1.this);
                         else
                             Alert("This trip has been cancelled by controllerkj....",Map1.this);
-
-                        SessionManagement.removeOngoingBooking(Map1.this);
+                        if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                            SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_ONGOING_TAG);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

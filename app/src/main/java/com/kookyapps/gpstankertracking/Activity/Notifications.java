@@ -398,11 +398,11 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
     public void readNotificationApiCall(String notificationId){
         try {
             GETAPIRequest getapiRequest = new GETAPIRequest();
-            String url = URLs.BASE_URL + URLs.READ_NOTIFICATIONS+"?id="+notificationId;
+            String url = URLs.BASE_URL + URLs.READ_NOTIFICATIONS+notificationId;
             String token = SessionManagement.getUserToken(this);
             Log.i("Token:",token);
             HeadersUtil headparam = new HeadersUtil(token);
-            getapiRequest.request(Notifications.this,readListener,url,headparam);
+            getapiRequest.requestString(Notifications.this,readListener,url,headparam);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -413,18 +413,20 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
             try {
                 if (data != null) {
                     if (data.getInt("error") == 0) {
-
+                        int count = Integer.parseInt(notiCount.getText().toString())-1;
+                        notiCount.setText(String.valueOf(count));
+                        SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,String.valueOf(count));
+                        adapter.setReadCalled(true);
                     }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                adapter.setReadCalled(false);
             }
         }
 
         @Override
-        public void onFetchFailure(String msg) {
-
-        }
+        public void onFetchFailure(String msg) {adapter.setReadCalled(false); }
 
         @Override
         public void onFetchStart() {
@@ -483,15 +485,9 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         //change the language of the the app when prompt
-
-
-
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notiCount.getText().toString();
         boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-
-
         boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if(b2){
             newNotification();
@@ -505,15 +501,9 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
             }
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
-
-
-
-
-
 }
