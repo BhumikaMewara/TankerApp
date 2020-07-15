@@ -98,22 +98,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         Intent i = getIntent();
         Bundle b = i.getExtras();
         imageencoded=SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
-        try {
-            if(Constants.travelled_path1==null) {
-                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
-                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
-                        Gson gson = new Gson();
-                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<Location>>() {
-                        }.getType();
-                        Constants.travelled_path1 = gson.fromJson(json, type);
-                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     //    leftbit = (Bitmap) b.get("Bitmap");
         blmod = b.getParcelable("Bookingdata");
         /*if(b.containsKey("snapped_path")) {
@@ -206,16 +190,8 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 progressBar.setVisibility(View.VISIBLE);
                 validateOTP();
                 if(blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)))
-                   // if(Constants.isPathSnapped)
-                        uploadBitmap();
-                    //else
-                      //  snapToRoad();
-
+                    uploadBitmap();
                 break;
-                /*   i = new Intent(this, TripComplete.class);
-
-
-                startActivity(i);*/
             case R.id.rl_toolbarmenu_backimglayout:
                 onBackPressed();
                 break;
@@ -318,16 +294,7 @@ private  void validateOTP(){
     private void uploadBitmap() {
         OTP = String.valueOf(editText_one.getText())+ String.valueOf(editText_two.getText())+String.valueOf(editText_three.getText())+ String.valueOf(editText_four.getText())+String.valueOf(editText_five.getText())+ String.valueOf(editText_six.getText());
         String url = URLs.BASE_URL + URLs.BOOKING_END+blmod.getBookingid();
-        //url = "http://13.233.54.144:8080/api/user/document";
-        //our custom volley request
-       /* JSONObject params = new JSONObject();
-        try {
-            params.put("id", blmod.getBookingid());
-            params.put("lat", currentlatlng.latitude);
-            params.put("lng",currentlatlng.longitude);
-        }catch (JSONException e){
-            e.printStackTrace();
-        }*/
+
 
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST,url,
                 new Response.Listener<NetworkResponse>() {
@@ -344,14 +311,11 @@ private  void validateOTP(){
                                     Intent intent = new Intent(EnterOTP.this,TripComplete.class);
                                     intent.putExtra("Bookingdata",blmod);
                                     intent.putExtra("init_type", init_type);
-                                    Constants.isTripOngoing = false;
-                                    Constants.ongoingBookingId = "";
-                                    Constants.isPathSnapped = false;
-                                    Constants.travelled_path1 = null;
                                     if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
                                         SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG);
-                                    if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
-                                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
+                                    if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY)){
+                                        SharedPrefUtil.removePreferenceKey(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
+                                    }
                                     progressBar.setVisibility(View.GONE);
                                     startActivity(intent);
                                     finish();
@@ -717,21 +681,6 @@ private  void validateOTP(){
 
     @Override
     protected void onPause() {
-        if(Constants.travelled_path1!=null) {
-            if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH)){
-                if(SharedPrefUtil.getIntegerPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE)<Constants.travelled_path1.size()){
-                    Gson gson = new Gson();
-                    String json = gson.toJson(Constants.travelled_path1);
-                    SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                    SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
-                }
-            }else{
-                Gson gson = new Gson();
-                String json = gson.toJson(Constants.travelled_path1);
-                SharedPrefUtil.setPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH, json);
-                SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_PATH_SIZE,Constants.travelled_path1.size());
-            }
-        }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onPause();
     }
