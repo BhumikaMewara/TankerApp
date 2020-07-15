@@ -41,10 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-
     }
     public void initViews(){
-
         titleSignInText=(TextView) findViewById(R.id.tv_main_signInTitle);
         usernameText=(TextView)    findViewById(R.id.tv_main_username);
         passwordText=(TextView)    findViewById(R.id.tv_main_password);

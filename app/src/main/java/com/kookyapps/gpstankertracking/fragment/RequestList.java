@@ -84,7 +84,7 @@ public class RequestList extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayout.setRefreshing(false);
+                //refreshLayout.setRefreshing(false);
                 tripList.clear();
 
                 mAdapter.clearAll();
@@ -163,6 +163,7 @@ public class RequestList extends Fragment {
             //RequestQueueService.cancelProgressDialog();
             try {
                 if (data != null) {
+                    refreshLayout.setRefreshing(false);
                     if (data.getInt("error")==0) {
                         tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");

@@ -66,6 +66,7 @@ public class BookingList extends Fragment {
 
 
 
+
     public BookingList(Context context) {
         // Required empty public constructor
         this.context = context;
@@ -111,6 +112,24 @@ public class BookingList extends Fragment {
                 return isLoading;
             }
         });
+        refreshLayout=(SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh_bookinglist);
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+               /* refreshLayout.setRefreshing(false);*/
+                requestlist.clear();
+
+                mAdapter.clearAll();
+                bookinglistApiCalling();
+            }
+        });
+        refreshLayout.setColorSchemeColors (getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(android.R.color.holo_green_dark),
+                getResources().getColor(android.R.color.holo_orange_dark),
+                getResources().getColor(android.R.color.holo_blue_dark));
+
+
         bookinglistApiCalling();
 
         return root;
@@ -138,6 +157,7 @@ public void bookinglistApiCalling(){
         public void onFetchComplete(JSONObject data) {
             try {
                 if (data!=null){
+                    refreshLayout.setRefreshing(false);
 
                     if (data.getInt("error") == 0) {
                         requestlist=new ArrayList<>();
