@@ -964,6 +964,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     JSONObject response = (JSONObject)args[0];
                     try {
                         Log.i("response","Booking Aborted "+response.getString("id"));
+                       // Alert();
                         SessionManagement.removeOngoingBooking(Map1.this);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1021,6 +1022,25 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         stopUpdate();
         super.onDestroy();
     }
+
+    /*public static void showAlert(String message, final FragmentActivity context) {
+        try {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setTitle("Alert!");
+            builder.setMessage(message);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                }
+            });
+
+            builder.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }*/
 
     public void showlanguage(){
         if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {

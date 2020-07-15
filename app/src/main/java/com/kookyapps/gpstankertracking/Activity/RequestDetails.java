@@ -699,7 +699,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         if(data.has("snapped_path")){
                             String snapstring = data.getString("snapped_path");
                             JSONObject snap = new JSONObject(snapstring);
-                            JSONArray snaparray = snap.getJSONArray("snappedpoints");
+                            JSONArray snaparray = snap.getJSONArray("snappedPoints");
                             if(finalpath == null)
                                 finalpath = new ArrayList<>();
                             for(int i=0;i<snaparray.length();i++){

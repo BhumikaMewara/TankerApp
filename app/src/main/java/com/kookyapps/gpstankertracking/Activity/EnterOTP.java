@@ -206,10 +206,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 progressBar.setVisibility(View.VISIBLE);
                 validateOTP();
                 if(blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)))
-                    if(Constants.isPathSnapped)
+                   // if(Constants.isPathSnapped)
                         uploadBitmap();
-                    else
-                        snapToRoad();
+                    //else
+                      //  snapToRoad();
 
                 break;
                 /*   i = new Intent(this, TripComplete.class);
@@ -624,6 +624,7 @@ private  void validateOTP(){
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(EnterOTP.this,"Error in snap to road",Toast.LENGTH_LONG);
+                RequestQueueService.showAlert("No value for snapped Points",EnterOTP.this);
             }
         }
 
