@@ -215,6 +215,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     JSONArray snappedArray;
     JSONObject finalsnap;
     //boolean path_snapped = false;
+    Location droploc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -491,11 +492,17 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         locationInProcess = false;
                         e.printStackTrace();
                     }
-                    double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
-                    if (enddist<1000)
-                        showEndTrip();
-                    else
-                        hideEndTrip();
+                    Constants.travelled_path1 .add(location);
+                    if (location.hasAccuracy()){
+                        if(location.getAccuracy()<60){
+                            //double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
+                            double enddist= location.distanceTo(droploc);
+                            if (enddist<Integer.parseInt(blmod.getGeofence_in_meter()))
+                                showEndTrip();
+                            else
+                                hideEndTrip();
+                        }
+                    }
                     locationInProcess = false;
                 }
             }
@@ -529,6 +536,10 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             locationInProcess = true;
             pathfetched = true;
         }
+        droploc = new Location("");
+        droploc.setLatitude(dropLatLng.latitude);
+        droploc.setLongitude(dropLatLng.longitude);
+       // Constants.travelled_path1.add(droploc);
     }
 
     @Override
@@ -913,9 +924,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     JSONObject response = (JSONObject)args[0];
                     try {
                         Log.i("response","Booking Aborted "+response.getString("id"));
-                       // Alert();
-                        if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
-                            SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_ONGOING_TAG);
+                        Integer abortedBy = response.getInt("aborted_by");
+                        if (abortedBy==1)
+                            Alert("This trip has been cancelled by admin",Map1.this);
+                        else
+                            Alert("This trip has been cancelled by controllerkj....",Map1.this);
+
+                        SessionManagement.removeOngoingBooking(Map1.this);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -943,7 +958,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         super.onDestroy();
     }
 
-    /*public static void showAlert(String message, final FragmentActivity context) {
+    public void Alert(String message, final FragmentActivity context) {
         try {
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
             builder.setTitle("Alert!");
@@ -960,7 +975,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         }catch (Exception e){
             e.printStackTrace();
         }
-    }*/
+    }
 
     public void showlanguage(){
         if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {

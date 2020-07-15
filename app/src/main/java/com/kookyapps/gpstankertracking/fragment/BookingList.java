@@ -134,6 +134,17 @@ public class BookingList extends Fragment {
 
         return root;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (requestlist!=null) {
+            requestlist.clear();
+            mAdapter.clearAll();
+            progressBar.setVisibility(View.VISIBLE);
+            bookinglistApiCalling();
+
+        }
+    }
 
 public void bookinglistApiCalling(){
     JSONObject jsonBodyObj = new JSONObject();

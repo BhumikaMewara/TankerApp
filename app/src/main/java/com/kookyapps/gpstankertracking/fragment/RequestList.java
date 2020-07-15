@@ -138,8 +138,16 @@ public class RequestList extends Fragment {
 
     }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (tripList!=null)
+        {
+        tripList.clear();
+        mAdapter.clearAll();
+        requestlistApiCalling();
+        }
+    }
 
     private void requestlistApiCalling(){
         JSONObject jsonBodyObj = new JSONObject();

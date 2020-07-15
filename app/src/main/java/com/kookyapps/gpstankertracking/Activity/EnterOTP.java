@@ -351,6 +351,22 @@ private  void validateOTP(){
                         verifyLayout.setClickable(true);
                         progressBar.setVisibility(View.GONE);
                         //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+
+                        NetworkResponse response = error.networkResponse;
+                        if(response != null && response.data != null){
+                            String errorString = new String(response.data);
+                            Log.i("log error", errorString);
+                            try {
+                                JSONObject obj = new JSONObject(new String(response.data));
+                                RequestQueueService.showAlert(obj.getString("message"),EnterOTP.this);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        else {
+                            RequestQueueService.showAlert("Something went wrong ", EnterOTP.this);
+                        }
                     }
                 }) {
 

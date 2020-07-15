@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -269,14 +270,18 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             requestPermission();
                         }
                     } else {
-                        intent = new Intent(RequestDetails.this, Map1.class);
-                        intent.putExtra("Bookingdata", blmod);
-                        intent.putExtra("init_type", Constants.BOOKING_INIT);
-                        intent.putExtra("booking_id", bkngid);
-                        intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
-                        progressBar.setVisibility(View.GONE);
-                        startActivity(intent);
-                        finish();
+                        if (blmod.getStatus()==0){
+                            Alert("This trip has been cancelled",RequestDetails.this);
+                        }else {
+                            intent = new Intent(RequestDetails.this, Map1.class);
+                            intent.putExtra("Bookingdata", blmod);
+                            intent.putExtra("init_type", Constants.BOOKING_INIT);
+                            intent.putExtra("booking_id", bkngid);
+                            intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
+                            progressBar.setVisibility(View.GONE);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
                 }
                 break;
@@ -465,6 +470,25 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         paint.setTextSize(desiredTextSize);
     }
 
+    public void Alert(String message, final FragmentActivity context) {
+        try {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setTitle("Alert!");
+            builder.setMessage(message);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    finish();
+
+                }
+            });
+
+            builder.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -581,6 +605,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                     RequestDetails.this.finish();
                                 }
                             }
+
+                            blmod.setStatus(data.getInt("status"));
                             //bookingid.setText(blmod.getBookingid());
                             if (data.getString("message").equals("")){
                                 message.setText("No message");

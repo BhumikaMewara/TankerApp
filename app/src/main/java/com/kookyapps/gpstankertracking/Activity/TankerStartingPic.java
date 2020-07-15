@@ -449,7 +449,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                                     startActivity(intent);
                                     finish();
                                 }else{
-                                    RequestQueueService.showAlert(obj.getString("code"), TankerStartingPic.this);
+                                    RequestQueueService.showAlert(obj.getString("message"), TankerStartingPic.this);
                                     captureImgBtn.setClickable(true);
                                     progressBar.setVisibility(View.GONE);
                                     //requestLayout.setBackgroundResource(R.drawable.straight_corners);
@@ -476,6 +476,23 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                         error.printStackTrace();
                         captureImgBtn.setClickable(true);
                         progressBar.setVisibility(View.GONE);
+
+
+                        NetworkResponse response = error.networkResponse;
+                        if(response != null && response.data != null){
+                            String errorString = new String(response.data);
+                            Log.i("log error", errorString);
+                            try {
+                                JSONObject obj = new JSONObject(new String(response.data));
+                                RequestQueueService.showAlert(obj.getString("message"),TankerStartingPic.this);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        else {
+                            RequestQueueService.showAlert("Something went wrong ", TankerStartingPic.this);
+                        }
                         //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                     }
                 }) {

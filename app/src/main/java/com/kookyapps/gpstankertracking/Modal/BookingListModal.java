@@ -11,12 +11,14 @@ public class BookingListModal implements Parcelable {
     String phone_country_code, phone, controller_name, geofence_in_meter, message;
     String driver_name,can_start,can_accept,can_end;
     String tankerBookingid;
+    Integer status;
 
 
 
 
 
-
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
     public String getTankerBookingid() { return tankerBookingid; }
     public void setTankerBookingid(String tankerBookingid) { this.tankerBookingid = tankerBookingid; }
 

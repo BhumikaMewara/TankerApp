@@ -157,10 +157,17 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     SessionManagement.setLanguage(FirstActivity.this, Constants.IS_OFFLINE);
                     updateLcationApiCalling(Constants.IS_OFFLINE);
                 }
-
             }
 
         });
+        String status = SessionManagement.getUserStatus(FirstActivity.this);
+        if (status.equals("1")){
+            onlineSwitch.setChecked(true);
+            updateLcationApiCalling(Constants.IS_ONLINE);
+        }else{
+            onlineSwitch.setChecked(false);
+            updateLcationApiCalling(Constants.IS_OFFLINE);
+        }
 
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
@@ -364,6 +371,21 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
 
                     if (CameraPermission && AccessFineLoaction && InternetPermission && CallPhonePermisission  && ReadExternalStoragePermission  &&  WriteExternalStoragePermission) {
+                        gpsTracker = new GPSTracker(this);
+
+                        stringLatitude = String.valueOf(gpsTracker.latitude);
+                        stringLongitude = String.valueOf(gpsTracker.longitude);
+
+
+                        String status = SessionManagement.getUserStatus(FirstActivity.this);
+                        if (status.equals("1")){
+                            onlineSwitch.setChecked(true);
+                            updateLcationApiCalling(Constants.IS_ONLINE);
+                        }else{
+                            onlineSwitch.setChecked(false);
+                            updateLcationApiCalling(Constants.IS_OFFLINE);
+                        }
+
 
                         Toast.makeText(FirstActivity.this, "Permission Granted", Toast.LENGTH_LONG).show();
                     }
@@ -651,18 +673,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }else {
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-
-
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notificationCountText.getText().toString();
         boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-
-
-
         boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if(b2){
             newNotification();
