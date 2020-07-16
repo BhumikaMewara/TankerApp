@@ -132,7 +132,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
     public void initViews() {
         init_type = getIntent().getExtras().getString("init_type");
-
         bkngid = getIntent().getExtras().getString("booking_id");
         progressBar=(ProgressBar) findViewById(R.id.pb_requestDetails_progressbar);
         pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
@@ -186,13 +185,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
         maplayout = (RelativeLayout)findViewById(R.id.rl_requestDetail_map);
         mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_requesttDeatils_map);
-
-        if (init_type.equals(Constants.TRIP_INIT)){
-            maplayout.setVisibility(View.VISIBLE);
-        }else {
-            maplayout.setVisibility(View.GONE);
-        }
-
 
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
@@ -569,7 +561,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             String token = SessionManagement.getUserToken(this);
             HeadersUtil headparam = new HeadersUtil(token);
             getapiRequest.request(RequestDetails.this, bookingdetailsApiListner, url, headparam, jsonBodyObj);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -586,70 +577,79 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         JSONObject data = mydata.getJSONObject("data");
                         blmod = new BookingListModal();
                         if (data != null) {
-                            bottom.setVisibility(View.VISIBLE);
-                            bottom.setClickable(true);
-                            progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
                             blmod.setStatus(data.getInt("status"));
                             if (init_type.equals(Constants.REQUEST_INIT)) {
                                 pagetitle.setText(getString(R.string.request_details));
-                            }else if (init_type.equals(Constants.TRIP_INIT)){
+                            } else if (init_type.equals(Constants.TRIP_INIT)) {
                                 pagetitle.setText(getString(R.string.trip_details));
-                            }else{
+                            } else {
                                 pagetitle.setText(getString(R.string.booking_details));
                             }
-
-
-                            if (data.getString("message").equals("")){
+                            if (data.getString("message").equals("")) {
                                 message.setText("No message");
-                            }else {
+                            } else {
                                 blmod.setMessage(data.getString("message"));
                                 message.setText(blmod.getMessage());
-                            }blmod.setPhone_country_code(data.getString("phone_country_code"));
+                            }
+                            blmod.setPhone_country_code(data.getString("phone_country_code"));
                             blmod.setPhone(data.getString("phone"));
                             contact_no.setText("+" + blmod.getPhone_country_code() + blmod.getPhone());
                             blmod.setController_name(data.getString("controller_name"));
                             controllername.setText(blmod.getController_name());
                             blmod.setCan_accept(data.getString("can_accept"));
-                            can_accept=String.valueOf(data.getBoolean("can_accept"));
+                            can_accept = String.valueOf(data.getBoolean("can_accept"));
                             blmod.setCan_start(data.getString("can_start"));
-                            can_start= String.valueOf(data.getBoolean("can_start"));
+                            can_start = String.valueOf(data.getBoolean("can_start"));
                             blmod.setCan_end(data.getString("can_end"));
-                            can_end=String.valueOf(data.getBoolean("can_end"));
-
-
-
-
-                            if(status.equals("0")){
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
-                                if(init_type.equals(Constants.SPLASH_INIT)) {
+                            can_end = String.valueOf(data.getBoolean("can_end"));
+                            if (status.equals("0")) {
+                                if (SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG);
+                                if (SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this, Constants.SHARED_PREF_TRIP_TAG);
+                                if (init_type.equals(Constants.SPLASH_INIT)) {
                                     Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
                                     RequestDetails.this.finish();
                                 }
                                 bottom.setVisibility(View.GONE);
-                            }else if(status.equals("1")&&can_accept.equals("true")){
+                            } else if (status.equals("1") && can_accept.equals("true")) {
                                 bottomtext.setText(getString(R.string.accept));
                                 bottom.setVisibility(View.VISIBLE);
-                            }else if(status.equals("2")&& can_start.equals("true")){
+                            } else if (status.equals("2") && can_start.equals("true")) {
                                 bottomtext.setText(getString(R.string.start));
                                 bottom.setVisibility(View.VISIBLE);
-                            }else if(status.equals("3")){
+                            } else if (status.equals("3")) {
                                 bottomtext.setText(getString(R.string.view_map));
                                 bottom.setVisibility(View.VISIBLE);
-                            }else if(status.equals("4")){
+                            } else if (status.equals("4")) {
                                 bottom.setVisibility(View.GONE);
-                            }else if(status.equals("5")){
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
-                                if(init_type.equals(Constants.SPLASH_INIT)) {
+                            } else if (status.equals("5")) {
+                                if (SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG);
+                                if (SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this, Constants.SHARED_PREF_TRIP_TAG);
+                                if(data.has("snapped_path")){
+                                    maplayout.setVisibility(View.VISIBLE);
+                                    String snapstring = data.getString("snapped_path");
+                                    JSONObject snap = new JSONObject(snapstring);
+                                    JSONArray snaparray = snap.getJSONArray("snappedPoints");
+                                    if(finalpath == null)
+                                        finalpath = new ArrayList<>();
+                                    for(int i=0;i<snaparray.length();i++){
+                                        JSONObject point = snaparray.getJSONObject(i);
+                                        JSONObject location = point.getJSONObject("location");
+                                        double lat = Double.parseDouble(location.getString("latitude"));
+                                        double longi = Double.parseDouble(location.getString("longitude"));
+                                        LatLng temp = new LatLng(lat,longi);
+                                        finalpath.add(temp);
+                                    }
+                                    mapFragment.getMapAsync(RequestDetails.this);
+                                }
+                                if (init_type.equals(Constants.SPLASH_INIT)) {
                                     Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
@@ -657,25 +657,15 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                 }
                                 bottom.setVisibility(View.GONE);
                             }
-
-
-
-
-
-
-
-
                             JSONObject distance = data.getJSONObject("distance");
                             if (distance != null) {
                                 distance.getString("value");
                                 blmod.setDistance(distance.getString("text"));
                                 distancetext.setText(blmod.getDistance());
-                            }else {
-                                RequestQueueService.showAlert("Error! No Data in distance Found", RequestDetails.this);
-                                progressBar.setVisibility(View.GONE);
-                                bottom.setVisibility(View.VISIBLE);
-                                bottom.setClickable(true);
-                            }JSONObject drop_point = data.getJSONObject("drop_point");
+                            } else {
+                                Toast.makeText(RequestDetails.this,"No distance value",Toast.LENGTH_LONG).show();
+                            }
+                            JSONObject drop_point = data.getJSONObject("drop_point");
                             if (drop_point != null) {
                                 drop_point.getString("location");
                                 blmod.setToaddress(drop_point.getString("address"));
@@ -688,64 +678,43 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                                     if (coordinates != null) {
                                         blmod.setTologitude(coordinates.getString(0)); // lng
                                         blmod.setTolatitude(coordinates.getString(1)); //lat
-                                    }else {
-                                        RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this);
-                                    }progressBar.setVisibility(View.GONE);
-                                    bottom.setVisibility(View.VISIBLE);
-                                    bottom.setClickable(true);
-                                }else {
-                                    RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this);
-                                }progressBar.setVisibility(View.GONE);
-                                bottom.setVisibility(View.VISIBLE);
-                                bottom.setClickable(true);
-                            } else {
-                                RequestQueueService.showAlert("Error! No Data in drop_point Found", RequestDetails.this);
-                                progressBar.setVisibility(View.GONE);
-                                bottom.setVisibility(View.VISIBLE);
-                                bottom.setClickable(true);
-                            }
-
-                            blmod.setTankerBookingid(data.getString("booking_id"));
-                            bookingid.setText(blmod.getTankerBookingid());
-
-                            JSONObject pickup_point = data.getJSONObject("pickup_point");
-                            { if (pickup_point != null) {
-                                    blmod.setFromlocation(pickup_point.getString("location"));
-                                    blmod.setFromaddress(pickup_point.getString("address"));
-                                    pickup.setText(blmod.getFromaddress());
-                                    JSONObject geomaetry = pickup_point.getJSONObject("geometry");
-                                    if (geomaetry != null) {
-                                        geomaetry.getString("type");
-                                        JSONArray coordinates = geomaetry.getJSONArray("coordinates");
-                                        if (coordinates != null) {
-                                            blmod.setFromlongitude(coordinates.getString(0)); // lng
-                                            blmod.setFromlatitude(coordinates.getString(1)); //lat
-                                        } else {
-                                            RequestQueueService.showAlert("Error! No Coordinates Found", RequestDetails.this);
-                                            progressBar.setVisibility(View.GONE);
-                                            bottom.setVisibility(View.VISIBLE);
-                                            bottom.setClickable(true);
-                                        }
                                     } else {
-                                        RequestQueueService.showAlert("Error! No Data in geomaetry Found", RequestDetails.this);
-                                        progressBar.setVisibility(View.GONE);
-                                        bottom.setVisibility(View.VISIBLE);
-                                        bottom.setClickable(true);
+                                        Toast.makeText(RequestDetails.this,"No drop point",Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-                                    RequestQueueService.showAlert("Error! No Data in pick_point Found", RequestDetails.this);
-                                    progressBar.setVisibility(View.GONE);
-                                    bottom.setVisibility(View.VISIBLE);
-                                    bottom.setClickable(true);
+                                    Toast.makeText(RequestDetails.this,"No drop point",Toast.LENGTH_LONG).show();
                                 }
+                            } else {
+                                Toast.makeText(RequestDetails.this,"No drop point",Toast.LENGTH_LONG).show();
                             }
-                            if (init_type.equals(Constants.REQUEST_INIT)) {
-                                pagetitle.setText(getString(R.string.request_details));
-                                bottomtext.setText(getString(R.string.accept));
-                            }else if (init_type.equals(Constants.TRIP_INIT)){
-                                bottom.setVisibility(View.GONE);
-                                pagetitle.setText(getString(R.string.trip_details));
+                            blmod.setTankerBookingid(data.getString("booking_id"));
+                            bookingid.setText(blmod.getTankerBookingid());
+                            JSONObject pickup_point = data.getJSONObject("pickup_point");
+                            if (pickup_point != null) {
+                                blmod.setFromlocation(pickup_point.getString("location"));
+                                blmod.setFromaddress(pickup_point.getString("address"));
+                                pickup.setText(blmod.getFromaddress());
+                                JSONObject geomaetry = pickup_point.getJSONObject("geometry");
+                                if (geomaetry != null) {
+                                    geomaetry.getString("type");
+                                    JSONArray coordinates = geomaetry.getJSONArray("coordinates");
+                                    if (coordinates != null) {
+                                        blmod.setFromlongitude(coordinates.getString(0)); // lng
+                                        blmod.setFromlatitude(coordinates.getString(1)); //lat
+                                    } else {
+                                        Toast.makeText(RequestDetails.this,"No pickup point",Toast.LENGTH_LONG).show();
+                                        //progressBar.setVisibility(View.GONE);
+                                    }
+                                } else {
+                                    Toast.makeText(RequestDetails.this,"No pickup point",Toast.LENGTH_LONG).show();
+                                    //progressBar.setVisibility(View.GONE);
+                                }
+                            } else {
+                                Toast.makeText(RequestDetails.this,"No pickup point",Toast.LENGTH_LONG).show();
+                                //RequestQueueService.showAlert("Error! No Data in pick_point Found", RequestDetails.this);
+                                //progressBar.setVisibility(View.GONE);
                             }
+                            progressBar.setVisibility(View.GONE);
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
                             progressBar.setVisibility(View.GONE);
@@ -753,24 +722,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             bottom.setClickable(true);
                         }
 
-                        if(data.has("snapped_path")){
-                            String snapstring = data.getString("snapped_path");
-                            JSONObject snap = new JSONObject(snapstring);
-                            JSONArray snaparray = snap.getJSONArray("snappedPoints");
-                            if(finalpath == null)
-                                finalpath = new ArrayList<>();
-                            for(int i=0;i<snaparray.length();i++){
-                                JSONObject point = snaparray.getJSONObject(i);
-                                JSONObject location = point.getJSONObject("location");
-                                double lat = Double.parseDouble(location.getString("latitude"));
-                                double longi = Double.parseDouble(location.getString("longitude"));
-                                LatLng temp = new LatLng(lat,longi);
-                                finalpath.add(temp);
-                            }
-                            mapFragment.getMapAsync(RequestDetails.this);
-                        }
                     }
-
                     else {
                         RequestQueueService.showAlert("Error! Data is null",RequestDetails.this);
                         progressBar.setVisibility(View.GONE);

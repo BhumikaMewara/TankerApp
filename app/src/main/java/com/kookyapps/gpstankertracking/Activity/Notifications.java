@@ -28,6 +28,7 @@ import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
+import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.PaginationScrollListener;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
@@ -117,7 +118,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         notificationlistview.setItemAnimator(new DefaultItemAnimator());
         notificationlistview.setAdapter(adapter);
         notificationlistview.addOnScrollListener(new PaginationScrollListener(mLayoutManager) {
-
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
@@ -244,6 +244,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                             } else {
                                 TOTAL_PAGES = (totalBookingCount / page_size) + 1;
                             }
+                        }
+                        if(response.has("unread_count")){
+                            SessionManagement.setNotificationCount(Notifications.this,response.getString("unread_count"));
+                            notiCount.setText(response.getString("unread_count"));
                         }
                         if(array!=null) {
                             if (array.length() != 0) {
@@ -397,12 +401,12 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
 
     public void readNotificationApiCall(String notificationId){
         try {
-            GETAPIRequest getapiRequest = new GETAPIRequest();
+            POSTAPIRequest getapiRequest = new POSTAPIRequest();
             String url = URLs.BASE_URL + URLs.READ_NOTIFICATIONS+notificationId;
             String token = SessionManagement.getUserToken(this);
             Log.i("Token:",token);
             HeadersUtil headparam = new HeadersUtil(token);
-            getapiRequest.requestString(Notifications.this,readListener,url,headparam);
+            getapiRequest.request(Notifications.this,readListener,url,headparam);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -457,9 +461,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                 noticountlayout.setVisibility(View.VISIBLE);
             }
             SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            /*boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-            if(b2)
-                SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");*/
             reloadNotification();
         }
     }

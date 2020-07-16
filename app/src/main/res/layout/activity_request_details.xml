@@ -318,7 +318,7 @@
             android:id="@+id/tv_result_details_bottomlayout_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="CREATE"
+            android:text=""
             android:layout_toLeftOf="@+id/rl_bottomLayout_icon"
             android:textColor="@color/colorwhite"
             android:textSize="13dp"

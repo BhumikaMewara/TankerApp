@@ -138,16 +138,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.i("Login", "Login Successfull");
                         JSONObject userdetail = object.getJSONObject("data");
                         if(userdetail!=null) {
-                            SessionManagement.createLoginSession(MainActivity.this,
-                                    true, userdetail.getString("tanker_id"),
-                                    userdetail.getString("phone_country_code"),
-                                    userdetail.getString("phone"),
-                                    userdetail.getString("driver_name"),
-                                    userdetail.getString("token"),
-                                    userdetail.getJSONObject("settings").getString("language"),
-                                    userdetail.getString("location"),
-                                    userdetail.getString("activity_status"),
-                                    userdetail.getString("notification_count"));
+                            if(userdetail.has("notification_count")) {
+                                if(userdetail.getString("notification_count").equals("")){
+                                    SessionManagement.createLoginSession(MainActivity.this,
+                                            true, userdetail.getString("tanker_id"),
+                                            userdetail.getString("phone_country_code"),
+                                            userdetail.getString("phone"),
+                                            userdetail.getString("driver_name"),
+                                            userdetail.getString("token"),
+                                            userdetail.getJSONObject("settings").getString("language"),
+                                            userdetail.getString("location"),
+                                            userdetail.getString("activity_status"),
+                                            "0");
+                                }else {
+                                    SessionManagement.createLoginSession(MainActivity.this,
+                                            true, userdetail.getString("tanker_id"),
+                                            userdetail.getString("phone_country_code"),
+                                            userdetail.getString("phone"),
+                                            userdetail.getString("driver_name"),
+                                            userdetail.getString("token"),
+                                            userdetail.getJSONObject("settings").getString("language"),
+                                            userdetail.getString("location"),
+                                            userdetail.getString("activity_status"),
+                                            userdetail.getString("notification_count"));
+                                }
+                            }else{
+                                SessionManagement.createLoginSession(MainActivity.this,
+                                        true, userdetail.getString("tanker_id"),
+                                        userdetail.getString("phone_country_code"),
+                                        userdetail.getString("phone"),
+                                        userdetail.getString("driver_name"),
+                                        userdetail.getString("token"),
+                                        userdetail.getJSONObject("settings").getString("language"),
+                                        userdetail.getString("location"),
+                                        userdetail.getString("activity_status"),
+                                        "0");
+                            }
                             SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
                             //String s = userdetail.getString("status");
                             Intent i = new Intent(MainActivity.this, FirstActivity.class);
