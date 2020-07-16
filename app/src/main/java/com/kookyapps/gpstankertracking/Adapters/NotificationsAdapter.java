@@ -28,15 +28,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
     private boolean isLoadingAdded = false;
     String detail_init_type = "";
 
-   /* public NotificationsAdapter(Context context,ArrayList<NotificationModal> notificationlist){
-        this.context = context;
-        this.notificationlist = notificationlist;
-    }
-    public NotificationAdapter(Context context,ArrayList<NotificationModal> notificationlist){
-        this.context = context;
-        this.notificationlist = notificationlist;
-    }*/
-
     public NotificationsAdapter(Context context){
         this.context = context;
         this.notificationlist = new ArrayList<>();
@@ -196,10 +187,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 detail_init_type="";
                 context.startActivity(i);
             }
-
         }
-
-
     }
 
 }

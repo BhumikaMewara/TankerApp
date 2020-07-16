@@ -417,9 +417,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
             try {
                 if (data != null) {
                     if (data.getInt("error") == 0) {
-                        int count = Integer.parseInt(notiCount.getText().toString())-1;
-                        notiCount.setText(String.valueOf(count));
-                        SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,String.valueOf(count));
+                        String count = data.getString("unread_count");
+                        SessionManagement.setNotificationCount(Notifications.this,count);
+                        notiCount.setText(count);
+                        SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,count);
                         adapter.setReadCalled(true);
                     }
                 }
