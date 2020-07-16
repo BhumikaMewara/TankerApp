@@ -249,11 +249,11 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 startActivity(intent);
                 break;
             case R.id.rl_result_details_bottomLayout_text:
-                if (init_type.equals(Constants.REQUEST_INIT)) {
+                if (blmod.getStatus()==1&&can_accept.equals("true")) {
                     bookingacceptedapiCalling();
                     bottom.setClickable(false);
                     progressBar.setVisibility(View.VISIBLE);
-                } else if (!init_type.equals(Constants.TRIP_INIT)) {
+                } else if (blmod.getStatus()==2) {
                     progressBar.setVisibility(View.VISIBLE);
                     if (can_start.equals("true")) {
                         if (checkPermission()) {
@@ -269,20 +269,18 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         } else {
                             requestPermission();
                         }
-                    } else {
-                        if (blmod.getStatus()==0){
-                            Alert("This trip has been cancelled",RequestDetails.this);
-                        }else {
-                            intent = new Intent(RequestDetails.this, Map1.class);
-                            intent.putExtra("Bookingdata", blmod);
-                            intent.putExtra("init_type", Constants.BOOKING_INIT);
-                            intent.putExtra("booking_id", bkngid);
-                            intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
-                            progressBar.setVisibility(View.GONE);
-                            startActivity(intent);
-                            finish();
-                        }
                     }
+                }
+                else if(blmod.getStatus()==3){
+                    progressBar.setVisibility(View.VISIBLE);
+                    intent = new Intent(RequestDetails.this, Map1.class);
+                    intent.putExtra("Bookingdata", blmod);
+                    intent.putExtra("init_type", Constants.BOOKING_INIT);
+                    intent.putExtra("booking_id", bkngid);
+                    intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
+                    progressBar.setVisibility(View.GONE);
+                    startActivity(intent);
+                    finish();
                 }
                 break;
         }
@@ -593,21 +591,16 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             progressBar.setVisibility(View.GONE);
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
-                            if((status.equals("0") || status.equals("5")||status.equals("6"))){
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
-                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
-                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
-                                if(init_type.equals(Constants.SPLASH_INIT)) {
-                                    Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
-                                    RequestDetails.this.finish();
-                                }
+                            blmod.setStatus(data.getInt("status"));
+                            if (init_type.equals(Constants.REQUEST_INIT)) {
+                                pagetitle.setText(getString(R.string.request_details));
+                            }else if (init_type.equals(Constants.TRIP_INIT)){
+                                pagetitle.setText(getString(R.string.trip_details));
+                            }else{
+                                pagetitle.setText(getString(R.string.booking_details));
                             }
 
-                            blmod.setStatus(data.getInt("status"));
-                            //bookingid.setText(blmod.getBookingid());
+
                             if (data.getString("message").equals("")){
                                 message.setText("No message");
                             }else {
@@ -624,6 +617,54 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             can_start= String.valueOf(data.getBoolean("can_start"));
                             blmod.setCan_end(data.getString("can_end"));
                             can_end=String.valueOf(data.getBoolean("can_end"));
+
+
+
+
+                            if(status.equals("0")){
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
+                                if(init_type.equals(Constants.SPLASH_INIT)) {
+                                    Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    RequestDetails.this.finish();
+                                }
+                                bottom.setVisibility(View.GONE);
+                            }else if(status.equals("1")&&can_accept.equals("true")){
+                                bottomtext.setText(getString(R.string.accept));
+                                bottom.setVisibility(View.VISIBLE);
+                            }else if(status.equals("2")&& can_start.equals("true")){
+                                bottomtext.setText(getString(R.string.start));
+                                bottom.setVisibility(View.VISIBLE);
+                            }else if(status.equals("3")){
+                                bottomtext.setText(getString(R.string.view_map));
+                                bottom.setVisibility(View.VISIBLE);
+                            }else if(status.equals("4")){
+                                bottom.setVisibility(View.GONE);
+                            }else if(status.equals("5")){
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_ONGOING_TAG);
+                                if(SharedPrefUtil.hasKey(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG,Constants.SHARED_ONGOING_TRAVELLED_PATH))
+                                    SharedPrefUtil.deletePreference(RequestDetails.this,Constants.SHARED_PREF_TRIP_TAG);
+                                if(init_type.equals(Constants.SPLASH_INIT)) {
+                                    Intent intent = new Intent(RequestDetails.this, FirstActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    RequestDetails.this.finish();
+                                }
+                                bottom.setVisibility(View.GONE);
+                            }
+
+
+
+
+
+
+
+
                             JSONObject distance = data.getJSONObject("distance");
                             if (distance != null) {
                                 distance.getString("value");
@@ -704,16 +745,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             }else if (init_type.equals(Constants.TRIP_INIT)){
                                 bottom.setVisibility(View.GONE);
                                 pagetitle.setText(getString(R.string.trip_details));
-                            }else{
-                                if (can_start.equals("true")){
-                                    pagetitle.setText(getString(R.string.booking_details));
-                                    bottomtext.setText(getString(R.string.start));
-                                }else if(can_end.equals("true")){
-                                    pagetitle.setText(getString(R.string.booking_details));
-                                    bottomtext.setText(getString(R.string.view_map));
-                                }else {
-                                    bottom.setVisibility(View.GONE);
-                                }
                             }
                         } else {
                             RequestQueueService.showAlert("Error! No Data Found", RequestDetails.this);
