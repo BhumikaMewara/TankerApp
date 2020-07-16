@@ -69,17 +69,15 @@ import java.util.Map;
 public class EnterOTP extends AppCompatActivity implements View.OnClickListener, TextWatcher {
 
     EditText otpcode, editText_one, editText_two, editText_three, editText_four, editText_five, editText_six;
-    TextView title, message, verify, resend,pageTitle,notificationCountText;
+    TextView title, message, verify, resend,pageTitle;
     ImageView msg_icon;
     ProgressBar progressBar;
     LinearLayout verifyLayout;
-    RelativeLayout back, noti,notificationCountLayout;
     String imageencoded ,bkngid,OTP;
     BookingListModal blmod;
     Bitmap leftbit;
     String init_type;
     private ArrayList<SnappedPoint> snappedPoints = null;
-    static String notificationCount;
     BroadcastReceiver mRegistrationBroadcastReceiver;
     int lowerbound=-1,upperbound=-1;
     double snappedDistance=0;
@@ -110,7 +108,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
 
     public void initView() {
         //otpcode=        (EditText)findViewById(R.id.ed_enterOtp_otp);
-        pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
+        pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title1);
         pageTitle.setText(R.string.enter_otp);
         title = (TextView) findViewById(R.id.tv_enterOtp_msgTitle);
         message = (TextView) findViewById(R.id.tv_enterOtp_msg);
@@ -121,13 +119,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         progressBar.setVisibility(View.GONE);
         verifyLayout = (LinearLayout) findViewById(R.id.lh_enterOtp_verify);
         resend = (TextView) findViewById(R.id.tv_enterOtp_resendText);
-        back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
-        back.setOnClickListener(this);
-        noti = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
-        noti.setOnClickListener(this);
-        notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
-
 
         verifyLayout.setOnClickListener(this);
         editText_one   = (EditText) findViewById(R.id.editText_one);
@@ -145,22 +136,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         editText_five.addTextChangedListener(this);
         editText_six.addTextChangedListener(this);
 
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
-        if(noticount<=0){
-            clearNotificationCount();
-        }else{
-            notificationCountText.setText(String.valueOf(noticount));
-            notificationCountLayout.setVisibility(View.VISIBLE);
-        }
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(EnterOTP.this));
-                    setNotificationCount(count+1,false);
-                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
                         finish();
@@ -192,20 +171,12 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 if(blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)))
                     uploadBitmap();
                 break;
-            case R.id.rl_toolbarmenu_backimglayout:
-                onBackPressed();
-                break;
-            case R.id.rl_toolbar_with_back_notification:
-                i = new Intent(this, Notifications.class);
-                startActivity(i);
-                break;
         }
     }
 
     @Override
     public void onBackPressed() {
-
-        super.onBackPressed();
+        Toast.makeText(EnterOTP.this,"Proceed to End",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -346,7 +317,7 @@ private  void validateOTP(){
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         verifyLayout.setClickable(true);
                         progressBar.setVisibility(View.GONE);
@@ -437,34 +408,7 @@ private  void validateOTP(){
 
 
 
-    public void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SessionManagement.getNotificationCount(EnterOTP.this);
-        if(Integer.parseInt(notificationCount)!=count) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                notificationCountText.setText(String.valueOf(count));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-            SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-            if(b2)
-                SharedPrefUtil.setPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
-        }
-    }
-    public void newNotification(){
-        Log.i("newNotification","Notification");
-        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        setNotificationCount(count+1,false);
-    }
-    public void clearNotificationCount(){
-        notificationCountText.setText("");
-        notificationCountLayout.setVisibility(View.GONE);
-    }
+
 
     @Override
     protected void onResume() {
@@ -487,8 +431,6 @@ private  void validateOTP(){
         }
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
 
         if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)) {
@@ -499,22 +441,6 @@ private  void validateOTP(){
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         //change the language when prompt
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notificationCountText.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
-            newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
-                notificationCountText.setText(String.valueOf(sharedCount));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
 

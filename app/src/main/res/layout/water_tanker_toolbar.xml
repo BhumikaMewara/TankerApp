@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:text="Request List"
+            android:text=""
             android:textColor="@color/colorblack"
             android:layout_centerVertical="true"
             android:textSize="20dp"

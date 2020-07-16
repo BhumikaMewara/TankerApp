@@ -541,15 +541,18 @@ FetchDataListener tripListener= new FetchDataListener() {
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         //change the language when prompt
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notificationCountText.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
+        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        boolean b1 = sharedCount != viewCount;
+        boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if (b2) {
             newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
+        } else if (b1) {
+            if(sharedCount<=0){
+                notificationCountText.setText("");
+                notificationCountLayout.setVisibility(View.GONE);
+            }else if (sharedCount < 100 && sharedCount > 0) {
                 notificationCountText.setText(String.valueOf(sharedCount));
                 notificationCountLayout.setVisibility(View.VISIBLE);
             } else {

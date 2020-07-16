@@ -292,11 +292,13 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                notificationprogress.setVisibility(View.GONE);
                 setRecyclerView();
             }
         }
         @Override
         public void onFetchFailure(String msg) {
+            notificationprogress.setVisibility(View.GONE);
             RequestQueueService.showAlert(msg, Notifications.this);
             setRecyclerView();
         }
@@ -337,6 +339,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         @Override
         public void onFetchComplete(JSONObject mydata) {
             //RequestQueueService.cancelProgressDialog();
+
             try {
                 if (mydata != null) {
                     if (mydata.getInt("error")==0) {
@@ -379,8 +382,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                         else isLastPage = true;
                     }
                 }
+                notificationprogress.setVisibility(View.GONE);
 
             } catch (JSONException e) {
+                notificationprogress.setVisibility(View.GONE);
                 e.printStackTrace();
             }
         }
@@ -388,6 +393,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         @Override
         public void onFetchFailure(String msg) {
             //RequestQueueService.cancelProgressDialog();
+            notificationprogress.setVisibility(View.GONE);
             RequestQueueService.showAlert(msg,Notifications.this);
         }
 
@@ -489,12 +495,15 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         //change the language of the the app when prompt
         int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
         String viewCount =notiCount.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
+        boolean b1 = sharedCount!=Integer.parseInt(viewCount);
         boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if(b2){
             newNotification();
         }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
+            if(sharedCount<=0){
+                notiCount.setText("");
+                noticountlayout.setVisibility(View.GONE);
+            }else if (sharedCount < 100 && sharedCount>0) {
                 notiCount.setText(String.valueOf(sharedCount));
                 noticountlayout.setVisibility(View.VISIBLE);
             } else {

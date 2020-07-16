@@ -51,7 +51,7 @@ import java.util.Locale;
 
 public class TripComplete extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
-    TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText;
+    TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText,distanceTravelledTitleText;
     //ImageView calltous;
     ImageView menunotification;
     RelativeLayout back,noti,bottom,notificationCountLayout;
@@ -104,10 +104,12 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
             controller_name = (TextView) findViewById(R.id.tv_tripcomplete_drivername);
             contact_no = (TextView) findViewById(R.id.tv_tripcomplete_contact);
             message = (TextView) findViewById(R.id.tv_tripcomplete_message);
+            distanceTravelledTitleText=(TextView)findViewById(R.id.tv_tripcomplete_distance_title);
             bottom=(RelativeLayout)findViewById(R.id.rl_bottomLayout_text);
             back.setOnClickListener(this);
             noti.setOnClickListener(this);
             bottom.setOnClickListener(this);
+
             pagetitle.setText(getString(R.string.trip_complete));
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -202,9 +204,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                             controller_name.setText(blmod.getController_name());
                             blmod.setCan_accept(data.getString("can_accept"));
 
-
                             can_accept=String.valueOf(data.getBoolean("can_accept"));
-
                             blmod.setCan_start(data.getString("can_start"));
                             can_start= String.valueOf(data.getBoolean("can_start"));
                             blmod.setCan_end(data.getString("can_end"));
@@ -215,7 +215,7 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                             if (distance != null) {
                                 distance.getString("value");
                                 blmod.setDistance(distance.getString("text"));
-                                distancetext.setText(blmod.getDistance());
+                               // distancetext.setText(blmod.getDistance());
                             } else {
                                 RequestQueueService.showAlert("Error! No Data in distance Found", TripComplete.this);
                             }
@@ -244,6 +244,21 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
 
                             blmod.setTankerBookingid(data.getString("booking_id"));
                             bookingid.setText(blmod.getTankerBookingid());
+
+
+                                JSONObject distanceTravelled = data.getJSONObject("distance_traveled");
+                                if (distanceTravelled != null) {
+                                    blmod.setDistanceTravelled(distanceTravelled.getString("text"));
+                                    distanceTravelled.getString("value");
+                                    distanceTravelledTitleText.setText(R.string.final_distance);
+                                    distancetext.setText(blmod.getDistanceTravelled());
+                                }else {
+                                    RequestQueueService.showAlert("Error! No Data in distanceTravelled Found", TripComplete.this);
+                                  //  progressBar.setVisibility(View.GONE);
+                                    bottom.setVisibility(View.VISIBLE);
+                                    bottom.setClickable(true); }
+
+
 
                             JSONObject pickup_point = data.getJSONObject("pickup_point");
                             {
@@ -364,15 +379,18 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         //change the language when prompt
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notificationCountText.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
-
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
+        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        boolean b1 = sharedCount != viewCount;
+        boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if (b2) {
             newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
+        } else if (b1) {
+            if(sharedCount<=0){
+                notificationCountText.setText("");
+                notificationCountLayout.setVisibility(View.GONE);
+            }else if (sharedCount < 100 && sharedCount > 0) {
                 notificationCountText.setText(String.valueOf(sharedCount));
                 notificationCountLayout.setVisibility(View.VISIBLE);
             } else {

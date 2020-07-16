@@ -82,7 +82,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
     TextView txt_retake,date,time,lat,lon,apmm,day;
     RelativeLayout latLongLayout,dateAndTime,imgInfoLayout;
     LinearLayout retake;
-    String imageencoded ,bkngid,init_type;
+    String imageencoded ,bkngid,init_type,tankerbookingid;
     boolean photo_taken,cameraAccepted=false,permissionGranted = false;
     BookingListModal blmod;
     Bitmap leftbit;
@@ -103,6 +103,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         //leftbit=addStampToImage(leftbit);
         blmod = b.getParcelable("Bookingdata");
         init_type=b.getString("init_type");
+        tankerbookingid=getIntent().getExtras().getString("tankerBookingId");
         /*if(b.containsKey("snapped_path")) {
             finalsnap = b.getString("snapped_path");
             snappedDistance = b.getString("snapped_distance");
@@ -445,6 +446,8 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
                                     intent.putExtra("Bookingdata",blmod);
+                                    Log.i("tankerBookingId",tankerbookingid.toString());
+                                    intent.putExtra("tankerBookingId", tankerbookingid);
                                     progressBar.setVisibility(View.GONE);
                                     startActivity(intent);
                                     finish();
@@ -462,6 +465,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                             }
                         } catch (JSONException e) {
                             RequestQueueService.showAlert("Something went wrong", TankerStartingPic.this);
+
                             e.printStackTrace();
                             captureImgBtn.setClickable(true);
                             progressBar.setVisibility(View.GONE);
@@ -472,7 +476,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         captureImgBtn.setClickable(true);
                         progressBar.setVisibility(View.GONE);

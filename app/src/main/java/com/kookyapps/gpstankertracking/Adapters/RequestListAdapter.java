@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +17,13 @@ import com.kookyapps.gpstankertracking.Activity.RequestDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
 import com.kookyapps.gpstankertracking.Utils.Constants;
+import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +37,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ITEM=0;
     private static final int LOADING=1;
     private boolean isLoadingAdded = false;
+    SwitchCompat spinner;
 
 
     public RequestListAdapter(Context context, FragmentActivity activity,String init_type) {

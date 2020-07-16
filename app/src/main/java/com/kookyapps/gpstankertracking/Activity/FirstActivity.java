@@ -154,7 +154,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_ONLINE);
                     updateLcationApiCalling(Constants.IS_ONLINE);
                 } else {
-                    SessionManagement.setLanguage(FirstActivity.this, Constants.IS_OFFLINE);
+                    SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_OFFLINE);
                     updateLcationApiCalling(Constants.IS_OFFLINE);
                 }
             }
@@ -417,11 +417,10 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 SixthPermissionResult == PackageManager.PERMISSION_GRANTED ;
                // SeventhPermissionResult==PackageManager.PERMISSION_GRANTED;
     }
+
+
     public void updateLcationApiCalling(String currentStatus) {
-
         JSONObject jsonBodyObj = new JSONObject();
-
-
         try {
             jsonBodyObj.put("lat", stringLatitude);
             jsonBodyObj.put("lng", stringLongitude);
@@ -445,7 +444,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 if (data!=null){
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
-                        Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (JSONException e){
@@ -675,14 +674,18 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notificationCountText.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
+        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        boolean b1 = sharedCount != viewCount;
+        boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
+        if (b2) {
             newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
+        } else if (b1) {
+            if(sharedCount<=0){
+                notificationCountText.setText("");
+                toolbarNotiCountLayout.setVisibility(View.GONE);
+            }else if (sharedCount < 100 && sharedCount > 0) {
                 notificationCountText.setText(String.valueOf(sharedCount));
                 toolbarNotiCountLayout.setVisibility(View.VISIBLE);
             } else {

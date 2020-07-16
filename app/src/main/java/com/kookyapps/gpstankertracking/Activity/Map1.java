@@ -135,8 +135,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
 
     private GoogleMap mMap;
     LinearLayout tripLayout,logoutLayout,l;
-    RelativeLayout notifications,bottom,seemore,details , redLayout,toolbarNotiCountLayout,toolbarmenuLayout,r;
-    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,notificationCountText,trips,language,logout;
+    RelativeLayout bottom,seemore,details , redLayout,r;
+    TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,trips,language,logout;
     TextView fullname,username;
     ImageView seemoreImg ;
     ScrollView scrolldetails;
@@ -146,7 +146,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     Boolean t =false,    permissionGranted = false,fromBuildMethod=false, pathfetched=false;
     BookingListModal blmod;
     private String parserstring="";
-    static String notificationCount;
     ArrayList<String> allpermissionsrequired;
     static ArrayList<LatLng> waypoints = null;
 
@@ -173,8 +172,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     boolean cameraAccepted;
     String imageencoded,can_accept,can_end,can_start;
     BroadcastReceiver mRegistrationBroadcastReceiver;
-    DrawerLayout navdrawer;
-    ActionBarDrawerToggle actionBarDrawerToggle;
+
+
     SwitchCompat switchCompat,onlineSwitch;
     GPSTracker gpsTracker;
     String  stringLatitude,stringLongitude;
@@ -229,14 +228,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         tanker_id=getIntent().getExtras().getString("tankerBookingId");
         Constants.isTripOngoing = true;
         //gpsTracker = new GPSTracker(this);
-        switchCompat=(SwitchCompat)findViewById(R.id.switch2_map);
-        if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
-            switchCompat.setChecked(true);
-            setAppLocale(Constants.HINDI_LANGUAGE);
-        }else {
-            switchCompat.setChecked(false);
-            setAppLocale(Constants.ENGLISH_LANGUAGE);
-        }
+
         fromLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlatitude())));
         fromLong=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getFromlongitude())));
         toLat=Double.parseDouble(String.format("%.5f",Double.parseDouble(blmod.getTolatitude())));
@@ -250,15 +242,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     }
 
     public void initViews(){
-        notifications = (RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu_notification);
-        notifications.setOnClickListener(this);
-        toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
         title.setText(R.string.title_activity_maps);
-        trips=(TextView)findViewById(R.id.tv_map_tripText);
-        language=(TextView)findViewById(R.id.tv_map_language);
-        logout=(TextView)findViewById(R.id.tv_map_logout);
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
         bottom.setVisibility(View.GONE);
         bottom.setOnClickListener(this);
@@ -278,52 +263,15 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         contanctno=(TextView)findViewById(R.id.tv_map_contact_text);
         contanctno.setText("+" +blmod.getPhone_country_code()+blmod.getPhone());
         distance=(TextView)findViewById(R.id.tv_map_distance);
-        navdrawer=(DrawerLayout)findViewById(R.id.dl_trip_details);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, navdrawer,
-                R.string.drawer_open, R.string.drawer_close) {
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, slideOffset);
-            }
-        };
-        navdrawer.setDrawerElevation(0f);
-        navdrawer.setScrimColor(Color.TRANSPARENT);
-        navdrawer.addDrawerListener(actionBarDrawerToggle);
         distance.setText(blmod.getDistance());
-        toolbarmenuLayout=(RelativeLayout)findViewById(R.id.rl_water_tanker_toolbar_menu);
-        toolbarmenuLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                drawerMenu(view);
-            }
-        });
-        l=(LinearLayout)findViewById(R.id.lv_map_drawer_firstLayout);
-        tripLayout=(LinearLayout) findViewById(R.id. lh_map_triplayout);
-        tripLayout.setOnClickListener(this);
-        logoutLayout=(LinearLayout)findViewById(R.id.lh_map_logoutLayout);
-        logoutLayout.setOnClickListener(this);
-        fullname=(TextView)findViewById(R.id.tv_map_drawer_fullName);
-        username=(TextView)findViewById(R.id.tv_map_drawer_username);
         fullname.setText(SessionManagement.getName(Map1.this));
         username.setText(SessionManagement.getUserId(Map1.this));
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_pickup_map);
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
-        if(noticount<=0){
-            clearNotificationCount();
-        }else{
-            notificationCountText.setText(String.valueOf(noticount));
-            toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-        }
+
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(Map1.this));
-                    setNotificationCount(count+1,false);
-                }
-                else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
                         finish();
@@ -336,31 +284,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 }
             }
         };
-
-        switchCompat.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                isTouched = true;
-                return false;
-            }
-        });
-        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if (isTouched) {
-                    isTouched = false;
-                    if (isChecked) {
-                        SessionManagement.setLanguage(Map1.this,Constants.HINDI_LANGUAGE);
-                    }
-                    else {
-                        SessionManagement.setLanguage(Map1.this,Constants.ENGLISH_LANGUAGE);
-                    }
-                    showlanguage();
-                }
-            }
-        });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         checkAndRequestPermissions(this,allpermissionsrequired);
     }
@@ -492,7 +415,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         locationInProcess = false;
                         e.printStackTrace();
                     }
-                    Constants.travelled_path1 .add(location);
+                    //Constants.travelled_path1 .add(location);
                     if (location.hasAccuracy()){
                         if(location.getAccuracy()<60){
                             //double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
@@ -663,17 +586,11 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     }
 
 
-    public void drawerMenu (View view ){
-        navdrawer.openDrawer(Gravity.LEFT);
-    }
+
     @Override
     public void onClick(View view) {
         Intent i ;
         switch (view.getId()){
-            case R.id.rl_water_tanker_toolbar_menu_notification:
-                i = new Intent(this,Notifications.class);
-                startActivity(i);
-                break;
             case R.id.rl_map_bottomLayout_text:
                 if (checkPermission()) {
                     cameraAccepted = true;
@@ -707,16 +624,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     scrolldetails.setVisibility(View.GONE);
                     t = true;
                 }
-                break;
-            case R.id.lh_map_triplayout:
-                Log.i("trip","clicked");
-                i = new Intent(this, TripDetails.class);
-                startActivity(i);
-                break;
-            case R.id.lh_map_logoutLayout:
-                Log.i("logout","clicked");
-                logoutLayout.setClickable(false);
-                logutApiCalling();
                 break;
         }
     }
@@ -852,43 +759,14 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     };
 
 
-    public void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SessionManagement.getNotificationCount(Map1.this);
-        if(Integer.parseInt(notificationCount)!=count) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                notificationCountText.setText(String.valueOf(count));
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-            }
-            SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-            if(b2)
-                SharedPrefUtil.setPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
-        }
-    }
 
-    public void newNotification(){
-        Log.i("newNotification","Notification");
-        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(Map1.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        setNotificationCount(count+1,false);
-    }
-    public void clearNotificationCount(){
-        notificationCountText.setText("");
-        toolbarNotiCountLayout.setVisibility(View.GONE);
-    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
         if(SessionManagement.getLanguage(Map1.this).equals(Constants.HINDI_LANGUAGE)) {
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else {
@@ -897,21 +775,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
         // clear the notification area when the app is opened
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notificationCountText.getText().toString();
-        boolean b1 = String.valueOf("sharedCount")!=viewCount;
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
-            newNotification();
-        }else if (b1){
-            if (sharedCount < 100 && sharedCount>0) {
-                notificationCountText.setText(String.valueOf(sharedCount));
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     private Emitter.Listener onBookingAborted = new Emitter.Listener() {
@@ -966,7 +829,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-
+                    finish();
 
                 }
             });

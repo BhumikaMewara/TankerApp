@@ -12,6 +12,8 @@
     <string name="title_activity_maps">नक्शा</string>
     <string name="booking_id_text">बुकिंग आईडी</string>
     <string name="estimated_distance">अनुमानित दूरी</string>
+    <string name="final_distance">अंतिम दूरी</string>
+
     <string name="pickup_point">पिक अप बिंदु</string>
     <string name="drop_point">ड्रॉप बिंदु</string>
     <string name="controller_name">नियंत्रक का नाम</string>

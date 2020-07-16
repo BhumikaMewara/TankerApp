@@ -95,7 +95,7 @@ import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISS
 
 public class RequestDetails extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
-    TextView bookingid, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
+    TextView bookingid, distanceTitle, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
     ImageView calltous;
     ImageView menunotification;
     ProgressBar progressBar;
@@ -137,6 +137,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
         bookingid = (TextView) findViewById(R.id.tv_bookingdetail_bookingid);
         distancetext = (TextView) findViewById(R.id.tv_bookingdetail_distance);
+        distanceTitle =(TextView)findViewById(R.id. tv_bookingdetail_distance_title);
         pickup = (TextView) findViewById(R.id.tv_bookingdetail_pickup);
         drop = (TextView) findViewById(R.id.tv_bookingdetail_drop);
         controllername = (TextView) findViewById(R.id.tv_bookingdetail_drivername);
@@ -344,6 +345,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                     Intent intent = new Intent(this, TankerStartingPic.class);
                     intent.putExtra("Bitmap", bitmap);
                     intent.putExtra("Bookingdata", blmod);
+                    intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
                     startActivity(intent);
                     finish();
                 }
@@ -824,7 +826,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             if (b2) {
                 newNotification();
             } else if (b1) {
-                if (sharedCount < 100 && sharedCount > 0) {
+                if(sharedCount<=0){
+                    notificationCountText.setText("");
+                    toolbarNotiCountLayout.setVisibility(View.GONE);
+                }else if (sharedCount < 100 && sharedCount > 0) {
                     notificationCountText.setText(String.valueOf(sharedCount));
                     toolbarNotiCountLayout.setVisibility(View.VISIBLE);
                 } else {

@@ -10,6 +10,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="booking_id_text">Booking ID</string>
     <string name="estimated_distance">Estimated Distance</string>
+    <string name="final_distance">Final Distance</string>
     <string name="pickup_point">Pickup Point</string>
     <string name="drop_point">Drop Point</string>
     <string name="controller_name">Controller Name</string>
