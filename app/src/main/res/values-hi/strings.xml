@@ -31,7 +31,8 @@
     <!-- Page Titles-->
     <string name="trip_complete">ट्रिप पूरी हुई</string>
     <string name="trip_details">यात्रा विवरण</string>
-    <string name="trips">यात्राएं</string>
+    <string name="trips">पूर्ण यात्राएं</string>
+    <string name="cancel_trips">रद्द यात्राएं</string>
     <string name="language">भाषा</string>
     <string name="logout">लॉग आउट</string>
     <string name="enter_otp">ओटीपी  दर्ज करें</string>

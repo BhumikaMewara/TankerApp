@@ -134,7 +134,6 @@ import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISS
 public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback ,TaskLoadedCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraMoveStartedListener {
 
     private GoogleMap mMap;
-    LinearLayout tripLayout,logoutLayout,l;
     RelativeLayout bottom,seemore,details , redLayout,r;
     TextView title, seemoreText,bookingid,dropPoint,distance,contanctno,trips,language,logout;
     TextView fullname,username;
@@ -214,7 +213,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     JSONArray snappedArray;
     JSONObject finalsnap;
     //boolean path_snapped = false;
-    Location droploc;
+    Location droploc,curloc=null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,10 +242,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
     }
 
     public void initViews(){
-        title=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
+        title=(TextView)findViewById(R.id.tb_with_bck_arrow_title1);
         title.setText(R.string.title_activity_maps);
         bottom=(RelativeLayout)findViewById(R.id.rl_map_bottomLayout_text);
-        bottom.setVisibility(View.GONE);
         bottom.setOnClickListener(this);
         seemore = (RelativeLayout)findViewById(R.id.rl_map_seemore);
         seemore.setOnClickListener(this);
@@ -264,8 +263,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         contanctno.setText("+" +blmod.getPhone_country_code()+blmod.getPhone());
         distance=(TextView)findViewById(R.id.tv_map_distance);
         distance.setText(blmod.getDistance());
-        fullname.setText(SessionManagement.getName(Map1.this));
-        username.setText(SessionManagement.getUserId(Map1.this));
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_pickup_map);
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -390,6 +387,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
+                    //curloc = location;
                     double lt = Double.parseDouble(String.format("%.5f", location.getLatitude()));
                     double lg = Double.parseDouble(String.format("%.5f", location.getLongitude()));
                     currentlatlng = new LatLng(lt, lg);
@@ -417,13 +415,9 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     }
                     //Constants.travelled_path1 .add(location);
                     if (location.hasAccuracy()){
-                        if(location.getAccuracy()<60){
+                        if(location.getAccuracy()<50){
+                            curloc = location;
                             //double enddist = distance(currentlatlng.latitude,currentlatlng.longitude,dropLatLng.latitude,dropLatLng.longitude);
-                            double enddist= location.distanceTo(droploc);
-                            if (enddist<Integer.parseInt(blmod.getGeofence_in_meter()))
-                                showEndTrip();
-                            else
-                                hideEndTrip();
                         }
                     }
                     locationInProcess = false;
@@ -598,14 +592,17 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                     requestPermission();
                 }
                 if (cameraAccepted) {
-                    stopUpdate();
-                    Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
-                    /*if(travelledpath==null){
-                        Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
-                    }else
-                        snapToRoad();*/
+                    if(curloc!=null){
+                        double enddist= curloc.distanceTo(droploc);
+                        if (enddist<Integer.parseInt(blmod.getGeofence_in_meter())){
+                            showEndAlert();
+                        }else{
+                            Toast.makeText(Map1.this,"Not within Geofence Range",Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        Toast.makeText(Map1.this,"Not within Geofence Range",Toast.LENGTH_LONG).show();
+                    }
+
                 } else {
                     requestPermission();
                 }
@@ -627,55 +624,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                 break;
         }
     }
-
-    public void logutApiCalling() {
-        JSONObject jsonBodyObj = new JSONObject();
-        try {
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.SIGN_OUT_URL;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            Log.i("Token:",token);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(Map1.this,logoutListner,url,headparam,jsonBodyObj);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    FetchDataListener logoutListner = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject data) {
-            try {
-                if (data!=null){
-                    if (data.getInt("error") == 0) {
-                        FirebaseAuth.getInstance().signOut();
-                        SessionManagement.logout(logoutListner, Map1.this);
-                        Intent i = new Intent(Map1.this, MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(i);
-                        Toast.makeText(Map1.this, "You are now logout", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }
-            } catch (JSONException e){
-                e.printStackTrace();
-            }
-
-        }
-
-
-        @Override
-        public void onFetchFailure(String msg) {
-            logoutLayout.setClickable(true);
-        }
-
-        @Override
-        public void onFetchStart() {
-
-        }
-    };
 
     private boolean checkPermission(){
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
@@ -714,54 +662,6 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void languageChangeApi() {
-        JSONObject jsonBodyObj = new JSONObject();
-        try {
-            jsonBodyObj.put("lang",locale);
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.LANGUAGE_CHANGED;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            Log.i("Token:",token);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(Map1.this,languageChangeListner,url,headparam,jsonBodyObj);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    FetchDataListener languageChangeListner = new FetchDataListener() {
-        @Override
-        public void onFetchComplete(JSONObject data) {
-            try {
-                if (data!=null){
-                    if (data.getInt("error") == 0) {
-                        String message=   data.getString("message");
-                        Toast.makeText(Map1.this, message, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } catch (JSONException e){
-                e.printStackTrace();
-
-            }
-
-        }
-        @Override
-        public void onFetchFailure(String msg) {
-            logoutLayout.setClickable(true);
-        }
-
-        @Override
-        public void onFetchStart() {
-
-        }
-    };
-
-
-
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -791,7 +691,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
                         if (abortedBy==1)
                             Alert("This trip has been cancelled by admin",Map1.this);
                         else
-                            Alert("This trip has been cancelled by controllerkj....",Map1.this);
+                            Alert("This trip has been cancelled by controller",Map1.this);
                         if(SharedPrefUtil.hasKey(Map1.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
                             SharedPrefUtil.deletePreference(Map1.this,Constants.SHARED_PREF_ONGOING_TAG);
                     } catch (JSONException e) {
@@ -829,11 +729,13 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(Map1.this, FirstActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                     finish();
 
                 }
             });
-
             builder.show();
         }catch (Exception e){
             e.printStackTrace();
@@ -919,5 +821,44 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         background.draw(canvas);
         //vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public void showEndAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(Map1.this);
+        // Set the message show for the Alert time
+        builder.setMessage("Do you want to end trip ?");
+        builder.setTitle("Alert !");
+        builder.setCancelable(false);
+        builder
+                .setPositiveButton(
+                        "Yes",
+                        new DialogInterface
+                                .OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which)
+                            {
+                                stopUpdate();
+                                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                startActivityForResult(camera_intent, CAMERA_CAPTURE_REQUEST);
+                            }
+                        });
+
+        builder
+                .setNegativeButton(
+                        "No",
+                        new DialogInterface
+                                .OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which)
+                            {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

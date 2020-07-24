@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kookyapps.gpstankertracking.Activity.FirstActivity;
 import com.kookyapps.gpstankertracking.Activity.MainActivity;
@@ -51,10 +52,8 @@ public class RequestList extends Fragment {
     Context context;
     SwipeRefreshLayout refreshLayout;
     ArrayList<BookingListModal> requestlist;
-
-
+    boolean showRequest = true;
     ArrayList<BookingListModal> tripList;
-
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
     private final int PAGE_START  = 1;
@@ -65,29 +64,34 @@ public class RequestList extends Fragment {
     private boolean isLastPage = false;
     private boolean isLoading = false;
     boolean isListNull = true;
+    boolean isRefresh = true;
 
     public RequestList(Context context) {
-        // Required empty public constructor
         this.context = context;
+    }
+    public RequestList(){
+        this.context = getActivity().getApplicationContext();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View root =inflater.inflate(R.layout.fragment_request_list, container, false);
-
         recyclerView = (RecyclerView)root.findViewById(R.id.rv_fg_reqstlist);
         progressBar = (RelativeLayout) root.findViewById(R.id.fg_request_progresbar);
         refreshLayout=(SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
-
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //refreshLayout.setRefreshing(false);
-                tripList.clear();
-
-                mAdapter.clearAll();
+                if(SessionManagement.getUserStatus(context).equals(Constants.IS_ONLINE)){
+                    showRequest = true;
+                }else{
+                    showRequest = false;
+                }
+                /*if(tripList!=null)
+                    tripList.clear();
+                if(mAdapter!=null)
+                    mAdapter.clearAll();*/
                 requestlistApiCalling();
             }
         });
@@ -95,8 +99,6 @@ public class RequestList extends Fragment {
                 getResources().getColor(android.R.color.holo_green_dark),
                 getResources().getColor(android.R.color.holo_orange_dark),
                 getResources().getColor(android.R.color.holo_blue_dark));
-
-
         noRequest=(TextView)root.findViewById(R.id.tv_requestlist_nodata);
         mAdapter = new RequestListAdapter(context,getActivity(), Constants.REQUEST_INIT);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -120,47 +122,58 @@ public class RequestList extends Fragment {
             public int getTotalPageCount() {
                 return TOTAL_PAGES;
             }
-
             @Override
             public boolean isLastPage() {
                 return isLastPage;
             }
-
             @Override
             public boolean isLoading() {
                 return isLoading;
             }
         });
-
-
+        if(SessionManagement.getUserStatus(context).equals(Constants.IS_ONLINE)){
+            showRequest = true;
+        }else{
+            showRequest = false;
+        }
         requestlistApiCalling();
         return root;
-
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-        if (tripList!=null)
-        {
-        tripList.clear();
-        mAdapter.clearAll();
-        requestlistApiCalling();
+        if(SessionManagement.getUserStatus(context).equals(Constants.IS_ONLINE)){
+            showRequest = true;
+        }else{
+            showRequest = false;
         }
+        requestlistApiCalling();
+        /*if (tripList!=null) {
+            tripList.clear();
+            mAdapter.clearAll();
+
+        }*/
+        super.onResume();
     }
 
     private void requestlistApiCalling(){
-        JSONObject jsonBodyObj = new JSONObject();
-        try{
-            GETAPIRequest getapiRequest=new GETAPIRequest();
-            String url = URLs.BASE_URL+URLs.REQUEST_LIST+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(getapiRequest));
-            String token = SessionManagement.getUserToken(getContext());
-            HeadersUtil headparam = new HeadersUtil(token);
-            getapiRequest.request(getActivity().getApplicationContext(),fetchListener,url,headparam,jsonBodyObj);
-            }catch (Exception e){
-            e.printStackTrace();
+        if(!showRequest){
+            Toast.makeText(context,"You are in offline mode",Toast.LENGTH_LONG).show();
+            setRecyclerView();
+            refreshLayout.setRefreshing(false);
+        }else {
+            JSONObject jsonBodyObj = new JSONObject();
+            try {
+                GETAPIRequest getapiRequest = new GETAPIRequest();
+                String url = URLs.BASE_URL + URLs.REQUEST_LIST + "?page_size=" + String.valueOf(page_size) + "&page=" + String.valueOf(PAGE_START);
+                Log.i("url", String.valueOf(url));
+                Log.i("Request", String.valueOf(getapiRequest));
+                String token = SessionManagement.getUserToken(getContext());
+                HeadersUtil headparam = new HeadersUtil(token);
+                getapiRequest.request(getActivity().getApplicationContext(), fetchListener, url, headparam, jsonBodyObj);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -173,7 +186,10 @@ public class RequestList extends Fragment {
                 if (data != null) {
                     refreshLayout.setRefreshing(false);
                     if (data.getInt("error")==0) {
-                        tripList=new ArrayList<>();
+                        if(tripList==null)
+                            tripList=new ArrayList<>();
+                        else
+                            tripList.clear();
                         JSONArray array = data.getJSONArray("data");
                         totaltxnCount = data.getInt("total");
                         if (totaltxnCount > page_size) {
@@ -184,7 +200,6 @@ public class RequestList extends Fragment {
                             }
                         }
                         if(array!=null) {
-                            isListNull = false;
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
@@ -238,22 +253,20 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data in pick_up ", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
-                                if (distance != null) {
-                                    tdmod.setDistance(distance.getString("text"));
-                                } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-
-
                                 tripList.add(tdmod);
                             }
                         }
                         else {
-                           noRequest.setText("No Request Found");
+                           noRequest.setText("No Request");
                         }
                         Log.d("RequestList:", data.toString());
+                        if(tripList!=null){
+                            if(tripList.size()!=0)
+                                isListNull = false;
+                        }
                         setRecyclerView();
+                        if(mAdapter!=null)
+                            mAdapter.clearAll();
                         mAdapter.addAll(tripList);
                         if (currentPage < TOTAL_PAGES)
                             mAdapter.addLoadingFooter();
@@ -398,16 +411,27 @@ public class RequestList extends Fragment {
 
 
     public void setRecyclerView(){
-        if(isListNull){
+        if(SessionManagement.getUserStatus(context).equals(Constants.IS_OFFLINE)){
             progressBar.setVisibility(View.GONE);
             noRequest.setVisibility(View.VISIBLE);
+            noRequest.setText("Offline Mode");
             recyclerView.setVisibility(View.GONE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-            noRequest.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+        }else {
+            if (isListNull) {
+                progressBar.setVisibility(View.GONE);
+                noRequest.setVisibility(View.VISIBLE);
+                noRequest.setText("No Requests");
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.GONE);
+                noRequest.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
 
+    public void requestReload(){
+        onResume();
+    }
 }

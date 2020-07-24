@@ -18,14 +18,14 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:id="@+id/rv_fg_bookinglist"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <TextView
         android:id="@+id/tv_bookinglist_nodata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Bookings Found"
+        android:text="No Bookings"
         android:gravity="center"
         android:visibility="gone"
         android:layout_gravity="center"/>

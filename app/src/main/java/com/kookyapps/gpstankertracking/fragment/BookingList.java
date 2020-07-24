@@ -17,9 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.google.gson.JsonObject;
-import com.kookyapps.gpstankertracking.Adapters.BookingListAdapter;
 import com.kookyapps.gpstankertracking.Adapters.RequestListAdapter;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
@@ -49,7 +46,7 @@ public class BookingList extends Fragment {
     TextView noBooking;
     Context context;
     SwipeRefreshLayout refreshLayout;
-    ArrayList<BookingListModal> requestlist;
+    ArrayList<BookingListModal> requestlist=null;
     private RequestListAdapter mAdapter;
     LinearLayoutManager mLayoutManager;
     private int totalNotificationCount;
@@ -70,6 +67,9 @@ public class BookingList extends Fragment {
     public BookingList(Context context) {
         // Required empty public constructor
         this.context = context;
+    }
+    public BookingList(){
+        this.context = getActivity().getApplicationContext();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,7 +119,6 @@ public class BookingList extends Fragment {
             public void onRefresh() {
                /* refreshLayout.setRefreshing(false);*/
                 requestlist.clear();
-
                 mAdapter.clearAll();
                 bookinglistApiCalling();
             }
@@ -137,13 +136,13 @@ public class BookingList extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (requestlist!=null) {
-            requestlist.clear();
-            mAdapter.clearAll();
-            progressBar.setVisibility(View.VISIBLE);
+        /*if (requestlist!=null) {
+            //requestlist.clear();
+            //mAdapter.clearAll();
+            //progressBar.setVisibility(View.VISIBLE);
             bookinglistApiCalling();
-
-        }
+        }*/
+        bookinglistApiCalling();
     }
 
 public void bookinglistApiCalling(){
@@ -151,14 +150,12 @@ public void bookinglistApiCalling(){
     try {
         GETAPIRequest getapiRequest = new GETAPIRequest();
         String url = URLs.BASE_URL+URLs.BOOKING_LIST+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
-
         Log.i("url", String.valueOf(url));
         Log.i("Request", String.valueOf(getapiRequest));
         String token = SessionManagement.getUserToken(getActivity());
         HeadersUtil headparam = new HeadersUtil(token);
         //getapiRequest.request(getActivity(),bookinglistListner,url,headparam,jsonBodyObj);
         getapiRequest.request(getActivity().getApplicationContext(),bookinglistListner,url,headparam,jsonBodyObj);
-
     }catch (Exception e){
         e.printStackTrace();
     }
@@ -169,9 +166,11 @@ public void bookinglistApiCalling(){
             try {
                 if (data!=null){
                     refreshLayout.setRefreshing(false);
-
                     if (data.getInt("error") == 0) {
-                        requestlist=new ArrayList<>();
+                        if(requestlist==null)
+                            requestlist=new ArrayList<>();
+                        else
+                            requestlist.clear();
                         //ArrayList<BookingListModal> tripList=new ArrayList<>();
                         JSONArray array = data.getJSONArray("data");
 
@@ -185,7 +184,7 @@ public void bookinglistApiCalling(){
                         }
 
                         if(array!=null) {
-                            isListNull = false;
+                            //isListNull = false;
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
@@ -249,10 +248,16 @@ public void bookinglistApiCalling(){
                                 requestlist.add(tdmod);
                             }
                         }else {
-                            noBooking.setText("No Booking Found");
+                            noBooking.setText("No Booking");
                         }
                         Log.d("RequestList:", data.toString());
+                        if(requestlist!=null){
+                            if(requestlist.size()!=0)
+                                isListNull = false;
+                        }
                         setRecyclerView();
+                        if(mAdapter!=null)
+                            mAdapter.clearAll();
                         mAdapter.addAll(requestlist);
                         if (currentPage < TOTAL_PAGES)
                             mAdapter.addLoadingFooter();
@@ -405,6 +410,10 @@ public void bookinglistApiCalling(){
             noBooking.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void bookingReload(){
+        onResume();
     }
 }
 

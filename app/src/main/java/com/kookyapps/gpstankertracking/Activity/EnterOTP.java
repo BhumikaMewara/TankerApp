@@ -13,11 +13,8 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.Editable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,10 +32,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.Modal.SnappedPoint;
 import com.kookyapps.gpstankertracking.R;
@@ -85,10 +79,6 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
     JSONObject finalsnap;
     private int OFFSET=0;
     private final int PAGINATION_OVERLAP = 3,PAGE_SIZE = 70;
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -413,26 +403,9 @@ private  void validateOTP(){
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            if(Constants.travelled_path1==null) {
-                if (SharedPrefUtil.hasKey(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH)) {
-                    if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))) {
-                        Gson gson = new Gson();
-                        String json = SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG, Constants.SHARED_ONGOING_TRAVELLED_PATH);
-                        Type type = new TypeToken<ArrayList<Location>>() {
-                        }.getType();
-                        Constants.travelled_path1 = gson.fromJson(json, type);
-                        SharedPrefUtil.deletePreference(EnterOTP.this, Constants.SHARED_PREF_TRIP_TAG);
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
         // clear the notification area when the app is opened
-
         if(SessionManagement.getLanguage(EnterOTP.this).equals(Constants.HINDI_LANGUAGE)) {
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else {

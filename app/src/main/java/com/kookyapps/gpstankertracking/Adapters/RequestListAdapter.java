@@ -2,22 +2,15 @@ package com.kookyapps.gpstankertracking.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Activity.RequestDetails;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
-import com.kookyapps.gpstankertracking.Utils.Constants;
-import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +53,6 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
         ConstraintLayout itemlayout;
 
         public BookingViewHolder(View view) {
-
             super(view);
             bookingid = (TextView) view.findViewById(R.id.tv_bookingitem_bookingid);
             distance = (TextView) view.findViewById(R.id.tv_bookingitem_distance);
@@ -69,24 +61,22 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
             toaddress = (TextView) view.findViewById(R.id.tv_bookingitem_tolocation);
             totime = (TextView) view.findViewById(R.id.tv_bookingitem_totime);
             bookingactiontext=(TextView)view.findViewById(R.id.tv_bookingitem_viewaction) ;
-            /*itemlayout = (ConstraintLayout)view.findViewById(R.id.cl_triplist_itemlayout);
-            itemlayout.setOnClickListener(this);*/
             bookingview = (RelativeLayout) view.findViewById(R.id.rl_bookingitem_view);
-
             bookingview.setOnClickListener(this);
             bookingactiontext.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-          /*  switch (view.getId()) {
-
+            switch (view.getId()) {
                 case R.id.tv_bookingitem_viewaction:
                     Intent i = new Intent(context, RequestDetails.class);
                     i.putExtra("init_type", init_type);
+                    i.putExtra("booking_id", requestlist.get(getAdapterPosition()).getBookingid());
                     context.startActivity(i);
+                    activity.finish();
                     break;
-            }*/
+            }
         }
     }
 
@@ -117,9 +107,6 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
         final BookingListModal current = requestlist.get(position);
 
         switch (getItemViewType(position)){
-
-
-
             case ITEM:
                 final BookingViewHolder mVH = (BookingViewHolder)holder;
                 //mVH.bookingid.setText(requestlist.get(position).getBookingid());
@@ -129,7 +116,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
                 mVH.totime.setText(requestlist.get(position).getTotime());
                 mVH.fromaddress.setText(requestlist.get(position).getFromaddress());
                 mVH.toaddress.setText(requestlist.get(position).getToaddress());
-                mVH.bookingactiontext.setOnClickListener(new View.OnClickListener() {
+                /*mVH.bookingactiontext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent i = new Intent(context, RequestDetails.class);
@@ -138,7 +125,7 @@ public class RequestListAdapter  extends RecyclerView.Adapter<RecyclerView.ViewH
                         context.startActivity(i);
                         
                     }
-                });
+                });*/
                 break;
             case LOADING:
                 break;

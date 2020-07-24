@@ -49,22 +49,17 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class TripComplete extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
+public class TripComplete extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback {
 
     TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText,distanceTravelledTitleText;
-    //ImageView calltous;
-    ImageView menunotification;
-    RelativeLayout back,noti,bottom,notificationCountLayout;
+    RelativeLayout back,bottom;
     String init_type,bkngid,can_accept,can_end,can_start;
     BookingListModal blmod;
-    static String notificationCount;
     Bundle b;
     SupportMapFragment mapFragment;
     RelativeLayout maplayout;
     ArrayList<LatLng>finalpath = null;
     GoogleMap mMap;
-
-    BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,87 +67,38 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_trip_complete);
         initViews();
         bookingByIdApiCalling();
-
     }
-    public void initViews(){
-
-            init_type = getIntent().getExtras().getString("init_type");
-           // bkngid = getIntent().getExtras().getString("booking_id");
-            blmod= (BookingListModal) getIntent().getExtras().get("Bookingdata");
-            pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
-            back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
-            noti=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
-
-            notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-            notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
-            maplayout = (RelativeLayout)findViewById(R.id.rl_tripComplete_map);
-            mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_tripcomplete_map);
-
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
-        if(noticount<=0){
-            clearNotificationCount();
-        }else{
-            notificationCountText.setText(String.valueOf(noticount));
-            notificationCountLayout.setVisibility(View.VISIBLE);
-        }
-
-
+    public void initViews() {
+        init_type = getIntent().getExtras().getString("init_type");
+        // bkngid = getIntent().getExtras().getString("booking_id");
+        blmod = (BookingListModal) getIntent().getExtras().get("Bookingdata");
+        pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
+        back = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
+        notificationCountText = (TextView) findViewById(R.id.tv_toolbar_notificationcount);
+        maplayout = (RelativeLayout) findViewById(R.id.rl_tripComplete_map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fg_tripcomplete_map);
         bookingid = (TextView) findViewById(R.id.tv_tripcomplete_bookingid);
-            distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
-            pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
-            drop = (TextView) findViewById(R.id.tv_tripcomplete_drop);
-            controller_name = (TextView) findViewById(R.id.tv_tripcomplete_drivername);
-            contact_no = (TextView) findViewById(R.id.tv_tripcomplete_contact);
-            message = (TextView) findViewById(R.id.tv_tripcomplete_message);
-            distanceTravelledTitleText=(TextView)findViewById(R.id.tv_tripcomplete_distance_title);
-            bottom=(RelativeLayout)findViewById(R.id.rl_bottomLayout_text);
-            back.setOnClickListener(this);
-            noti.setOnClickListener(this);
-            bottom.setOnClickListener(this);
-
-            pagetitle.setText(getString(R.string.trip_complete));
-
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripComplete.this));
-                    setNotificationCount(count+1,false);
-                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
-                    if(SessionManagement.getLanguage(TripComplete.this).equals(Constants.HINDI_LANGUAGE)){
-                        setAppLocale(Constants.HINDI_LANGUAGE);
-                        finish();
-                    }else{
-                        setAppLocale(Constants.ENGLISH_LANGUAGE);
-                        finish();
-                        startActivity(getIntent());
-                    }
-                }
-            }
-        };
-
-
+        distancetext = (TextView) findViewById(R.id.tv_tripcomplete_distance);
+        pickup = (TextView) findViewById(R.id.tv_tripcomplete_pickup);
+        drop = (TextView) findViewById(R.id.tv_tripcomplete_drop);
+        controller_name = (TextView) findViewById(R.id.tv_tripcomplete_drivername);
+        contact_no = (TextView) findViewById(R.id.tv_tripcomplete_contact);
+        message = (TextView) findViewById(R.id.tv_tripcomplete_message);
+        distanceTravelledTitleText = (TextView) findViewById(R.id.tv_tripcomplete_distance_title);
+        bottom = (RelativeLayout) findViewById(R.id.rl_bottomLayout_text);
+        back.setOnClickListener(this);
+        bottom.setOnClickListener(this);
+        pagetitle.setText(getString(R.string.trip_complete));
     }
     @Override
     public void onClick(View view) {
         Intent i;
         switch (view.getId()){
             case R.id.rl_toolbarmenu_backimglayout:
-                back.setClickable(false);
-                i=new Intent(TripComplete.this,FirstActivity.class);
-                startActivity(i);
-                finish();
-                break;
-            case R.id.iv_tb_with_bck_arrow_notification:
-                i = new Intent(TripComplete.this,Notifications.class);
-                startActivity(i);
+                onBackPressed();
                 break;
             case R.id.rl_bottomLayout_text:
-                i=new Intent(this,FirstActivity.class);
-                startActivity(i);
-                finish();
+                onBackPressed();
                 break;
         }
     }
@@ -334,101 +280,20 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-
-    public void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SessionManagement.getNotificationCount(TripComplete.this);
-        if(Integer.parseInt(notificationCount)!=count) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                notificationCountText.setText(String.valueOf(count));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-            SharedPrefUtil.setPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-            if(b2)
-                SharedPrefUtil.setPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
-        }
-    }
-    public void newNotification(){
-        Log.i("newNotification","Notification");
-        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(TripComplete.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        setNotificationCount(count+1,false);
-    }
-    public void clearNotificationCount(){
-        notificationCountText.setText("");
-        notificationCountLayout.setVisibility(View.GONE);
-    }
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
     @Override
     protected void onResume() {
         super.onResume();
-        // register new push message receiver
-        // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
-        // clear the notification area when the app is opened
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.LANGUAGE_CHANGE));
-        //change the language when prompt
-        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
-                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
-        boolean b1 = sharedCount != viewCount;
-        boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if (b2) {
-            newNotification();
-        } else if (b1) {
-            if(sharedCount<=0){
-                notificationCountText.setText("");
-                notificationCountLayout.setVisibility(View.GONE);
-            }else if (sharedCount < 100 && sharedCount > 0) {
-                notificationCountText.setText(String.valueOf(sharedCount));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-        }
     }
-
-
-    public void setLocale(String lang) {
-        Locale myLocale = new Locale(lang);
-        Resources res = getResources();
-        DisplayMetrics dm = res.getDisplayMetrics();
-        Configuration conf = res.getConfiguration();
-        conf.locale = myLocale;
-        res.updateConfiguration(conf, dm);
-    }
-
-    private void setAppLocale(String localeCode){
-        Resources resources = getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        Configuration config = resources.getConfiguration();
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
-            config.setLocale(new Locale(localeCode.toLowerCase()));
-        } else {
-            config.locale = new Locale(localeCode.toLowerCase());
-        }
-        resources.updateConfiguration(config, dm);
-    }
-
 
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
         Intent i = new Intent(this, FirstActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
     }

@@ -2,11 +2,6 @@ package com.kookyapps.gpstankertracking.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +9,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.kookyapps.gpstankertracking.Activity.BookingDetails;
 import com.kookyapps.gpstankertracking.Activity.RequestDetails;
 import com.kookyapps.gpstankertracking.Activity.TripDetails;
 import com.kookyapps.gpstankertracking.Modal.TripDetailsModal;
 import com.kookyapps.gpstankertracking.R;
-import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,8 +148,6 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 mVH.totime.setText(tripList.get(position).getTotime());
                 mVH.from_address.setText(tripList.get(position).getFromlocation());
                 mVH.to_address.setText(tripList.get(position).getTolocation());
-
-
                 mVH.itemlayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

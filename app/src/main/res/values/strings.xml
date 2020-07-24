@@ -26,7 +26,8 @@
     <!-- Page Titles-->
     <string name="trip_complete">Trip Complete</string>
     <string name="trip_details">Trip Details</string>
-    <string name="trips">Trips</string>
+    <string name="trips">Completed Trips</string>
+    <string name="cancel_trips">Cancelled Trips</string>
     <string name="language">Language</string>
     <string name="logout">LogOut</string>
     <string name="enter_otp">Enter OTP</string>

@@ -62,13 +62,15 @@ public class NotificationsAdapter extends RecyclerView.Adapter<RecyclerView.View
                     if(context instanceof Notifications && !readCalled) {
                         readCalled = true;
                         readPos = getAdapterPosition();
-                        String type = notificationlist.get(readPos).getNotificationtype();
-                        if(type.equals("BOOKING_REQUEST")) {
-                            detail_init_type = Constants.REQUEST_INIT;
-                        } else {
-                            detail_init_type = Constants.BOOKING_INIT;
+                        if (readPos >= 0) {
+                            String type = notificationlist.get(readPos).getNotificationtype();
+                            if (type.equals("BOOKING_REQUEST")) {
+                                detail_init_type = Constants.REQUEST_INIT;
+                            } else {
+                                detail_init_type = Constants.BOOKING_INIT;
+                            }
+                            ((Notifications) context).readNotificationApiCall(notificationlist.get(getAdapterPosition()).getNotifiactionid());
                         }
-                        ((Notifications) context).readNotificationApiCall(notificationlist.get(getAdapterPosition()).getNotifiactionid());
                     }
                     break;
             }

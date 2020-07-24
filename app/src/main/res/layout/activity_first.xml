@@ -184,9 +184,42 @@
                     android:text="@string/trips"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"/>
-
-
-
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/colordark_grey"
+                android:visibility="visible" />
+            <LinearLayout
+                android:id="@+id/lh_first_cancellayout"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="start"
+                android:gravity="start">
+                <ImageView
+                    android:id="@+id/iv_first_cancelitem"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/trip_menu"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="start"/>
+                <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
+                    android:id="@+id/tv_drawer_cancelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="start"
+                    android:text="@string/cancel_trips"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"

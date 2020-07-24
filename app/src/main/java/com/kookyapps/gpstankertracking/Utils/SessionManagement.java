@@ -39,11 +39,9 @@ public class SessionManagement {
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, NAME, username);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, USER_TOKEN, token);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, LANGUAGE, language);
-        SharedPrefUtil.setPreferences(con, Constants.SHARED_PREF_LOGIN_TAG, LOCATION, location);
+        SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, LOCATION, location);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, IS_ONLINE, status);
         SharedPrefUtil.setPreferences(con, Constants.SHARED_PREF_NOTICATION_TAG, SHARED_NOTIFICATION_COUNT_KEY, noticount);
-
-
     }
 
     public static void logout(FetchDataListener fetchDataListener, Context con) {
@@ -131,6 +129,4 @@ public class SessionManagement {
     public static void setNotificationCount(Context con, String count) {
         SharedPrefUtil.setPreferences(con, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY, count);
     }
-
-
 }

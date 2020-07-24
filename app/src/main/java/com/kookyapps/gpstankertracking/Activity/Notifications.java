@@ -53,11 +53,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
     RelativeLayout menuback;
     TextView pagetitle,nodata;
     ProgressBar notificationprogress;
-
-    RelativeLayout toolbar_notification,noticountlayout,menunotification;
     BroadcastReceiver mRegistrationBroadcastReceiver;
-    TextView notiCount;
-    static String notificationCount;
     static Context context;
 
     private final int PAGE_START  = 1;
@@ -93,7 +89,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
 
 
     public  void initViews() {
-
         notificationlistview = (RecyclerView)findViewById(R.id.rv_notification);
         notificationlistview.setVisibility(View.GONE);
         nodata = (TextView)findViewById(R.id.tv_notificationitem_nodata);
@@ -101,17 +96,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
         context=this;
-
-        menunotification = (RelativeLayout) findViewById(R.id.rl_toolbar_with_back_notification);
-        noticountlayout = (RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        notiCount = (TextView)findViewById(R.id.tv_toolbar_notificationcount);
-
         pagetitle = (TextView)findViewById(R.id.tb_with_bck_arrow_title);
         pagetitle.setText(R.string.notifications);
-
         notificationprogress = (ProgressBar)findViewById(R.id.pg_notification);
         notificationprogress.setVisibility(View.VISIBLE);
-
         adapter = new NotificationsAdapter(Notifications.this,Constants.NOTIFICATION_INIT);
         mLayoutManager = new LinearLayoutManager(this);
         notificationlistview.setLayoutManager(mLayoutManager);
@@ -130,39 +118,26 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                     }
                 }, 1000);
             }
-
             @Override
             public int getTotalPageCount() {
                 return TOTAL_PAGES;
             }
-
             @Override
             public boolean isLastPage() {
                 return isLastPage;
             }
-
             @Override
             public boolean isLoading() {
                 return isLoading;
             }
         });
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
-        if(noticount<=0){
-            clearNotificationCount();
-        }else{
-            notiCount.setText(String.valueOf(noticount));
-            noticountlayout.setVisibility(View.VISIBLE);
-        }
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(Notifications.this));
-                    setNotificationCount(count+1,false);
-                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
+                    reloadNotification();
+                }/*else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(Notifications.this).equals(Constants.HINDI_LANGUAGE)){
                         Locale locale = new Locale(Constants.HINDI_LANGUAGE);
                         Locale.setDefault(locale);
@@ -176,14 +151,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                         config.locale = locale;
                         getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
                     }
-                }
+                }*/
             }
         };
-
-
         createNotificationData();
-
-
     }
     @Override
     protected void onStart() {
@@ -198,7 +169,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.rl_toolbarmenu_backimglayout:
                 onBackPressed();
-
                 break;
         }
     }
@@ -247,7 +217,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                         }
                         if(response.has("unread_count")){
                             SessionManagement.setNotificationCount(Notifications.this,response.getString("unread_count"));
-                            notiCount.setText(response.getString("unread_count"));
+                            //notiCount.setText(response.getString("unread_count"));
                         }
                         if(array!=null) {
                             if (array.length() != 0) {
@@ -425,7 +395,7 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
                     if (data.getInt("error") == 0) {
                         String count = data.getString("unread_count");
                         SessionManagement.setNotificationCount(Notifications.this,count);
-                        notiCount.setText(count);
+                        //notiCount.setText(count);
                         SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,count);
                         adapter.setReadCalled(true);
                     }
@@ -454,34 +424,6 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SessionManagement.getNotificationCount(context);
-        if(Integer.parseInt(notificationCount)!=count) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                notiCount.setText(String.valueOf(count));
-                noticountlayout.setVisibility(View.VISIBLE);
-            } else {
-                notiCount.setText("99+");
-                noticountlayout.setVisibility(View.VISIBLE);
-            }
-            SharedPrefUtil.setPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            reloadNotification();
-        }
-    }
-    public void clearNotificationCount(){
-        notiCount.setText("");
-        noticountlayout.setVisibility(View.GONE);
-    }
-
-    public void newNotification(){
-        Log.i("newNotification","Notification");
-        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(context,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        setNotificationCount(count+1,false);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -490,27 +432,10 @@ public class Notifications extends AppCompatActivity implements View.OnClickList
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.LANGUAGE_CHANGE));
+        /*LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));*/
         //change the language of the the app when prompt
-        int sharedCount =Integer.parseInt(SessionManagement.getNotificationCount(this));
-        String viewCount =notiCount.getText().toString();
-        boolean b1 = sharedCount!=Integer.parseInt(viewCount);
-        boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if(b2){
-            newNotification();
-        }else if (b1){
-            if(sharedCount<=0){
-                notiCount.setText("");
-                noticountlayout.setVisibility(View.GONE);
-            }else if (sharedCount < 100 && sharedCount>0) {
-                notiCount.setText(String.valueOf(sharedCount));
-                noticountlayout.setVisibility(View.VISIBLE);
-            } else {
-                notiCount.setText("99+");
-                noticountlayout.setVisibility(View.VISIBLE);
-            }
-        }
+
     }
     @Override
     protected void onPause() {

@@ -35,7 +35,6 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity android:name=".Activity.Map1" />
-        <activity android:name=".CameraActivity" />
         <activity android:name=".Activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +44,6 @@
         </activity>
         <activity android:name=".Activity.TripDetails" />
         <activity android:name=".Activity.TripComplete" />
-        <activity android:name=".Activity.BookingDetails" />
         <activity android:name=".Activity.EnterOTP" />
         <activity android:name=".Activity.TankerStartingPic" />
         <activity android:name=".Activity.RequestDetails" />

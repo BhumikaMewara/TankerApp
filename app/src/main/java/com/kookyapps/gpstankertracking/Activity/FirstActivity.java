@@ -86,7 +86,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     ViewPager viewPager;
-    LinearLayout l ,tripLayout ,logoutLayout;
+    LinearLayout l ,tripLayout ,logoutLayout,cancelLayout;
     RelativeLayout r ,toolbarNotiCountLayout,toolbarmenuLayout,notificationLayout;
     TextView fullname,username,trip,language,logut,toolBarTitle,pagetitle,bookind_id,distance,from,to,view;
     ImageView tripImg,languageImg,logoutImg,flagImg,toolBarImgMenu,toolBarImgNotification;
@@ -94,6 +94,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     Button rqstbtn , bkngbtn;
     static FragmentManager fragmentManager;
     ViewPagerAdapter adapter;
+    int viewpos=0;
      String [] tabTitle ;
     Locale locale;
     Bundle b;
@@ -126,9 +127,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else{
             setAppLocale(Constants.ENGLISH_LANGUAGE);
-
         }
-
         onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
         if(SessionManagement.getUserStatus(FirstActivity.this).equals(Constants.IS_ONLINE)){
             onlineSwitch.setChecked(true);
@@ -140,35 +139,26 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             stringLongitude = String.valueOf(gpsTracker.longitude);
         }else
         {
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
         onlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 if (isChecked) {
                     SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_ONLINE);
-                    updateLcationApiCalling(Constants.IS_ONLINE);
+                    if(viewpos==0)
+                        ((RequestList)adapter.getItem(viewpos)).requestReload();
                 } else {
                     SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_OFFLINE);
-                    updateLcationApiCalling(Constants.IS_OFFLINE);
+                    if(viewpos==0)
+                        ((RequestList)adapter.getItem(viewpos)).requestReload();
+                    //updateLcationApiCalling(Constants.IS_OFFLINE);
                 }
             }
 
         });
-        String status = SessionManagement.getUserStatus(FirstActivity.this);
-        if (status.equals("1")){
-            onlineSwitch.setChecked(true);
-            updateLcationApiCalling(Constants.IS_ONLINE);
-        }else{
-            onlineSwitch.setChecked(false);
-            updateLcationApiCalling(Constants.IS_OFFLINE);
-        }
-
+        updateLcationApiCalling(SessionManagement.getUserStatus(FirstActivity.this));
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
@@ -207,6 +197,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         r=(RelativeLayout)findViewById(R.id.rl_first_insideDL);
         l=(LinearLayout)findViewById(R.id.lv_first_drawer_firstLayout);
         tripLayout=(LinearLayout) findViewById(R.id. lh_first_triplayout);
+        cancelLayout=(LinearLayout)findViewById(R.id.lh_first_cancellayout);
         logoutLayout=(LinearLayout)findViewById(R.id.lh_first_logoutLayout);
         rqstbtn= (Button)findViewById(R.id.btn_first_rqstbtn);
         bkngbtn= (Button)findViewById(R.id.btn_first_bookingbtn);
@@ -238,30 +229,26 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                     if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
                         languageChangeApi();
-                        finish();
                         startActivity(getIntent());
-
+                        finish();
                     }else{
-                         setAppLocale(Constants.ENGLISH_LANGUAGE);
+                        setAppLocale(Constants.ENGLISH_LANGUAGE);
                         languageChangeApi();
-                        finish();
                         startActivity(getIntent());
+                        finish();
                     }
                 }
             }
         };
-             pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-
-
-
+        pagetitle = (TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
         tripLayout.setOnClickListener(this);
+        cancelLayout.setOnClickListener(this);
         logoutLayout.setOnClickListener(this);
         rqstbtn.setOnClickListener(this);
         bkngbtn.setOnClickListener(this);
         viewPager = (ViewPager)findViewById(R.id.vp_first);
         fragmentManager = getSupportFragmentManager();
         setupViewPager(viewPager);
-
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -272,13 +259,17 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
                 //pagetitle.setText(tabTitle[position]);
                 if(position==0){
+                    viewpos =0;
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
                     pagetitle.setText(getString(R.string.request_list));
+                    ((RequestList)adapter.getItem(position)).requestReload();
                 }else{
+                    viewpos=1;
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
                     bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
                     pagetitle.setText(getString(R.string.booking_list));
+                    ((BookingList)adapter.getItem(position)).bookingReload();
                 }
             }
             @Override
@@ -307,14 +298,13 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             {
                 if (isTouched) {
                     isTouched = false;
-
                     if (isChecked) {
                         SessionManagement.setLanguage(FirstActivity.this, Constants.HINDI_LANGUAGE);
                     }else {
                         SessionManagement.setLanguage(FirstActivity.this, Constants.ENGLISH_LANGUAGE);
                     }
                 }
-                    showlanguage();
+                showlanguage();
                 }
 
         });
@@ -353,6 +343,13 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 }, RequestPermissionCode);
 
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setCurrentTab();
+        super.onNewIntent(intent);
+    }
+
     // Calling override method.
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -377,21 +374,18 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                         stringLongitude = String.valueOf(gpsTracker.longitude);
 
 
-                        String status = SessionManagement.getUserStatus(FirstActivity.this);
+                        /*String status = SessionManagement.getUserStatus(FirstActivity.this);
                         if (status.equals("1")){
                             onlineSwitch.setChecked(true);
                             updateLcationApiCalling(Constants.IS_ONLINE);
                         }else{
                             onlineSwitch.setChecked(false);
                             updateLcationApiCalling(Constants.IS_OFFLINE);
-                        }
-
-
+                        }*/
                         Toast.makeText(FirstActivity.this, "Permission Granted", Toast.LENGTH_LONG).show();
                     }
                     else {
                         Toast.makeText(FirstActivity.this,"Permission Denied",Toast.LENGTH_LONG).show();
-
                     }
                 }
 
@@ -444,7 +438,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 if (data!=null){
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
-                        //Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FirstActivity.this, "Error while updating status", Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (JSONException e){
@@ -469,11 +463,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             int currentTab = b.getInt("curretTab", 0);
             viewPager.setCurrentItem(currentTab);
             if(currentTab==0){
-
-
                 rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
                 bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist));
-
             }else{
                 rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist));
                 bkngbtn.setBackground(getResources().getDrawable( R.drawable.bg_bookinglist_selected));
@@ -502,8 +493,11 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         Intent i ;
         switch (view.getId()){
             case R.id.lh_first_triplayout:
-                onBackPressed();
+                if (navdrawer.isDrawerOpen(GravityCompat.START)) {
+                    navdrawer.closeDrawer(GravityCompat.START);
+                }
                 i = new Intent(this, TripDetails.class);
+                i.putExtra("init_type",Constants.COMPLETED_TRIP);
                 startActivity(i);
                 break;
             case R.id.lh_first_logoutLayout:
@@ -520,6 +514,14 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 i = new Intent(this,Notifications.class);
                 startActivity(i);
                 break;
+            case R.id.lh_first_cancellayout:
+                if (navdrawer.isDrawerOpen(GravityCompat.START)) {
+                    navdrawer.closeDrawer(GravityCompat.START);
+                }
+                i = new Intent(this, TripDetails.class);
+                i.putExtra("init_type",Constants.CANCELLED_TRIP);
+                startActivity(i);
+
         }
     }
 
@@ -674,9 +676,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.LANGUAGE_CHANGE));
-        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
-                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        String sc = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY);
+        String vc = notificationCountText.getText().toString();
+        int sharedCount,viewCount;
+        if(sc.equals("")){
+            sharedCount=0;
+        }else{
+            sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
+                    Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
+        }
+        if(vc.equals("")){
+            viewCount=0;
+        }else{
+            viewCount = Integer.parseInt(notificationCountText.getText().toString());
+        }
         boolean b1 = sharedCount != viewCount;
         boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if (b2) {
@@ -705,8 +718,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         if (navdrawer.isDrawerOpen(GravityCompat.START)) {
             navdrawer.closeDrawer(GravityCompat.START);
         }else {
-
-
             // Create the object of
             // AlertDialog Builder class
             AlertDialog.Builder builder
@@ -764,10 +775,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                                     dialog.cancel();
                                 }
                             });
-
             // Create the Alert dialog
             AlertDialog alertDialog = builder.create();
-
             // Show the Alert Dialog box
             alertDialog.show();
         }

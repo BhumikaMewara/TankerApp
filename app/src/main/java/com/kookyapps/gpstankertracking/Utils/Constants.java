@@ -19,11 +19,12 @@ public class Constants {
     public static final String REQUEST_INIT= "request_init";
     public static final String NOTIFICATION_INIT= "notification_init";
     public static final String SPLASH_INIT= "splash_init";
-    public static final String TRIP_INIT= "trip_init";
-    public static final String COMPLETED_CALL="Completed";
+    //public static final String TRIP_INIT= "trip_init";
+    //public static final String COMPLETED_CALL="Completed";
     public static final String TRIP_END_IMG="trip_end_img";
     public static final String BOOKING_INIT= "booking_init";
-    public static final String Trip = "trip";
+    public static final String COMPLETED_TRIP = "completed";
+    public static final String CANCELLED_TRIP = "cancelled";
 
 
 

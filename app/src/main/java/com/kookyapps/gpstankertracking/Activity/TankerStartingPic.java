@@ -445,6 +445,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                                     SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_DRIVER_ID,SessionManagement.getUserId(TankerStartingPic.this));
                                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     intent.putExtra("Bookingdata",blmod);
                                     Log.i("tankerBookingId",tankerbookingid.toString());
                                     intent.putExtra("tankerBookingId", tankerbookingid);

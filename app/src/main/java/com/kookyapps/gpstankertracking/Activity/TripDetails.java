@@ -56,19 +56,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class TripDetails extends AppCompatActivity implements View.OnClickListener {
-
-    DrawerLayout navdrawer;
-    ImageView toolbarmenu  ;
     ProgressBar tripDetProgressBar;
-    TextView nodata,pageTitle,trip,language,logutText,total_trip,totalKm,fullname,username,notificationCountText,date,time,bookingid,distance,from,to;
+    TextView nodata,pageTitle,total_trip,totalKm,notificationCountText,bookingid,distance,from,to;
     RecyclerView trip_details_listView;
     TripDetailsAdapter adapter;
     String s;
     Context context;
-    RelativeLayout notification ,back,notificationCountLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    LinearLayout l,logout,tripLayout;
-    ArrayList<TripDetailsModal>tripDetailList;
+    RelativeLayout back,distancelay;
     LinearLayoutManager mLayoutManager;
     Switch switch1;
    // TripListAdapter adapter;
@@ -80,15 +74,14 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     private boolean isLastPage = false;
     private boolean isLoading = false;
     boolean isListNull = true;
-    String init_type;
-    static String notificationCount;
-    BroadcastReceiver mRegistrationBroadcastReceiver;
-
+    String init_type="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
+        if(getIntent().hasExtra("init_type"))
+            init_type = getIntent().getStringExtra("init_type");
         initViews();
 //        createTrip();
 
@@ -97,6 +90,11 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
 
     public void initViews(){
+        distancelay = (RelativeLayout)findViewById(R.id.rl_trip_details_relativeView);
+        if(init_type.equals(Constants.COMPLETED_TRIP))
+            distancelay.setVisibility(View.VISIBLE);
+        else
+            distancelay.setVisibility(View.GONE);
         tripDetProgressBar = (ProgressBar) findViewById(R.id.pb_trip_details);
         total_trip=(TextView)findViewById(R.id.tv_trip_details_totalTrip_value) ;
         totalKm=(TextView)findViewById(R.id.tv_trip_details_totalKM_value);
@@ -106,59 +104,15 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         distance=findViewById(R.id.tv_trip_details_distance);
         from=findViewById(R.id.tv_trip_details_fromtitle);
         to=findViewById(R.id.tv_trip_details_totitle);
-
-
-
-       /* date=findViewById(R.id.tv_currentDay);
-        time=findViewById(R.id.tv_currentDate);*/
         back=(RelativeLayout)findViewById(R.id.rl_toolbarmenu_backimglayout);
         back.setOnClickListener(this);
         pageTitle=(TextView)findViewById(R.id.tb_with_bck_arrow_title);
-        pageTitle.setText(getString(R.string.trips));
-        notification=(RelativeLayout)findViewById(R.id.rl_toolbar_with_back_notification);
-        notification.setOnClickListener(this);
+        if(init_type.equals(Constants.COMPLETED_TRIP))
+            pageTitle.setText(getString(R.string.trips));
+        else
+            pageTitle.setText(getString(R.string.cancel_trips));
         trip_details_listView=(RecyclerView)findViewById(R.id.rv_trip_details);
-        notificationCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-        notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
-
-
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
-        if(noticount<=0){
-            clearNotificationCount();
-        }else{
-            notificationCountText.setText(String.valueOf(noticount));
-            notificationCountLayout.setVisibility(View.VISIBLE);
-        }
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    int count = Integer.parseInt(SessionManagement.getNotificationCount(TripDetails.this));
-                    setNotificationCount(count+1,false);
-                }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
-                    if(SessionManagement.getLanguage(TripDetails.this).equals(Constants.HINDI_LANGUAGE)){
-                        Locale locale = new Locale(Constants.HINDI_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                    }else{
-                        Locale locale = new Locale(Constants.ENGLISH_LANGUAGE);
-                        Locale.setDefault(locale);
-                        Configuration config = new Configuration();
-                        config.locale = locale;
-                        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-                    }
-                }
-            }
-        };
-
-
-
-        adapter = new TripDetailsAdapter(this,TripDetails.this,Constants.TRIP_INIT);
-
+        adapter = new TripDetailsAdapter(this,TripDetails.this,init_type);
         mLayoutManager = new LinearLayoutManager(this);
         trip_details_listView.setLayoutManager(mLayoutManager);
         trip_details_listView.setItemAnimator(new DefaultItemAnimator());
@@ -168,7 +122,6 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             protected void loadMoreItems() {
                 isLoading = true;
                 currentPage += 1;
-
                 // mocking network delay for API call
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -205,11 +158,6 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         Intent i ;
         switch (view.getId()){
-            case R.id.rl_toolbar_with_back_notification:
-                Intent intent;
-                intent = new Intent(TripDetails.this,Notifications.class);
-                startActivity(intent);
-                break;
             case R.id.rl_toolbarmenu_backimglayout:
               onBackPressed();
                 break;
@@ -221,9 +169,12 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
         JSONObject jsonBodyObj = new JSONObject();
         try {
-
                 GETAPIRequest getapiRequest = new GETAPIRequest();
-                String url = URLs.BASE_URL+URLs.TRIP_DETAILS+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
+                String url;
+                if(init_type.equals(Constants.COMPLETED_TRIP))
+                    url = URLs.BASE_URL+URLs.TRIP_DETAILS+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
+                else
+                    url = URLs.BASE_URL+URLs.CANCELLED_TRIP_DETAILS+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
 //                Log.i("Success Url", String.valueOf(url));
                 Log.i("url", String.valueOf(url));
                 Log.i("Request", String.valueOf(getapiRequest));
@@ -241,14 +192,8 @@ FetchDataListener tripListener= new FetchDataListener() {
         try {
             if (data != null) {
                 if (data.getInt("error")==0) {
-
-                    //TripDetailsModal tdmod = new TripDetailsModal();
-                    //tdmod.setTotaltrip(data.getString("total"));
                     total_trip.setText(data.getString("total"));
-                    //tdmod.setTotal_distance(data.getString("total_distance"));
                     totalKm.setText(data.getString("total_distance"));
-
-
                     ArrayList<TripDetailsModal> tripList=new ArrayList<>();
                     JSONArray array = data.getJSONArray("data");
                     totaltxnCount = data.getInt("total");
@@ -353,7 +298,11 @@ FetchDataListener tripListener= new FetchDataListener() {
         JSONObject jsonBodyObj = new JSONObject();
         try{
             GETAPIRequest getapiRequest=new GETAPIRequest();
-            String url = URLs.BASE_URL+URLs.TRIP_DETAILS+"?page_size="+page_size+"&page="+currentPage;
+            String url;
+            if(init_type.equals(Constants.COMPLETED_TRIP))
+                url = URLs.BASE_URL+URLs.TRIP_DETAILS+"?page_size="+page_size+"&page="+currentPage;
+            else
+                url = URLs.BASE_URL+URLs.CANCELLED_TRIP_DETAILS+"?page_size="+page_size+"&page="+currentPage;
             Log.i("url", String.valueOf(url));
             Log.i("Request", String.valueOf(getapiRequest));
             String token = SessionManagement.getUserToken(this);
@@ -494,77 +443,17 @@ FetchDataListener tripListener= new FetchDataListener() {
         }
     }
 
-
-    public void setNotificationCount(int count,boolean isStarted){
-        notificationCount = SessionManagement.getNotificationCount(TripDetails.this);
-
-        if(Integer.parseInt(notificationCount)!=count) {
-            notificationCount = String.valueOf(count);
-            if (count <= 0) {
-                clearNotificationCount();
-            } else if (count < 100) {
-                notificationCountText.setText(String.valueOf(count));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-            SharedPrefUtil.setPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,notificationCount);
-            boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-            if(b2)
-                SharedPrefUtil.setPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
-        }
-    }
-    public void newNotification(){
-        Log.i("newNotification","Notification");
-        int count = Integer.parseInt(SharedPrefUtil.getStringPreferences(TripDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        setNotificationCount(count+1,false);
-    }
-    public void clearNotificationCount(){
-        notificationCountText.setText("");
-        notificationCountLayout.setVisibility(View.GONE);
-    }
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
     @Override
     protected void onResume() {
         super.onResume();
-        // register new push message receiver
-        // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
-        // clear the notification area when the app is opened
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.LANGUAGE_CHANGE));
-        //change the language when prompt
-        int sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
-                Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
-        int viewCount = Integer.parseInt(notificationCountText.getText().toString());
-        boolean b1 = sharedCount != viewCount;
-        boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
-        if (b2) {
-            newNotification();
-        } else if (b1) {
-            if(sharedCount<=0){
-                notificationCountText.setText("");
-                notificationCountLayout.setVisibility(View.GONE);
-            }else if (sharedCount < 100 && sharedCount > 0) {
-                notificationCountText.setText(String.valueOf(sharedCount));
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            } else {
-                notificationCountText.setText("99+");
-                notificationCountLayout.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
     }
 }

@@ -108,14 +108,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         username = usernameET.getText().toString();
         password = passwordET.getText().toString();
         JSONObject jsonBodyObj = new JSONObject();
-
         try {
             jsonBodyObj.put("username",username);
             jsonBodyObj.put("password",password);
             jsonBodyObj.put("device_type", "a");
             String token= FirebaseInstanceId.getInstance().getToken();
-      //      String token = FirebaseInstanceId.getInstance().getToken();
-
             jsonBodyObj.put("device_token", token);
             POSTAPIRequest postapiRequest=new POSTAPIRequest();
             String url = URLs.BASE_URL+ URLs.SIGN_IN_URL;
@@ -131,15 +128,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FetchDataListener loginApiListener=new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject object) {
-            //RequestQueueService.cancelProgressDialog();
             try {
                 if (object != null) {
                     if (object.getInt("error")==0) {
-                        Log.i("Login", "Login Successfull");
+                        Log.i("Login", object.toString());
                         JSONObject userdetail = object.getJSONObject("data");
                         if(userdetail!=null) {
-                            if(userdetail.has("notification_count")) {
-                                if(userdetail.getString("notification_count").equals("")){
+                            String ongoing  = userdetail.getString("booking_ongoing");
+                            if(ongoing.equals("true")){
+                                RequestQueueService.showAlert("Cannot Login while trip is ongoing", MainActivity.this);
+                            }else {
+                                if (userdetail.has("notification_count")) {
+                                    if (userdetail.getString("notification_count").equals("")) {
+                                        SessionManagement.createLoginSession(MainActivity.this,
+                                                true, userdetail.getString("tanker_id"),
+                                                userdetail.getString("phone_country_code"),
+                                                userdetail.getString("phone"),
+                                                userdetail.getString("driver_name"),
+                                                userdetail.getString("token"),
+                                                userdetail.getJSONObject("settings").getString("language"),
+                                                userdetail.getString("location"),
+                                                "1",
+                                                "0");
+                                    } else {
+                                        SessionManagement.createLoginSession(MainActivity.this,
+                                                true, userdetail.getString("tanker_id"),
+                                                userdetail.getString("phone_country_code"),
+                                                userdetail.getString("phone"),
+                                                userdetail.getString("driver_name"),
+                                                userdetail.getString("token"),
+                                                userdetail.getJSONObject("settings").getString("language"),
+                                                userdetail.getString("location"),
+                                                "1",
+                                                userdetail.getString("notification_count"));
+                                    }
+                                } else {
                                     SessionManagement.createLoginSession(MainActivity.this,
                                             true, userdetail.getString("tanker_id"),
                                             userdetail.getString("phone_country_code"),
@@ -148,39 +171,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             userdetail.getString("token"),
                                             userdetail.getJSONObject("settings").getString("language"),
                                             userdetail.getString("location"),
-                                            userdetail.getString("activity_status"),
+                                            "1",
                                             "0");
-                                }else {
-                                    SessionManagement.createLoginSession(MainActivity.this,
-                                            true, userdetail.getString("tanker_id"),
-                                            userdetail.getString("phone_country_code"),
-                                            userdetail.getString("phone"),
-                                            userdetail.getString("driver_name"),
-                                            userdetail.getString("token"),
-                                            userdetail.getJSONObject("settings").getString("language"),
-                                            userdetail.getString("location"),
-                                            userdetail.getString("activity_status"),
-                                            userdetail.getString("notification_count"));
                                 }
-                            }else{
-                                SessionManagement.createLoginSession(MainActivity.this,
-                                        true, userdetail.getString("tanker_id"),
-                                        userdetail.getString("phone_country_code"),
-                                        userdetail.getString("phone"),
-                                        userdetail.getString("driver_name"),
-                                        userdetail.getString("token"),
-                                        userdetail.getJSONObject("settings").getString("language"),
-                                        userdetail.getString("location"),
-                                        userdetail.getString("activity_status"),
-                                        "0");
+                                SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
+                                Intent i = new Intent(MainActivity.this, FirstActivity.class);
+                                progressBar.setVisibility(View.GONE);
+                                startActivity(i);
+                                finish();
                             }
-                            SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
-                            //String s = userdetail.getString("status");
-                            Intent i = new Intent(MainActivity.this, FirstActivity.class);
-                            //i.putExtra("status",s);
-                            progressBar.setVisibility(View.GONE);
-                            startActivity(i);
-                            finish();
                         }
                         else {
                             RequestQueueService.showAlert("Error! No data fetched", MainActivity.this);
