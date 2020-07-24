@@ -2,7 +2,7 @@ package com.kookyapps.gpstankertracking.Utils;
 
 public class URLs {
     //public static final String BASE_URL= "http://ec2-18-190-47-17.us-east-2.compute.amazonaws.com:8081/api/tanker/";
-    public static final String BASE_URL= "http://ec2-15-206-253-136.ap-south-1.compute.amazonaws.com:8081/api/tanker";
+    public static final String BASE_URL= "http://ec2-15-206-253-136.ap-south-1.compute.amazonaws.com:8081/api/tanker/";
 
     //public static final String SOCKET_URL="http://ec2-18-190-47-17.us-east-2.compute.amazonaws.com:8081?token=";
     public static final String SOCKET_URL="http://ec2-15-206-253-136.ap-south-1.compute.amazonaws.com:8081?token=";
