@@ -16,6 +16,7 @@ import androidx.viewpager.widget.ViewPager;
 
 
 import com.kookyapps.gpstankertracking.Utils.LocaleHelper;
+import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.app.GPSTracker;
 import com.kookyapps.gpstankertracking.fcm.Config;
 
@@ -502,6 +503,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.lh_first_logoutLayout:
                 logoutLayout.setClickable(false);
+
                 logutApiCalling();
                 break;
             case R.id.btn_first_rqstbtn:
@@ -517,8 +519,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             case R.id.lh_first_cancellayout:
                 if (navdrawer.isDrawerOpen(GravityCompat.START)) {
                     navdrawer.closeDrawer(GravityCompat.START);
-                }
-                i = new Intent(this, TripDetails.class);
+        }
+        i = new Intent(this, TripDetails.class);
                 i.putExtra("init_type",Constants.CANCELLED_TRIP);
                 startActivity(i);
 
@@ -530,17 +532,22 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     public void logutApiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
         try {
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.SIGN_OUT_URL;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            Log.i("Token:",token);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(FirstActivity.this,logoutListner,url,headparam,jsonBodyObj);
-
+            if(SharedPrefUtil.hasKey(FirstActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
+                RequestQueueService.showAlert("Cannot logout while trip is ongoing.",FirstActivity.this);
+                logoutLayout.setClickable(true);
+            }else {
+                POSTAPIRequest postapiRequest = new POSTAPIRequest();
+                String url = URLs.BASE_URL + URLs.SIGN_OUT_URL;
+                Log.i("url", String.valueOf(url));
+                Log.i("Request", String.valueOf(postapiRequest));
+                String token = SessionManagement.getUserToken(this);
+                Log.i("Token:", token);
+                HeadersUtil headparam = new HeadersUtil(token);
+                postapiRequest.request(FirstActivity.this, logoutListner, url, headparam, jsonBodyObj);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
+            logoutLayout.setClickable(true);
         }
 
     }
@@ -562,6 +569,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                }
            } catch (JSONException e){
                     e.printStackTrace();
+               logoutLayout.setClickable(true);
            }
 
         }
@@ -688,7 +696,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         if(vc.equals("")){
             viewCount=0;
         }else{
-            viewCount = Integer.parseInt(notificationCountText.getText().toString());
+            viewCount = Integer.parseInt(vc);
         }
         boolean b1 = sharedCount != viewCount;
         boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");

@@ -237,6 +237,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         allpermissionsrequired = new ArrayList<>();
         allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        allpermissionsrequired.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
        //initSocket();
        initViews();
     }
@@ -369,8 +370,8 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
-                .setInterval(FASTEST_INTERVAL)
-                .setSmallestDisplacement(10);
+                .setInterval(FASTEST_INTERVAL);
+                //.setSmallestDisplacement(10);
         if (!permissionGranted) {
             return;
         }
@@ -726,6 +727,7 @@ public class Map1 extends AppCompatActivity implements View.OnClickListener,OnMa
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
             builder.setTitle("Alert!");
             builder.setMessage(message);
+            builder.setCancelable(false);
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

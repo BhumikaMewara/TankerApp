@@ -29,13 +29,13 @@ public class Constants {
 
 
 
-    public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
+    //public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
-    public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
-    public static final String SHARED_PREF_TRIP_TAG="trip_pref";
+  /*  public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
+    public static final String SHARED_PREF_TRIP_TAG="trip_pref";*/
     public static final String SHARED_PREF_ONGOING_TAG="ongoing_pref";
     public static final String SHARED_PREF_IMAGE_TAG="image_tag";
-    public static final String CAPTURE_IMAGE = "tanker_img";
+    //public static final String CAPTURE_IMAGE = "tanker_img";
 
 
 
@@ -48,8 +48,8 @@ public class Constants {
     public static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     public static final String SHARED_NOTIFICATION_UPDATE_KEY  = "notification_update";
     public static final String SHARED_END_IMAGE_KEY="image_key";
-    public static final String SHARED_ONGOING_TRAVELLED_PATH="ongoing_travelled_path";
-    public static final String SHARED_ONGOING_PATH_SIZE="ongoing_path_size";
+   // public static final String SHARED_ONGOING_TRAVELLED_PATH="ongoing_travelled_path";
+    //public static final String SHARED_ONGOING_PATH_SIZE="ongoing_path_size";
     public static final String SHARED_ONGOING_BOOKING_ID="ongoing_booking_id";
     public static final String SHARED_ONGOING_DRIVER_ID="ongoing_driver_id";
 

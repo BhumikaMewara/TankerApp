@@ -1,10 +1,14 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -281,7 +285,6 @@ private  void validateOTP(){
                                     startActivity(intent);
                                     finish();
                                 }else{
-
                                     //RequestQueueService.showAlert(obj.getString("code"), EnterOTP.this);
                                     RequestQueueService.showAlert("Error in response", EnterOTP.this);
                                     verifyLayout.setClickable(true);
@@ -312,14 +315,14 @@ private  void validateOTP(){
                         verifyLayout.setClickable(true);
                         progressBar.setVisibility(View.GONE);
                         //requestLayout.setBackgroundResource(R.drawable.straight_corners);
-
                         NetworkResponse response = error.networkResponse;
                         if(response != null && response.data != null){
                             String errorString = new String(response.data);
                             Log.i("log error", errorString);
                             try {
                                 JSONObject obj = new JSONObject(new String(response.data));
-                                RequestQueueService.showAlert(obj.getString("message"),EnterOTP.this);
+                                //RequestQueueService.showAlert(obj.getString("message"),EnterOTP.this);
+                                Alert("This Trip has been cancelled",EnterOTP.this);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -609,5 +612,28 @@ private  void validateOTP(){
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public void Alert(String message, final FragmentActivity context) {
+        try {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setTitle("Alert!");
+            builder.setMessage(message);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+                        SharedPrefUtil.deletePreference(EnterOTP.this,Constants.SHARED_PREF_ONGOING_TAG);
+                    Intent intent = new Intent(EnterOTP.this, FirstActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+
+                }
+            });
+            builder.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
