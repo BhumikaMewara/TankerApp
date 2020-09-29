@@ -101,7 +101,6 @@
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusForward="@+id/editText_two">
                                     <requestFocus/>
@@ -111,7 +110,6 @@
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_four">
 
@@ -121,17 +119,14 @@
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_four">
-
                                 </EditText>
                                 <EditText
                                     android:id="@+id/editText_four"
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_fifth">
 
@@ -141,7 +136,6 @@
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center"
                                     android:nextFocusRight="@+id/editText_sixth">
 
@@ -152,7 +146,6 @@
                                     android:layout_width="40sp"
                                     android:layout_height="42sp"
                                     android:inputType="number"
-                                    android:maxLength="1"
                                     android:gravity="center" />
                             </LinearLayout>
 

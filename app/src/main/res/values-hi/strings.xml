@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">पानी का टैंकर</string>
+    <string name="app_name">AE Tanker</string>
     <string name="no_booking">No Bookings Found</string>
     <!--<item name="myUrl" type="menu">http://myUrl.com</item>-->
     <string name="drawer_open">open</string>

@@ -10,7 +10,8 @@ public class BookingListModal implements Parcelable {
     String fromlatitude, fromlongitude, tolatitude, tologitude;
     String phone_country_code, phone, controller_name, geofence_in_meter, message;
     String driver_name,can_start,can_accept,can_end;
-    String tankerBookingid,distanceTravelled;;
+    String tankerBookingid,distanceTravelled;
+    String path;
     Integer status;
 
 
@@ -24,9 +25,13 @@ public class BookingListModal implements Parcelable {
     }
 
 
+    public String getPath() {
+        return path;
+    }
 
-
-
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public Integer getStatus() { return status; }
     public void setStatus(Integer status) { this.status = status; }
@@ -209,6 +214,8 @@ public class BookingListModal implements Parcelable {
         parcel.writeString(can_accept);
         parcel.writeString(can_start);
         parcel.writeString(can_end);
+        parcel.writeString(tankerBookingid);
+        parcel.writeString(path);
     }
 
     protected BookingListModal(Parcel in){
@@ -233,6 +240,8 @@ public class BookingListModal implements Parcelable {
         can_accept=in.readString();
         can_start=in.readString();
         can_end=in.readString();
+        tankerBookingid=in.readString();
+        path=in.readString();
     }
 
 

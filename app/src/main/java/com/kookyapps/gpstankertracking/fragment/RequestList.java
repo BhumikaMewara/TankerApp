@@ -45,7 +45,6 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class RequestList extends Fragment {
-
     RecyclerView recyclerView;
     RelativeLayout progressBar;
     TextView noRequest;
@@ -65,14 +64,12 @@ public class RequestList extends Fragment {
     private boolean isLoading = false;
     boolean isListNull = true;
     boolean isRefresh = true;
-
     public RequestList(Context context) {
         this.context = context;
     }
     public RequestList(){
         this.context = getActivity().getApplicationContext();
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -148,32 +145,31 @@ public class RequestList extends Fragment {
             showRequest = false;
         }
         requestlistApiCalling();
-        /*if (tripList!=null) {
-            tripList.clear();
-            mAdapter.clearAll();
-
-        }*/
         super.onResume();
     }
 
     private void requestlistApiCalling(){
-        if(!showRequest){
-            Toast.makeText(context,"You are in offline mode",Toast.LENGTH_LONG).show();
-            setRecyclerView();
-            refreshLayout.setRefreshing(false);
-        }else {
-            JSONObject jsonBodyObj = new JSONObject();
-            try {
-                GETAPIRequest getapiRequest = new GETAPIRequest();
-                String url = URLs.BASE_URL + URLs.REQUEST_LIST + "?page_size=" + String.valueOf(page_size) + "&page=" + String.valueOf(PAGE_START);
-                Log.i("url", String.valueOf(url));
-                Log.i("Request", String.valueOf(getapiRequest));
-                String token = SessionManagement.getUserToken(getContext());
-                HeadersUtil headparam = new HeadersUtil(token);
-                getapiRequest.request(getActivity().getApplicationContext(), fetchListener, url, headparam, jsonBodyObj);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(SessionManagement.getValidity(context)) {
+            if (!showRequest) {
+                Toast.makeText(context, "You are in offline mode", Toast.LENGTH_LONG).show();
+                setRecyclerView();
+                refreshLayout.setRefreshing(false);
+            } else {
+                JSONObject jsonBodyObj = new JSONObject();
+                try {
+                    GETAPIRequest getapiRequest = new GETAPIRequest();
+                    String url = URLs.BASE_URL + URLs.REQUEST_LIST + "?page_size=" + String.valueOf(page_size) + "&page=" + String.valueOf(PAGE_START);
+                    Log.i("url", String.valueOf(url));
+                    Log.i("Request", String.valueOf(getapiRequest));
+                    String token = SessionManagement.getUserToken(getContext());
+                    HeadersUtil headparam = new HeadersUtil(token);
+                    getapiRequest.request(getActivity().getApplicationContext(), fetchListener, url, headparam, jsonBodyObj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        }else{
+            setRecyclerView();
         }
     }
 
@@ -204,7 +200,8 @@ public class RequestList extends Fragment {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
                                 tdmod.setBookingid(jsonObject.getString("_id"));
-
+                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                tdmod.setDistance(distance.getString("text"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
@@ -326,6 +323,8 @@ public class RequestList extends Fragment {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
                                 tdmod.setBookingid(jsonObject.getString("_id"));
+                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                tdmod.setDistance(distance.getString("text"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
@@ -371,13 +370,6 @@ public class RequestList extends Fragment {
                                 } else {
                                     RequestQueueService.showAlert("Error! no data in pick_up", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
-                                if (distance != null) {
-                                    tdmod.setDistance(distance.getString("text"));
-                                } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-
                                 tripList.add(tdmod);
                             }
                         }
@@ -411,10 +403,18 @@ public class RequestList extends Fragment {
 
 
     public void setRecyclerView(){
-        if(SessionManagement.getUserStatus(context).equals(Constants.IS_OFFLINE)){
+        if(refreshLayout.isRefreshing()){
+            refreshLayout.setRefreshing(false);
+        }
+        if(!SessionManagement.getValidity(context)){
             progressBar.setVisibility(View.GONE);
+            noRequest.setText("Validity Expired");
             noRequest.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }else if(SessionManagement.getUserStatus(context).equals(Constants.IS_OFFLINE)){
+            progressBar.setVisibility(View.GONE);
             noRequest.setText("Offline Mode");
+            noRequest.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }else {
             if (isListNull) {

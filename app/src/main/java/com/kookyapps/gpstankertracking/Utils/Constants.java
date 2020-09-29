@@ -19,8 +19,7 @@ public class Constants {
     public static final String REQUEST_INIT= "request_init";
     public static final String NOTIFICATION_INIT= "notification_init";
     public static final String SPLASH_INIT= "splash_init";
-    //public static final String TRIP_INIT= "trip_init";
-    //public static final String COMPLETED_CALL="Completed";
+    public static final String TRIP_START_IMG="trip_start_img";
     public static final String TRIP_END_IMG="trip_end_img";
     public static final String BOOKING_INIT= "booking_init";
     public static final String COMPLETED_TRIP = "completed";
@@ -35,6 +34,7 @@ public class Constants {
     public static final String SHARED_PREF_TRIP_TAG="trip_pref";*/
     public static final String SHARED_PREF_ONGOING_TAG="ongoing_pref";
     public static final String SHARED_PREF_IMAGE_TAG="image_tag";
+    public static final String SHARED_REQUESTING_LOCATION_TAG="requesting_location";
     //public static final String CAPTURE_IMAGE = "tanker_img";
 
 
@@ -52,6 +52,7 @@ public class Constants {
     //public static final String SHARED_ONGOING_PATH_SIZE="ongoing_path_size";
     public static final String SHARED_ONGOING_BOOKING_ID="ongoing_booking_id";
     public static final String SHARED_ONGOING_DRIVER_ID="ongoing_driver_id";
+    public static final String SHARED_REQUESTING_KEY="requesting";
 
 
     public static final String HINDI_LANGUAGE  = "hi";
@@ -82,8 +83,15 @@ public class Constants {
 
     public static final String GOOGLE_API_KEY_MAPS= "AIzaSyDzV0TMTS1RXLeT3e4dBxjP6yQcUbzL02Y";
 
+    public static final String STOP_SERVICE_ACTION="Stop Service";
+    public static final String START_SERVICE_ACTION="Start Service";
 
+    /* Permission Request Codes */
 
+    public static final int CAMERA_PERMISSION_REQUEST=10101;
+    public static final int CALL_PERMISSION_REQUEST=10102;
+    public static final int LOCATION_PERMISSION_REQUEST=10103;
+    public static final int BACKGROUND_PERMISSION_REQUEST=10104;
 
 
 

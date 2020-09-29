@@ -1,17 +1,27 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Services.TankerLocationCallback;
+import com.kookyapps.gpstankertracking.Services.TankerLocationService;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
@@ -30,22 +40,58 @@ import java.util.ArrayList;
 public class SplashActivity extends AppCompatActivity {
 
     private static int SPLASH_TIME_OUT = 3000;
+    private TankerLocationService mService = null;
+    private boolean mBound = false;
+    ConstraintLayout cl_NoInternet;
+    ImageView iv_refresh;
+    TextView tv_NoInternet;
+    int refreshlevel = 0;
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            TankerLocationService.LocalBinder binder = (TankerLocationService.LocalBinder)iBinder;
+            mService = binder.getService();
+            mBound = true;
+            //mService.setServiceCallback(SplashActivity.this);
+            /*if(!mService.isSocketInitialized())
+                mService.initSocket(blmod.getBookingid());*/
+            mService.stopService();
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mService = null;
+            mBound = false;
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
+        cl_NoInternet = (ConstraintLayout)findViewById(R.id.cl_no_internet);
+        tv_NoInternet = (TextView)findViewById(R.id.tv_no_internet);
+        iv_refresh = (ImageView)findViewById(R.id.iv_refresh_icon);
+        iv_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iv_refresh.setClickable(false);
+                cl_NoInternet.setVisibility(View.GONE);
+                if(refreshlevel==0)
+                    bookingByIdApiCalling();
+                else if(refreshlevel==1)
+                    getNotificationCount();
+                iv_refresh.setClickable(true);
+            }
+        });
+        NotificationManager nm = (NotificationManager)getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+        nm.cancelAll();
         if (SessionManagement.checkSignIn(this)) {
-
             if (SharedPrefUtil.hasKey(SplashActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
                 bookingByIdApiCalling();
             }else{
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent i = new Intent(SplashActivity.this, FirstActivity.class);
-                    startActivity(i);
-                    finish();
+                    getNotificationCount();
                 }
             }, SPLASH_TIME_OUT);
             }
@@ -74,6 +120,9 @@ public class SplashActivity extends AppCompatActivity {
             getapiRequest.request(this, bookingdetailsApiListner, url, headparam, jsonBodyObj);
         } catch (JSONException e) {
             e.printStackTrace();
+            refreshlevel = 0;
+            tv_NoInternet.setText("An Error Occurred");
+            cl_NoInternet.setVisibility(View.VISIBLE);
         }
     }
 
@@ -87,10 +136,13 @@ public class SplashActivity extends AppCompatActivity {
                     if (mydata.getInt("error") == 0) {
                         ArrayList<BookingListModal> bookingList = new ArrayList<>();
                         JSONObject data = mydata.getJSONObject("data");
+                        Log.d("Booking Detail",data.toString());
                         BookingListModal blmod = new BookingListModal();
                         if (data != null) {
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
+                            if(data.has("path"))
+                                blmod.setPath(data.getString("path"));
                             if (status.equals("3")) {
                                 blmod.setStatus(data.getInt("status"));
                                 blmod.setMessage(data.getString("message"));
@@ -155,17 +207,19 @@ public class SplashActivity extends AppCompatActivity {
                                 startActivity(i);
                                 finish();
                             } else {
-                                Intent i = new Intent(SplashActivity.this, FirstActivity.class);
-                                startActivity(i);
-                                finish();
+                                bindService(new Intent(SplashActivity.this, TankerLocationService.class),mServiceConnection, Context.BIND_AUTO_CREATE);
+                                getNotificationCount();
                             }
                         }
                     }
 
                 }
             } catch (JSONException e) {
-                RequestQueueService.showAlert("Error! No Data Found",SplashActivity.this);
+                //RequestQueueService.showAlert("Error! No Data Found",SplashActivity.this);
                 e.printStackTrace();
+                refreshlevel = 0;
+                tv_NoInternet.setText("An Error Occurred");
+                cl_NoInternet.setVisibility(View.VISIBLE);
             }
 
         }
@@ -176,9 +230,85 @@ public class SplashActivity extends AppCompatActivity {
                 JSONObject er = new JSONObject(msg);
                 String code = er.getString("code");
                 Toast.makeText(SplashActivity.this,"Fetch Failure",Toast.LENGTH_LONG).show();
+                refreshlevel = 0;
+                tv_NoInternet.setText(msg);
+                cl_NoInternet.setVisibility(View.VISIBLE);
             }catch (Exception e){
                 e.printStackTrace();
-                RequestQueueService.showAlert(msg, SplashActivity.this);
+                //RequestQueueService.showAlert(msg, SplashActivity.this);
+                refreshlevel = 0;
+                tv_NoInternet.setText(msg);
+                cl_NoInternet.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+
+    };
+
+    private void getNotificationCount() {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            GETAPIRequest getapiRequest = new GETAPIRequest();
+            String url = URLs.BASE_URL + URLs.NOTIFICATION_COUNT;
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(getapiRequest));
+            String token = SessionManagement.getUserToken(this);
+            HeadersUtil headparam = new HeadersUtil(token);
+            getapiRequest.request(this, notiCountListener, url, headparam, jsonBodyObj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            refreshlevel = 1;
+            tv_NoInternet.setText("An Error Occurred");
+            cl_NoInternet.setVisibility(View.VISIBLE);
+        }
+    }
+
+    FetchDataListener notiCountListener = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject response) {
+            Log.d("NotiCount:",response.toString());
+            try {
+                if (response != null) {
+                    if (response.getInt("error") == 0) {
+                        JSONObject data = response.getJSONObject("data");
+                        String count = data.getString("count");
+                        SessionManagement.setNotificationCount(SplashActivity.this,count);
+                        Intent i = new Intent(SplashActivity.this, FirstActivity.class);
+                        SharedPrefUtil.deletePreference(SplashActivity.this,Constants.SHARED_PREF_ONGOING_TAG);
+                        startActivity(i);
+                        finish();
+                    }
+                }
+            } catch (JSONException e) {
+                RequestQueueService.showAlert("Error! No Data Found",SplashActivity.this);
+                e.printStackTrace();
+                refreshlevel = 1;
+                tv_NoInternet.setText("An Error Occurred");
+                cl_NoInternet.setVisibility(View.VISIBLE);
+            }
+
+        }
+
+        @Override
+        public void onFetchFailure(String msg) {
+            try {
+                Log.e("noticount",msg);
+                //JSONObject er = new JSONObject(msg);
+                //String code = er.getString("code");
+                Toast.makeText(SplashActivity.this,"Fetch Failure",Toast.LENGTH_LONG).show();
+                refreshlevel = 1;
+                tv_NoInternet.setText(msg);
+                cl_NoInternet.setVisibility(View.VISIBLE);
+            }catch (Exception e){
+                e.printStackTrace();
+                //RequestQueueService.showAlert(msg, SplashActivity.this);
+                refreshlevel = 1;
+                tv_NoInternet.setText(msg);
+                cl_NoInternet.setVisibility(View.VISIBLE);
             }
         }
 

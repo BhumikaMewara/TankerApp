@@ -7,15 +7,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.Manifest;
-import android.content.BroadcastReceiver;
+import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -28,13 +27,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,7 +54,7 @@ import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
 import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
-import com.kookyapps.gpstankertracking.fcm.Config;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,25 +63,28 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-import static com.kookyapps.gpstankertracking.Activity.TankerStartingPic.PERMISSION_REQUEST_CODE;
+
 
 public class RequestDetails extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
-    TextView bookingid, distanceTitle, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext;
-    ImageView calltous;
+    TextView bookingid, distanceTitle, distancetext, pickup, drop, controllername, contact_no, message, pagetitle, bottomtext,tv_showmap;
+    ImageView calltous,iv_showmap;
     ProgressBar progressBar;
+    ScrollView scrollview;
     SupportMapFragment mapFragment;
-    RelativeLayout maplayout;
+    RelativeLayout maplayout,mapshowlayout;
     ArrayList<LatLng>finalpath = null;
     GoogleMap mMap;
     RelativeLayout menuback, bottom;
     String init_type, bkngid;
     BookingListModal blmod;
+    String dial_no = null;
     String can_accept, can_end, can_start,currentPhotoPath;
     boolean cameraAccepted, callaccepted;
-    private static final int MAKE_CALL_PERMISSION_REQUEST_CODE = 1;
     static final int REQUEST_IMAGE_CAPTURE = 2;
     static final int REQUEST_TAKE_PHOTO = 3;
+    String location_permission = Manifest.permission.ACCESS_FINE_LOCATION;
+    String camera_permission = Manifest.permission.CAMERA;
+    String call_permission = Manifest.permission.CALL_PHONE;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,10 +92,10 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         initViews();
         bookingByIdApiCalling();
     }
-
     public void initViews() {
-        init_type = getIntent().getExtras().getString("init_type");
-        bkngid = getIntent().getExtras().getString("booking_id");
+        Bundle b = getIntent().getExtras();
+        init_type = b.getString("init_type");
+        bkngid = b.getString("booking_id");
         progressBar=(ProgressBar) findViewById(R.id.pb_requestDetails_progressbar);
         pagetitle = (TextView) findViewById(R.id.tb_with_bck_arrow_title);
         bookingid = (TextView) findViewById(R.id.tv_bookingdetail_bookingid);
@@ -105,56 +106,29 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         controllername = (TextView) findViewById(R.id.tv_bookingdetail_drivername);
         contact_no = (TextView) findViewById(R.id.tv_bookingdetail_contact);
         message = (TextView) findViewById(R.id.tv_bookingdetail_message);
+        mapshowlayout = (RelativeLayout)findViewById(R.id.rl_request_detail_showmap);
+        tv_showmap = (TextView)findViewById(R.id.tv_request_detail_showmap);
+        iv_showmap = (ImageView)findViewById(R.id.iv_request_detail_showmap);
+        mapshowlayout.setOnClickListener(this);
+        scrollview = (ScrollView)findViewById(R.id.sv_request_details);
         calltous = (ImageView) findViewById(R.id.iv_bookingdetail_bookingid_call);
-        calltous.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String phoneNumber = contact_no.getText().toString();
-                if (!TextUtils.isEmpty(phoneNumber)) {
-                    if (checkCall(Manifest.permission.CALL_PHONE)) {
-                        String dial = "tel:" + phoneNumber;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    Activity#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for Activity#requestPermissions for more details.
-                                return;
-                            }
-                        }
-                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
-                    } else {
-                        Toast.makeText(RequestDetails.this, "Permission Call Phone denied", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(RequestDetails.this, "Enter a phone number", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        if (checkCall(Manifest.permission.CALL_PHONE)) {
-            calltous.setEnabled(true);
-        } else {
-            calltous.setEnabled(false);
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MAKE_CALL_PERMISSION_REQUEST_CODE);
-        }
-
+        calltous.setOnClickListener(this);
         maplayout = (RelativeLayout)findViewById(R.id.rl_requestDetail_map);
         mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fg_requesttDeatils_map);
-
         menuback = (RelativeLayout) findViewById(R.id.rl_toolbarmenu_backimglayout);
         menuback.setOnClickListener(this);
-        bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout_text);
+        bottom = (RelativeLayout) findViewById(R.id.rl_result_details_bottomLayout);
         bottom.setOnClickListener(this);
-        //bottom.setClickable(false);
         bottomtext = (TextView) findViewById(R.id.tv_result_details_bottomlayout_text);
+        if(init_type.equals("notification")){
+            readNotificationApiCall(b.getString("notification_id"));
+            NotificationManager nm = (NotificationManager)getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+            nm.cancelAll();
+        }
+        hideMapBar();
     }
-
-
-
+    public void showMapBar(){mapshowlayout.setVisibility(View.VISIBLE);}
+    public void hideMapBar(){mapshowlayout.setVisibility(View.GONE);}
     @Override
         public void onClick(View view) {
         Intent intent;
@@ -162,27 +136,18 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             case R.id.rl_toolbarmenu_backimglayout:
                 onBackPressed();
                 break;
-            case R.id.rl_result_details_bottomLayout_text:
+            case R.id.rl_result_details_bottomLayout:
+                bottom.setClickable(false);
                 if (blmod.getStatus()==1&&can_accept.equals("true")) {
                     bookingacceptedapiCalling();
-                    bottom.setClickable(false);
                     progressBar.setVisibility(View.VISIBLE);
                 } else if (blmod.getStatus()==2) {
                     progressBar.setVisibility(View.VISIBLE);
                     if (can_start.equals("true")) {
-                        if (checkPermission()) {
-                            cameraAccepted = true;
-                        } else {
-                            requestPermission();
-                        }
-                        if (cameraAccepted) {
-                            Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            if (camera_intent.resolveActivity(getPackageManager()) != null) {
-                                startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
-                            }
-                        } else {
-                            requestPermission();
-                        }
+                        checkRequestCameraPermission(RequestDetails.this);
+                    }else{
+                        Toast.makeText(RequestDetails.this, "Booking can't be started", Toast.LENGTH_SHORT).show();
+                        bottom.setClickable(true);
                     }
                 }
                 else if(blmod.getStatus()==3){
@@ -193,80 +158,236 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                     intent.putExtra("booking_id", bkngid);
                     intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
                     progressBar.setVisibility(View.GONE);
+                    bottom.setClickable(true);
                     startActivity(intent);
                     finish();
+                }
+                break;
+            case R.id.rl_request_detail_showmap:
+                if(maplayout.getVisibility()==View.VISIBLE){
+                    maplayout.setVisibility(View.GONE);
+                    scrollview.setVisibility(View.VISIBLE);
+                    tv_showmap.setText("Show Map");
+                    iv_showmap.setImageResource(R.drawable.ic_plus);
+                }else{
+                    scrollview.setVisibility(View.GONE);
+                    maplayout.setVisibility(View.VISIBLE);
+                    tv_showmap.setText("Hide Map");
+                    iv_showmap.setImageResource(R.drawable.ic_minus);
+                }
+                break;
+            case R.id.iv_bookingdetail_bookingid_call:
+                calltous.setClickable(false);
+                String phoneNumber = contact_no.getText().toString();
+                if (!TextUtils.isEmpty(phoneNumber)) {
+                    dial_no = "tel:" + phoneNumber;
+                    checkRequestCallPermission(RequestDetails.this);
+                } else {
+                    Toast.makeText(RequestDetails.this, "No Phone Number Available", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
-
-    private void requestPermission(){
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},PERMISSION_REQUEST_CODE);
-        //ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_REQUEST_CODE);
+    private void checkRequestCameraPermission(final Activity activity){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),camera_permission)!= PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(activity,camera_permission)){
+                new AlertDialog.Builder(activity)
+                        .setTitle("Camera Permission")
+                        .setMessage("We need to capture the tanker Image.")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(activity,new String[]{camera_permission},Constants.CAMERA_PERMISSION_REQUEST);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                bottom.setClickable(true);
+                                if(progressBar.getVisibility()==View.VISIBLE)
+                                    progressBar.setVisibility(View.GONE);
+                                noCameraLocationAlert(RequestDetails.this,camera_permission);
+                            }
+                        })
+                        .create()
+                        .show();
+            }else{
+                ActivityCompat.requestPermissions(activity,new String[]{camera_permission},Constants.CAMERA_PERMISSION_REQUEST);
+            }
+        }else{
+            cameraAccepted = true;
+            checkRequestLocationPermission(RequestDetails.this);
+        }
     }
 
-    private boolean checkPermission(){
-        int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
-
-        return result == PackageManager.PERMISSION_GRANTED;
-
-        //
+    public void checkRequestCallPermission(final Activity activity){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),call_permission)!= PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(activity,call_permission)){
+                new AlertDialog.Builder(activity)
+                        .setTitle("Call Permission")
+                        .setMessage("We need call permission to place a call.")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(activity,new String[]{call_permission},Constants.CALL_PERMISSION_REQUEST);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                calltous.setClickable(true);
+                                noCallAlert(RequestDetails.this);
+                            }
+                        })
+                        .create()
+                        .show();
+            }else{
+                ActivityCompat.requestPermissions(activity,new String[]{call_permission},Constants.CALL_PERMISSION_REQUEST);
+            }
+        }else{
+            callaccepted = true;
+            calltous.setClickable(true);
+            if(dial_no!=null)
+                startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial_no)));
+        }
     }
 
-    private boolean checkCall(String permission){
-        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    public void checkRequestLocationPermission(final Activity activity){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),location_permission)!= PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(activity,location_permission)){
+                new AlertDialog.Builder(activity)
+                        .setTitle("Location Permission")
+                        .setMessage("Location Permission is required for showing your location on  the map.")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(activity,new String[]{location_permission},Constants.LOCATION_PERMISSION_REQUEST);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                bottom.setClickable(true);
+                                if(progressBar.getVisibility()==View.VISIBLE)
+                                    progressBar.setVisibility(View.GONE);
+                                noCameraLocationAlert(RequestDetails.this,location_permission);
+                            }
+                        })
+                        .create()
+                        .show();
+            }else{
+                ActivityCompat.requestPermissions(activity,new String[]{location_permission},Constants.LOCATION_PERMISSION_REQUEST);
+            }
+        }else{
+            Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (camera_intent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
     }
 
+    public void noCameraLocationAlert(final Activity activity,String permission){
+        String msg = "";
+        if(permission.equals(camera_permission)){
+            msg = "camera permission";
+            cameraAccepted = false;
+        }else if(permission.equals(location_permission)){
+            msg = "location permission";
+        }
+        new AlertDialog.Builder(activity)
+                .setTitle("Permission Not Granted")
+                .setMessage("Sorry, we can not proceed without "+msg)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    public void noCallAlert(final Activity activity){
+        new AlertDialog.Builder(activity)
+                .setTitle("Permission Not Granted")
+                .setMessage("Sorry, call could not be placed.")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
-            case PERMISSION_REQUEST_CODE:
+            case Constants.CAMERA_PERMISSION_REQUEST:
                 if(grantResults.length>0){
                     cameraAccepted = grantResults[0]==PackageManager.PERMISSION_GRANTED;
                     if(cameraAccepted){
-                        cameraAccepted = true;
+                        checkRequestLocationPermission(RequestDetails.this);
                     }else{
-                        cameraAccepted = false;
+                        bottom.setClickable(true);
+                        if(progressBar.getVisibility()==View.VISIBLE)
+                            progressBar.setVisibility(View.GONE);
+                        noCameraLocationAlert(RequestDetails.this,camera_permission);
                     }
                 }
                 break;
-            case MAKE_CALL_PERMISSION_REQUEST_CODE:
+            case Constants.CALL_PERMISSION_REQUEST:
                 callaccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
+                calltous.setClickable(true);
                 if (callaccepted){
-                    callaccepted=true;
+                    if(dial_no!=null)
+                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial_no)));
                 }else {
-                    callaccepted=false;
+                    noCallAlert(RequestDetails.this);
                 }
-                calltous.setEnabled(true);
+                break;
+            case Constants.LOCATION_PERMISSION_REQUEST:
+                if(progressBar.getVisibility()==View.VISIBLE)
+                    progressBar.setVisibility(View.GONE);
+                if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (camera_intent.resolveActivity(getPackageManager()) != null) {
+                        startActivityForResult(camera_intent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }else{
+                    bottom.setClickable(true);
+                    noCameraLocationAlert(RequestDetails.this,camera_permission);
+                }
                 break;
         }
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-        if (resultCode!=0) {
-            progressBar.setVisibility(View.VISIBLE);
-            Bundle b = data.getExtras();
-            if (resultCode != REQUEST_IMAGE_CAPTURE && b.containsKey("data")) {
-                Bitmap bitmap = (Bitmap) b.get("data");
-                // bitmap = addStampToImage(bitmap);
-                //imageencoded = Utils.encodeTobase64(bitmap);
-                if (can_start.equals("true")) {
-                    Intent intent = new Intent(this, TankerStartingPic.class);
-                    intent.putExtra("Bitmap", bitmap);
-                    intent.putExtra("Bookingdata", blmod);
-                    intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
-                    startActivity(intent);
-                    finish();
+        switch(requestCode){
+            case REQUEST_IMAGE_CAPTURE:
+                if(resultCode==RESULT_OK && data.hasExtra("data")){
+                    progressBar.setVisibility(View.VISIBLE);
+                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                    if (can_start.equals("true")) {
+                        Intent intent = new Intent(this, TankerStartingPic.class);
+                        intent.putExtra("Bitmap", bitmap);
+                        intent.putExtra("init_type",Constants.TRIP_START_IMG);
+                        intent.putExtra("Bookingdata", blmod);
+                        intent.putExtra("tankerBookingId", blmod.getTankerBookingid());
+                        progressBar.setVisibility(View.GONE);
+                        bottom.setClickable(true);
+                        startActivity(intent);
+                        //finish();
+                    }
+                }else{
+                    Toast.makeText(RequestDetails.this,"Image not captured successfully",Toast.LENGTH_LONG).show();
                 }
-            }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -318,89 +439,43 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
 
     private Bitmap addStampToImage(Bitmap originalBitmap) {
-
         int extraHeight = (int) (originalBitmap.getHeight() * 0.15);
-
         Bitmap newBitmap = Bitmap.createBitmap(originalBitmap.getWidth(),
                 originalBitmap.getHeight() , Bitmap.Config.ARGB_8888);
-
         Canvas canvas = new Canvas(newBitmap);
         canvas.drawBitmap(originalBitmap, 0, 0, null);
-
         Resources resources = getResources();
         float scale = resources.getDisplayMetrics().density;
-
         String text = "Friday 3 march 2020";
-
         //Paint pText = new Paint();
         Paint pText = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         pText.setColor(Color.WHITE);
         pText.setTextSize(12);
         pText.setAntiAlias(true);
-
-
-
        // setTextSizeForWidth(pText,(int) (originalBitmap.getHeight() * 0.04),text);
-
-
         Rect bounds = new Rect();
         pText.getTextBounds(text, 0, text.length(), bounds);
-
         Rect textHeightWidth = new Rect();
         pText.getTextBounds(text, 0, text.length(), textHeightWidth);
-
         canvas.drawText(text, (canvas.getWidth() / 4) - (textHeightWidth.width() / 2),
                 originalBitmap.getHeight()  - textHeightWidth.height(),
                 pText);
-
        //imageView.setImageBitmap(newBitmap);
         return newBitmap;
     }
 
 
-    private void setTextSizeForWidth(Paint paint, float desiredHeight,
-                                     String text) {
-
-        // Pick a reasonably large value for the test. Larger values produce
-        // more accurate results, but may cause problems with hardware
-        // acceleration. But there are workarounds for that, too; refer to
-        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+    private void setTextSizeForWidth(Paint paint, float desiredHeight, String text) {
         final float testTextSize = 48f;
-
         // Get the bounds of the text, using our testTextSize.
         paint.setTextSize(testTextSize);
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
-
         // Calculate the desired size as a proportion of our testTextSize.
         float desiredTextSize = testTextSize * desiredHeight / bounds.height();
-
         // Set the paint for that size.
         paint.setTextSize(desiredTextSize);
     }
-
-    public void Alert(String message, final FragmentActivity context) {
-        try {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-            builder.setTitle("Alert!");
-            builder.setMessage(message);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                    finish();
-
-                }
-            });
-
-            builder.show();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-
 
     private void bookingacceptedapiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
@@ -412,17 +487,14 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             String token = SessionManagement.getUserToken(this);
             HeadersUtil headparam = new HeadersUtil(token);
             postapiRequest.request(RequestDetails.this, bookingacceptApiListner, url, headparam, jsonBodyObj);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     FetchDataListener bookingacceptApiListner = new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject mydata) {
-
             try {
                 if (mydata != null) {
                     if (mydata.getInt("error") == 0) {
@@ -448,9 +520,7 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                 bottom.setClickable(true);
                 e.printStackTrace();
             }
-
         }
-
         @Override
         public void onFetchFailure(String msg) {
             RequestQueueService.showAlert(msg,RequestDetails.this);
@@ -458,12 +528,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             bottom.setVisibility(View.VISIBLE);
             bottom.setClickable(true);
         }
-
         @Override
-        public void onFetchStart() {
-
-        }
-
+        public void onFetchStart() { }
     };
     private void bookingByIdApiCalling() {
         JSONObject jsonBodyObj = new JSONObject();
@@ -479,7 +545,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
             e.printStackTrace();
         }
     }
-
     FetchDataListener bookingdetailsApiListner = new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject mydata) {
@@ -494,6 +559,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             blmod.setBookingid(data.getString("_id"));
                             String status = data.getString("status");
                             blmod.setStatus(data.getInt("status"));
+                            if(data.has("path"))
+                                blmod.setPath(data.getString("path"));
                             if (init_type.equals(Constants.REQUEST_INIT)) {
                                 pagetitle.setText(getString(R.string.request_details));
                             } else if (init_type.equals(Constants.COMPLETED_TRIP)) {
@@ -539,17 +606,21 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                             } else if (status.equals("3")) {
                                 bottomtext.setText(getString(R.string.view_map));
                                 bottom.setVisibility(View.VISIBLE);
+                                if (!SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID)) {
+                                    SharedPrefUtil.setPreferences(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID, blmod.getBookingid());
+                                    SharedPrefUtil.setPreferences(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_DRIVER_ID, SessionManagement.getUserId(RequestDetails.this));
+                                }
                             } else if (status.equals("4")) {
                                 bottom.setVisibility(View.GONE);
                             } else if (status.equals("5")) {
                                 if (SharedPrefUtil.hasKey(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID))
                                     SharedPrefUtil.deletePreference(RequestDetails.this, Constants.SHARED_PREF_ONGOING_TAG);
-                                if(data.has("snapped_path")){
+                                if (data.has("snapped_path")) {
                                     String snapstring = data.getString("snapped_path");
                                     JSONObject snap = new JSONObject(snapstring);
                                     JSONArray snaparray;
-                                    if(snap.has("snappedPoints")) {
-                                        maplayout.setVisibility(View.VISIBLE);
+                                    if (snap.has("snappedPoints")) {
+                                        //maplayout.setVisibility(View.VISIBLE);
                                         snaparray = snap.getJSONArray("snappedPoints");
                                         if (finalpath == null)
                                             finalpath = new ArrayList<>();
@@ -691,7 +762,6 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
 
     };
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -738,7 +808,8 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        maplayout.setVisibility(View.VISIBLE);
+        showMapBar();
+        //maplayout.setVisibility(View.VISIBLE);
         PolylineOptions op = new PolylineOptions();
         op.addAll(finalpath);
         op.width(30);
@@ -757,4 +828,41 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
         mMap.addMarker(dropop);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pickupLatLng, 18));
     }
+
+    public void readNotificationApiCall(String notificationId){
+        try {
+            POSTAPIRequest getapiRequest = new POSTAPIRequest();
+            String url = URLs.BASE_URL + URLs.READ_NOTIFICATIONS+notificationId;
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:",token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            getapiRequest.request(RequestDetails.this,readListener,url,headparam);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    FetchDataListener readListener = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data != null) {
+                    if (data.getInt("error") == 0) {
+                        String count = data.getString("unread_count");
+                        SessionManagement.setNotificationCount(RequestDetails.this,count);
+                        SharedPrefUtil.setPreferences(RequestDetails.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_COUNT_KEY,count);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onFetchFailure(String msg) {Log.e("Read Error",msg);}
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
 }

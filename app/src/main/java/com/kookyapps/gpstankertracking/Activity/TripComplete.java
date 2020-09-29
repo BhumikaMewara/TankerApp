@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -50,17 +51,17 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class TripComplete extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback {
-
-    TextView bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText,distanceTravelledTitleText;
-    RelativeLayout back,bottom;
+    TextView tv_showmap,bookingid,distancetext,pickup,drop,controller_name,contact_no,message,pagetitle,notificationCountText,distanceTravelledTitleText;
+    RelativeLayout back,bottom,showmaplayout;
     String init_type,bkngid,can_accept,can_end,can_start;
     BookingListModal blmod;
+    ImageView iv_showmap;
+    ScrollView scroll;
     Bundle b;
     SupportMapFragment mapFragment;
     RelativeLayout maplayout;
     ArrayList<LatLng>finalpath = null;
     GoogleMap mMap;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +87,14 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         message = (TextView) findViewById(R.id.tv_tripcomplete_message);
         distanceTravelledTitleText = (TextView) findViewById(R.id.tv_tripcomplete_distance_title);
         bottom = (RelativeLayout) findViewById(R.id.rl_bottomLayout_text);
+        showmaplayout = (RelativeLayout)findViewById(R.id.rl_trip_complete_showmap);
+        tv_showmap = (TextView)findViewById(R.id.tv_trip_complete_showmap);
+        iv_showmap = (ImageView) findViewById(R.id.iv_trip_complete_showmap);
+        scroll = (ScrollView)findViewById(R.id.sv_tripcomplete);
+        scroll.setVisibility(View.GONE);
+        showmaplayout.setOnClickListener(this);
+        tv_showmap.setText("Hide Map");
+        iv_showmap.setImageResource(R.drawable.ic_minus);
         back.setOnClickListener(this);
         bottom.setOnClickListener(this);
         pagetitle.setText(getString(R.string.trip_complete));
@@ -99,6 +108,19 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.rl_bottomLayout_text:
                 onBackPressed();
+                break;
+            case R.id.rl_trip_complete_showmap:
+                if(maplayout.getVisibility()==View.VISIBLE){
+                    maplayout.setVisibility(View.GONE);
+                    scroll.setVisibility(View.VISIBLE);
+                    tv_showmap.setText("Show Map");
+                    iv_showmap.setImageResource(R.drawable.ic_plus);
+                }else{
+                    scroll.setVisibility(View.GONE);
+                    maplayout.setVisibility(View.VISIBLE);
+                    tv_showmap.setText("Hide Map");
+                    iv_showmap.setImageResource(R.drawable.ic_minus);
+                }
                 break;
         }
     }
@@ -117,8 +139,6 @@ public class TripComplete extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     FetchDataListener bookingdetailsApiListner = new FetchDataListener() {

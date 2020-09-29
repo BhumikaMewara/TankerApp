@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Water Tanker</string>
+    <string name="app_name">AE Tanker</string>
     <string name="no_booking">No Bookings Found</string>
     <!--<item name="myUrl" type="menu">http://myUrl.com</item>-->
     <string name="drawer_open">open</string>

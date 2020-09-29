@@ -1,15 +1,18 @@
 package com.kookyapps.gpstankertracking.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -31,10 +34,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     TextView titleSignInText,usernameText,passwordText,signInText;
     EditText usernameET,passwordET;
-    ImageView usernameImg,passwordImg;
-    LinearLayout signIn;
+    ImageView usernameImg,passwordImg,eye;
+    ConstraintLayout signIn;
     ProgressBar progressBar;
     String username , password;
+    boolean pwd_visibility;
+
+    RelativeLayout rl_eye;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,25 +58,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         usernameImg=(ImageView)    findViewById(R.id.iv_main_usernameImg);
         passwordImg=(ImageView)    findViewById(R.id.iv_main_passwordImg);
         progressBar=(ProgressBar)  findViewById(R.id.main_progressBar);
+        eye=(ImageView)            findViewById(R.id.iv_login_eye);
+        rl_eye = (RelativeLayout)findViewById(R.id.rl_login_showpwwd);
+        rl_eye.setOnClickListener(this);
+        eye.setOnClickListener(this);
         progressBar.setVisibility(View.GONE);
-        signIn=(LinearLayout)      findViewById(R.id.lh_main_signIn);
+        signIn=(ConstraintLayout)      findViewById(R.id.lh_main_signIn);
         signIn.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        pwd_visibility = false;
+        passwordET.setTransformationMethod(new PasswordTransformationMethod());
+        eye.setImageResource(R.drawable.ic_eye);
     }
 
     @Override
     public void onClick(View view) {
         Intent i;
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.lh_main_signIn:
-            signIn.setClickable(false);
+                signIn.setClickable(false);
                 progressBar.setVisibility(View.VISIBLE);
-
-        if (validate()){
-            loginApiCalling();
-        }
-
-
-        break;
+                if (validate()) {
+                    loginApiCalling();
+                }
+                break;
+            case R.id.iv_login_eye:
+                eye.setClickable(false);
+                pwd_visibility = !pwd_visibility;
+                if(pwd_visibility) {
+                    passwordET.setTransformationMethod(null);
+                    eye.setImageResource(R.drawable.ic_hidden);
+                }
+                else {
+                    passwordET.setTransformationMethod(new PasswordTransformationMethod());
+                    eye.setImageResource(R.drawable.ic_eye);
+                }
+                eye.setClickable(true);
+                break;
         }
     }
 
@@ -113,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             jsonBodyObj.put("password",password);
             jsonBodyObj.put("device_type", "a");
             String token= FirebaseInstanceId.getInstance().getToken();
+            Log.d("FCMTOKEN:","token");
             jsonBodyObj.put("device_token", token);
             POSTAPIRequest postapiRequest=new POSTAPIRequest();
             String url = URLs.BASE_URL+ URLs.SIGN_IN_URL;
@@ -149,7 +178,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 userdetail.getJSONObject("settings").getString("language"),
                                                 userdetail.getString("location"),
                                                 "1",
-                                                "0");
+                                                "0",
+                                                userdetail.getBoolean("valid"));
                                     } else {
                                         SessionManagement.createLoginSession(MainActivity.this,
                                                 true, userdetail.getString("tanker_id"),
@@ -160,7 +190,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 userdetail.getJSONObject("settings").getString("language"),
                                                 userdetail.getString("location"),
                                                 "1",
-                                                userdetail.getString("notification_count"));
+                                                userdetail.getString("notification_count"),
+                                                userdetail.getBoolean("valid"));
                                     }
                                 } else {
                                     SessionManagement.createLoginSession(MainActivity.this,
@@ -172,7 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             userdetail.getJSONObject("settings").getString("language"),
                                             userdetail.getString("location"),
                                             "1",
-                                            "0");
+                                            "0",
+                                            userdetail.getBoolean("valid"));
                                 }
                                 SessionManagement.setUserStatus(MainActivity.this, userdetail.getString("activity_status"));
                                 Intent i = new Intent(MainActivity.this, FirstActivity.class);

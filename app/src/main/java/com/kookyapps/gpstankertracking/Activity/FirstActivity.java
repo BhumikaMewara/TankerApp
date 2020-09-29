@@ -1,5 +1,6 @@
 package com.kookyapps.gpstankertracking.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,31 +10,29 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-
-import com.kookyapps.gpstankertracking.Utils.LocaleHelper;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.kookyapps.gpstankertracking.Utils.GETAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.app.GPSTracker;
 import com.kookyapps.gpstankertracking.fcm.Config;
-
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Location;
 import android.location.LocationManager;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -48,7 +47,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.kookyapps.gpstankertracking.Adapters.ViewPagerAdapter;
 import com.kookyapps.gpstankertracking.R;
@@ -62,24 +60,17 @@ import com.kookyapps.gpstankertracking.Utils.URLs;
 import com.kookyapps.gpstankertracking.fcm.NotificationUtilsFcm;
 import com.kookyapps.gpstankertracking.fragment.BookingList;
 import com.kookyapps.gpstankertracking.fragment.RequestList;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Locale;
-
-import static android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.SEND_SMS;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static androidx.viewpager.widget.PagerAdapter.POSITION_NONE;
+
 
 public class FirstActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -89,38 +80,27 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     ViewPager viewPager;
     LinearLayout l ,tripLayout ,logoutLayout,cancelLayout;
     RelativeLayout r ,toolbarNotiCountLayout,toolbarmenuLayout,notificationLayout;
-    TextView fullname,username,trip,language,logut,toolBarTitle,pagetitle,bookind_id,distance,from,to,view;
-    ImageView tripImg,languageImg,logoutImg,flagImg,toolBarImgMenu,toolBarImgNotification;
+    TextView fullname,username,trip,language,logut,pagetitle,bookind_id,distance,from,to,view;
+    ImageView toolBarImgMenu,toolBarImgNotification;
     static String notificationCount;
     Button rqstbtn , bkngbtn;
     static FragmentManager fragmentManager;
     ViewPagerAdapter adapter;
     int viewpos=0;
-     String [] tabTitle ;
+    private FusedLocationProviderClient mFusedLocationClient;
     Locale locale;
     Bundle b;
-    Context newContext; ;
     public static final int RequestPermissionCode = 7;
     BroadcastReceiver mRegistrationBroadcastReceiver;
     TextView notificationCountText;
     SwitchCompat switchCompat, onlineSwitch;
-    static Boolean isTouched = false,isTouched2=true;
-    Boolean x=true,permissionGranted = false;
-    GPSTracker gpsTracker;
-    ArrayList<String> allpermissionsrequired;
-    String  stringLatitude,stringLongitude,s12;
-    private LocationManager locationManager;
-
-
-
-
+    static Boolean isTouched = false;
+    Location currloc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-       // pagetitle=(TextView)findViewById(R.id.tv_water_tanker_toolbartitle);
-        toGetAllPermissions();
-        gpsTracker = new GPSTracker(this);
+        //toGetAllPermissions();
         switchCompat=(SwitchCompat)findViewById(R.id.switch2);
         if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
             Log.i("language",SessionManagement.getLanguage(this));
@@ -129,18 +109,12 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }else{
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         onlineSwitch=(SwitchCompat)findViewById(R.id.switch1);
         if(SessionManagement.getUserStatus(FirstActivity.this).equals(Constants.IS_ONLINE)){
             onlineSwitch.setChecked(true);
         }else{
             onlineSwitch.setChecked(false);
-        }
-        if (gpsTracker.getIsGPSTrackingEnabled()){
-            stringLatitude = String.valueOf(gpsTracker.latitude);
-            stringLongitude = String.valueOf(gpsTracker.longitude);
-        }else
-        {
-            gpsTracker.showSettingsAlert();
         }
         onlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
@@ -148,24 +122,23 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_ONLINE);
+                    updateLcationApiCalling(Constants.IS_ONLINE);
                     if(viewpos==0)
                         ((RequestList)adapter.getItem(viewpos)).requestReload();
                 } else {
                     SessionManagement.setUserStatus(FirstActivity.this, Constants.IS_OFFLINE);
+                    updateLcationApiCalling(Constants.IS_OFFLINE);
                     if(viewpos==0)
                         ((RequestList)adapter.getItem(viewpos)).requestReload();
-                    //updateLcationApiCalling(Constants.IS_OFFLINE);
                 }
             }
 
         });
-        updateLcationApiCalling(SessionManagement.getUserStatus(FirstActivity.this));
         toolbar =(Toolbar)findViewById(R.id.water_tanker_toolbar);
         viewPager=(ViewPager)findViewById(R.id.vp_first);
         fullname=(TextView)findViewById(R.id.tv_first_drawer_fullName);
         username=(TextView)findViewById(R.id.tv_first_drawer_username);
         trip=(TextView)findViewById(R.id.tv_drawer_tripText);
-
         language=(TextView)findViewById(R.id.tv_drawer_language);
         logut=(TextView)findViewById(R.id.tv_drawer_logout);
         toolBarImgMenu =(ImageView)findViewById(R.id.toolbarmenu);
@@ -181,7 +154,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         notificationLayout.setOnClickListener(this);
         notificationCountText=(TextView)findViewById(R.id.tv_toolbar_notificationcount);
         toolbarNotiCountLayout=(RelativeLayout)findViewById(R.id.rl_toolbar_notificationcount);
-
         navdrawer= (DrawerLayout)   findViewById(R.id.dl_first) ;
         //actionBarDrawerToggle = new ActionBarDrawerToggle(this,navdrawer,R.string.drawer_open,R.string.drawer_close);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, navdrawer,
@@ -191,7 +163,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 super.onDrawerSlide(drawerView, slideOffset);
             }
         };
-
         navdrawer.setDrawerElevation(0f);
         navdrawer.setScrimColor(Color.TRANSPARENT);
         navdrawer.addDrawerListener(actionBarDrawerToggle);
@@ -202,30 +173,31 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         logoutLayout=(LinearLayout)findViewById(R.id.lh_first_logoutLayout);
         rqstbtn= (Button)findViewById(R.id.btn_first_rqstbtn);
         bkngbtn= (Button)findViewById(R.id.btn_first_bookingbtn);
-
         bookind_id=(TextView)findViewById(R.id.tv_bookingitem_bookingid_title);
         distance=(TextView)findViewById(R.id.tv_bookingitem_distance_title);
         from=(TextView)findViewById(R.id.tv_bookingitem_fromtitle);
         to=(TextView)findViewById(R.id.tv_bookingitem_totitle);
         view=(TextView)findViewById(R.id.tv_bookingitem_viewaction);
-
         fullname.setText(SessionManagement.getName(FirstActivity.this));
         username.setText(SessionManagement.getUserId(FirstActivity.this));
-        int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
+        /*int noticount = Integer.parseInt(SessionManagement.getNotificationCount(this));
         if(noticount<=0){
             clearNotificationCount();
         }else{
             notificationCountText.setText(String.valueOf(noticount));
             toolbarNotiCountLayout.setVisibility(View.VISIBLE);
-        }
+        }*/
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                     String message = intent.getStringExtra("message");
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                     int count = Integer.parseInt(SessionManagement.getNotificationCount(FirstActivity.this));
                     setNotificationCount(count+1,false);
+                    if(viewpos==0){
+                        ((RequestList)adapter.getItem(viewpos)).requestReload();
+                    }
                 }else if(intent.getAction().equals(Config.LANGUAGE_CHANGE)){
                     if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)){
                         setAppLocale(Constants.HINDI_LANGUAGE);
@@ -256,9 +228,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             }
             @Override
             public void onPageSelected(int position) {
-                //highLightCurrentTab(position);
-
-                //pagetitle.setText(tabTitle[position]);
                 if(position==0){
                     viewpos =0;
                     rqstbtn.setBackground(getResources().getDrawable( R.drawable.bg_requestlist_selected));
@@ -311,127 +280,36 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
-
-
-    public void toGetAllPermissions(){
-        // Adding if condition inside button.
-
-        // If All permission is enabled successfully then this block will execute.
-        if(CheckingPermissionIsEnabledOrNot())
-        {
-           // Toast.makeText(FirstActivity.this, "All Permissions Granted Successfully", Toast.LENGTH_LONG).show();
-        }
-        // If, If permission is not enabled then else condition will execute.
-        else {
-
-            //Calling method to enable permission.
-            RequestMultiplePermission();
-
-        }
-    }
-
-    private void RequestMultiplePermission() {
-
-        // Creating String Array with Permissions.
-        ActivityCompat.requestPermissions(FirstActivity.this, new String[]
-                {
-                        CAMERA,
-                        ACCESS_FINE_LOCATION,
-                        INTERNET,
-                        CALL_PHONE,
-                        READ_EXTERNAL_STORAGE,
-                        WRITE_EXTERNAL_STORAGE
-                }, RequestPermissionCode);
-
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         setCurrentTab();
         super.onNewIntent(intent);
     }
 
-    // Calling override method.
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-
-            case RequestPermissionCode:
-
-                if (grantResults.length > 0) {
-
-                    boolean CameraPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean AccessFineLoaction = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    boolean InternetPermission = grantResults[2] == PackageManager.PERMISSION_GRANTED;
-                    boolean CallPhonePermisission = grantResults[3] == PackageManager.PERMISSION_GRANTED;
-                    boolean ReadExternalStoragePermission = grantResults[4] == PackageManager.PERMISSION_GRANTED;
-                    boolean WriteExternalStoragePermission = grantResults[5] == PackageManager.PERMISSION_GRANTED;
-
-
-                    if (CameraPermission && AccessFineLoaction && InternetPermission && CallPhonePermisission  && ReadExternalStoragePermission  &&  WriteExternalStoragePermission) {
-                        gpsTracker = new GPSTracker(this);
-
-                        stringLatitude = String.valueOf(gpsTracker.latitude);
-                        stringLongitude = String.valueOf(gpsTracker.longitude);
-
-
-                        /*String status = SessionManagement.getUserStatus(FirstActivity.this);
-                        if (status.equals("1")){
-                            onlineSwitch.setChecked(true);
-                            updateLcationApiCalling(Constants.IS_ONLINE);
-                        }else{
-                            onlineSwitch.setChecked(false);
-                            updateLcationApiCalling(Constants.IS_OFFLINE);
-                        }*/
-                        Toast.makeText(FirstActivity.this, "Permission Granted", Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        Toast.makeText(FirstActivity.this,"Permission Denied",Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                break;
-        }
-    }
-
-    public boolean CheckingPermissionIsEnabledOrNot() {
-
-        int FirstPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), CAMERA);
-        int SecondPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
-        int ThirdPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), INTERNET);
-        int ForthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE);
-        int FivthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
-        int SixthPermissionResult = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
-       // int SeventhPermissionResult=ContextCompat.checkSelfPermission(getApplicationContext(),ACCESS_BACKGROUND_LOCATION);
-
-        return FirstPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                SecondPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                ThirdPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                ForthPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                FivthPermissionResult == PackageManager.PERMISSION_GRANTED &&
-                SixthPermissionResult == PackageManager.PERMISSION_GRANTED ;
-               // SeventhPermissionResult==PackageManager.PERMISSION_GRANTED;
-    }
-
-
     public void updateLcationApiCalling(String currentStatus) {
         JSONObject jsonBodyObj = new JSONObject();
         try {
-            jsonBodyObj.put("lat", stringLatitude);
-            jsonBodyObj.put("lng", stringLongitude);
-            jsonBodyObj.put("status", currentStatus);
-            POSTAPIRequest postapiRequest = new POSTAPIRequest();
-            String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
-            Log.i("url", String.valueOf(url));
-            Log.i("Request", String.valueOf(postapiRequest));
-            String token = SessionManagement.getUserToken(this);
-            Log.i("Token:", token);
-            HeadersUtil headparam = new HeadersUtil(token);
-            postapiRequest.request(FirstActivity.this, updateLocationListner, url, headparam, jsonBodyObj);
+            getLastLocation();
+            if(currloc!=null) {
+                jsonBodyObj.put("lat", currloc.getLatitude());
+                jsonBodyObj.put("lng", currloc.getLongitude());
+                jsonBodyObj.put("status", currentStatus);
+                POSTAPIRequest postapiRequest = new POSTAPIRequest();
+                String url = URLs.BASE_URL + URLs.UPDATE_LOCATION ;
+                Log.i("url", String.valueOf(url));
+                Log.i("Request", String.valueOf(postapiRequest));
+                String token = SessionManagement.getUserToken(this);
+                Log.i("Token:", token);
+                HeadersUtil headparam = new HeadersUtil(token);
+                postapiRequest.request(FirstActivity.this, updateLocationListner, url, headparam, jsonBodyObj);
+            }else{
+                Log.e("UpdateLocation","currloc is null");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
     FetchDataListener updateLocationListner = new FetchDataListener() {
         @Override
         public void onFetchComplete(JSONObject data) {
@@ -439,7 +317,8 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 if (data!=null){
                     if (data.getInt("error") == 0) {
                         String message=   data.getString("message");
-                        //Toast.makeText(FirstActivity.this, "Error while updating status", Toast.LENGTH_SHORT).show();
+                        Log.i("UpdateLocationApi",message);
+                        Toast.makeText(FirstActivity.this, message, Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (JSONException e){
@@ -482,28 +361,24 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         adapter.addFragment(new RequestList(FirstActivity.this));
         adapter.addFragment(new BookingList(FirstActivity.this));
         viewPager.setAdapter(adapter);
-
     }
     public void drawerMenu (View view ){
         navdrawer.openDrawer(Gravity.LEFT);
     }
-
-
     @Override
     public void onClick(View view) {
         Intent i ;
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.lh_first_triplayout:
                 if (navdrawer.isDrawerOpen(GravityCompat.START)) {
                     navdrawer.closeDrawer(GravityCompat.START);
                 }
                 i = new Intent(this, TripDetails.class);
-                i.putExtra("init_type",Constants.COMPLETED_TRIP);
+                i.putExtra("init_type", Constants.COMPLETED_TRIP);
                 startActivity(i);
                 break;
             case R.id.lh_first_logoutLayout:
                 logoutLayout.setClickable(false);
-
                 logutApiCalling();
                 break;
             case R.id.btn_first_rqstbtn:
@@ -511,19 +386,19 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.btn_first_bookingbtn:
                 viewPager.setCurrentItem(1);
-                break ;
+                break;
             case R.id.rl_water_tanker_toolbar_menu_notification:
-                i = new Intent(this,Notifications.class);
+                i = new Intent(this, Notifications.class);
                 startActivity(i);
                 break;
             case R.id.lh_first_cancellayout:
                 if (navdrawer.isDrawerOpen(GravityCompat.START)) {
                     navdrawer.closeDrawer(GravityCompat.START);
-        }
-        i = new Intent(this, TripDetails.class);
-                i.putExtra("init_type",Constants.CANCELLED_TRIP);
+                }
+                i = new Intent(this, TripDetails.class);
+                i.putExtra("init_type", Constants.CANCELLED_TRIP);
                 startActivity(i);
-
+                break;
         }
     }
 
@@ -533,7 +408,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         JSONObject jsonBodyObj = new JSONObject();
         try {
             if(SharedPrefUtil.hasKey(FirstActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
-                RequestQueueService.showAlert("Cannot logout while trip is ongoing.",FirstActivity.this);
+                RequestQueueService.showAlert("Cannot login while trip is ongoing.",FirstActivity.this);
                 logoutLayout.setClickable(true);
             }else {
                 POSTAPIRequest postapiRequest = new POSTAPIRequest();
@@ -633,10 +508,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
         }
     };
-
-
-
-
     public void setNotificationCount(int count,boolean isStarted){
         notificationCount = SessionManagement.getNotificationCount(FirstActivity.this);
         if(Integer.parseInt(notificationCount)!=count) {
@@ -654,7 +525,6 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             boolean b2 = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
             if(b2)
                 SharedPrefUtil.setPreferences(FirstActivity.this,Constants.SHARED_PREF_NOTICATION_TAG,Constants.SHARED_NOTIFICATION_UPDATE_KEY,"no");
-
         }
     }
     public void clearNotificationCount(){
@@ -670,20 +540,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onResume() {
-        super.onResume();
         // register new push message receiver
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.LANGUAGE_CHANGE));
         // clear the no04  ki[[vtification area when the app is opened
-
+        getValidity();
         if(SessionManagement.getLanguage(FirstActivity.this).equals(Constants.HINDI_LANGUAGE)) {
             setAppLocale(Constants.HINDI_LANGUAGE);
         }else {
             setAppLocale(Constants.ENGLISH_LANGUAGE);
         }
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.LANGUAGE_CHANGE));
+
         String sc = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY);
         String vc = notificationCountText.getText().toString();
         int sharedCount,viewCount;
@@ -693,12 +563,20 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
             sharedCount = Integer.parseInt(SharedPrefUtil.getStringPreferences(this,
                     Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY));
         }
+        boolean b1;
         if(vc.equals("")){
             viewCount=0;
+            b1 = sharedCount != viewCount;
+        }else if(vc.equals("99+")) {
+            if (sharedCount > 99) {
+                b1 = false;
+            } else {
+                b1 = true;
+            }
         }else{
             viewCount = Integer.parseInt(vc);
+            b1 = sharedCount != viewCount;
         }
-        boolean b1 = sharedCount != viewCount;
         boolean b2 = SharedPrefUtil.getStringPreferences(this, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY).equals("yes");
         if (b2) {
             newNotification();
@@ -714,6 +592,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                 toolbarNotiCountLayout.setVisibility(View.VISIBLE);
             }
         }
+        super.onResume();
     }
     @Override
     protected void onPause() {
@@ -722,53 +601,27 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
     }
     @Override
     public void onBackPressed() {
-
         if (navdrawer.isDrawerOpen(GravityCompat.START)) {
             navdrawer.closeDrawer(GravityCompat.START);
         }else {
-            // Create the object of
-            // AlertDialog Builder class
             AlertDialog.Builder builder
                     = new AlertDialog
                     .Builder(FirstActivity.this);
-
-            // Set the message show for the Alert time
             builder.setMessage("Do you want to exit ?");
-
-            // Set Alert Title
             builder.setTitle("Alert !");
-
-            // Set Cancelable false
-            // for when the user clicks on the outside
-            // the Dialog Box then it will remain show
             builder.setCancelable(false);
-
-            // Set the positive button with yes name
-            // OnClickListener method is use of
-            // DialogInterface interface.
-
-            builder
-                    .setPositiveButton(
+            builder.setPositiveButton(
                             "Yes",
                             new DialogInterface
                                     .OnClickListener() {
-
                                 @Override
                                 public void onClick(DialogInterface dialog,
                                                     int which)
                                 {
-
-                                    // When the user click yes button
-                                    // then app will close
                                     finish();
                                 }
                             });
-
-            // Set the Negative button with No name
-            // OnClickListener method is use
-            // of DialogInterface interface.
-            builder
-                    .setNegativeButton(
+            builder.setNegativeButton(
                             "No",
                             new DialogInterface
                                     .OnClickListener() {
@@ -777,15 +630,10 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                                 public void onClick(DialogInterface dialog,
                                                     int which)
                                 {
-
-                                    // If user click no
-                                    // then dialog box is canceled.
                                     dialog.cancel();
                                 }
                             });
-            // Create the Alert dialog
             AlertDialog alertDialog = builder.create();
-            // Show the Alert Dialog box
             alertDialog.show();
         }
     }
@@ -813,6 +661,71 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
         }
         resources.updateConfiguration(config, dm);
     }
+
+    private void getLastLocation() {
+        try {
+            mFusedLocationClient.getLastLocation()
+                    .addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                currloc = task.getResult();
+                            } else {
+                                Log.w("Home Page", "Failed to get location.");
+                                currloc = null;
+                            }
+                        }
+                    });
+        } catch (SecurityException unlikely) {
+            Log.e("Home Page", "Lost location permission." + unlikely);
+            currloc = null;
+        }
+    }
+
+    private void getValidity(){
+        try {
+            GETAPIRequest postapiRequest = new GETAPIRequest();
+            String url = URLs.BASE_URL + URLs.CHECK_VALIDITY ;
+            Log.i("url", String.valueOf(url));
+            String token = SessionManagement.getUserToken(this);
+            Log.i("Token:", token);
+            HeadersUtil headparam = new HeadersUtil(token);
+            postapiRequest.request(FirstActivity.this, validityListener, url, headparam);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    FetchDataListener validityListener = new FetchDataListener() {
+        @Override
+        public void onFetchComplete(JSONObject data) {
+            try {
+                if (data!=null){
+                    if (data.getInt("error") == 0) {
+                        boolean b = data.getBoolean("valid");
+                        if(b!=SessionManagement.getValidity(FirstActivity.this)) {
+                            SessionManagement.setValidity(FirstActivity.this, b);
+                            if(viewpos==0)
+                                ((RequestList)adapter.getItem(viewpos)).requestReload();
+                            else
+                                ((BookingList)adapter.getItem(viewpos)).bookingReload();
+                        }
+                    }
+                }
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+        @Override
+        public void onFetchFailure(String msg) {
+            Log.e("FirstActivity","Validity Api Failure");
+        }
+
+        @Override
+        public void onFetchStart() {
+
+        }
+    };
 
 
 }

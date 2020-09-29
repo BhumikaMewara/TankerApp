@@ -43,9 +43,9 @@ public class PointsParser extends AsyncTask<String, Integer, MapDataParserModal>
 
         try {
             jObject = new JSONObject(jsonData[0]);
-            Log.d("mylog", jsonData[0].toString());
+            Log.d("mylog json", jsonData[0].toString());
             DataParser parser = new DataParser();
-            Log.d("mylog", parser.toString());
+            Log.d("mylog parser", parser.toString());
 
             // Starts parsing data
             calculated = parser.parse(jObject);

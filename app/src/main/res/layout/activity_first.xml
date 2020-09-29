@@ -84,13 +84,11 @@
             android:background="@color/drawerColor"
             android:gravity="center_horizontal"
             android:orientation="vertical">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false" android:orientation="horizontal"
                 android:weightSum="4">
-
                 <LinearLayout
                     android:id="@+id/lv_first_drawer_firstLayout"
                     android:layout_width="wrap_content"
@@ -99,8 +97,6 @@
                     android:layout_gravity="start"
                     android:gravity="start"
                     android:layout_weight="3">
-
-
                     <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                         android:id="@+id/tv_first_drawer_fullName"
                         android:layout_width="wrap_content"
@@ -112,7 +108,6 @@
                         android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="@android:color/black" />
-
                     <com.kookyapps.gpstankertracking.CustomViews.RobotoRegularTextView
                         android:id="@+id/tv_first_drawer_username"
                         android:layout_width="wrap_content"
@@ -123,9 +118,7 @@
                         android:textStyle="bold"
                         android:textSize="14sp"
                         android:textColor="@android:color/black" />
-
                 </LinearLayout>
-
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

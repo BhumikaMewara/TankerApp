@@ -61,4 +61,17 @@ public class Utils {
         byte[] decodeByte = Base64.decode(input,0);
         return BitmapFactory.decodeByteArray(decodeByte,0,decodeByte.length);
     }
+
+    public static void setRequestingLocationUpdates(Context context,boolean isRequesting){
+        SharedPrefUtil.setPreferences(context,Constants.SHARED_REQUESTING_LOCATION_TAG,Constants.SHARED_REQUESTING_KEY,isRequesting );
+    }
+
+    public static void removeRequestingLocation(Context context){
+        if(SharedPrefUtil.hasKey(context,Constants.SHARED_REQUESTING_LOCATION_TAG,Constants.SHARED_REQUESTING_KEY)) {
+            SharedPrefUtil.deletePreference(context,Constants.SHARED_REQUESTING_LOCATION_TAG);
+        }
+    }
+    public static boolean isRequestingLocation(Context context){
+        return SharedPrefUtil.getBooleanPreferences(context,Constants.SHARED_REQUESTING_LOCATION_TAG,Constants.SHARED_REQUESTING_KEY);
+    }
 }

@@ -40,7 +40,6 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class BookingList extends Fragment {
-
     RecyclerView recyclerView;
     RelativeLayout progressBar;
     TextView noBooking;
@@ -60,10 +59,6 @@ public class BookingList extends Fragment {
     private String bookingCount;
     private int totaltxnCount;
     boolean isListNull = true;
-
-
-
-
     public BookingList(Context context) {
         // Required empty public constructor
         this.context = context;
@@ -113,13 +108,14 @@ public class BookingList extends Fragment {
             }
         });
         refreshLayout=(SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh_bookinglist);
-
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                /* refreshLayout.setRefreshing(false);*/
-                requestlist.clear();
-                mAdapter.clearAll();
+                if(requestlist!=null) {
+                    requestlist.clear();
+                    mAdapter.clearAll();
+                }
                 bookinglistApiCalling();
             }
         });
@@ -145,19 +141,23 @@ public class BookingList extends Fragment {
         bookinglistApiCalling();
     }
 
-public void bookinglistApiCalling(){
-    JSONObject jsonBodyObj = new JSONObject();
-    try {
-        GETAPIRequest getapiRequest = new GETAPIRequest();
-        String url = URLs.BASE_URL+URLs.BOOKING_LIST+"?page_size="+String.valueOf(page_size)+"&page="+String.valueOf(PAGE_START);
-        Log.i("url", String.valueOf(url));
-        Log.i("Request", String.valueOf(getapiRequest));
-        String token = SessionManagement.getUserToken(getActivity());
-        HeadersUtil headparam = new HeadersUtil(token);
-        //getapiRequest.request(getActivity(),bookinglistListner,url,headparam,jsonBodyObj);
-        getapiRequest.request(getActivity().getApplicationContext(),bookinglistListner,url,headparam,jsonBodyObj);
-    }catch (Exception e){
-        e.printStackTrace();
+public void bookinglistApiCalling() {
+    if (SessionManagement.getValidity(context)) {
+        JSONObject jsonBodyObj = new JSONObject();
+        try {
+            GETAPIRequest getapiRequest = new GETAPIRequest();
+            String url = URLs.BASE_URL + URLs.BOOKING_LIST + "?page_size=" + String.valueOf(page_size) + "&page=" + String.valueOf(PAGE_START);
+            Log.i("url", String.valueOf(url));
+            Log.i("Request", String.valueOf(getapiRequest));
+            String token = SessionManagement.getUserToken(getActivity());
+            HeadersUtil headparam = new HeadersUtil(token);
+            //getapiRequest.request(getActivity(),bookinglistListner,url,headparam,jsonBodyObj);
+            getapiRequest.request(getActivity().getApplicationContext(), bookinglistListner, url, headparam, jsonBodyObj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }else{
+        setRecyclerView();
     }
 }
     FetchDataListener bookinglistListner = new FetchDataListener() {
@@ -187,8 +187,11 @@ public void bookinglistApiCalling(){
                             //isListNull = false;
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject jsonObject = (JSONObject) array.get(i);
+                                Log.i("Booking Detail",jsonObject.toString());
                                 BookingListModal tdmod = new BookingListModal();
                                 tdmod.setBookingid(jsonObject.getString("_id"));
+                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                tdmod.setDistance(distance.getString("text"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
@@ -237,14 +240,6 @@ public void bookinglistApiCalling(){
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
-                                if (distance != null) {
-                                    tdmod.setDistance(distance.getString("text"));
-                                } else {
-                                    RequestQueueService.showAlert("Error! no data found in distance", getActivity());
-                                }*/
-
-
                                 requestlist.add(tdmod);
                             }
                         }else {
@@ -317,6 +312,8 @@ public void bookinglistApiCalling(){
                                 JSONObject jsonObject = (JSONObject) array.get(i);
                                 BookingListModal tdmod = new BookingListModal();
                                 tdmod.setBookingid(jsonObject.getString("_id"));
+                                JSONObject distance = jsonObject.getJSONObject("distance");
+                                tdmod.setDistance(distance.getString("text"));
                                 JSONObject dropPoint = jsonObject.getJSONObject("drop_point");
                                 if (dropPoint != null) {
                                     tdmod.setTolocation(dropPoint.getString("location"));
@@ -353,21 +350,12 @@ public void bookinglistApiCalling(){
                                         } else {
                                             RequestQueueService.showAlert("Error! no data in coordinates", getActivity());
                                         }
-
-
                                     }else {
                                         RequestQueueService.showAlert("Error! no data in geometry",getActivity());
                                     }
                                 } else {
                                     RequestQueueService.showAlert("Error! no data found in pick_up_point", getActivity());
                                 }
-                                /*JSONObject distance = jsonObject.getJSONObject("distance");
-                                if (distance != null) {
-                                    tdmod.setDistance(distance.getString("text"));
-                                } else {
-                                    RequestQueueService.showAlert("Error! no data found", getActivity());
-                                }*/
-
                                 requestlist.add(tdmod);
                             }
                         }
@@ -401,8 +389,16 @@ public void bookinglistApiCalling(){
 
 
     public void setRecyclerView(){
-        if(isListNull){
+        if(refreshLayout.isRefreshing())
+            refreshLayout.setRefreshing(false);
+        if(!SessionManagement.getValidity(context)){
             progressBar.setVisibility(View.GONE);
+            noBooking.setText("Validity Expired");
+            noBooking.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }else if(isListNull){
+            progressBar.setVisibility(View.GONE);
+            noBooking.setText("No Bookings");
             noBooking.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }else{

@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.media.ToneGenerator;
@@ -38,6 +39,7 @@ import java.util.Map;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.media.AudioAttributesCompat;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -49,175 +51,58 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.e(TAG, "From: " + remoteMessage.getFrom());
-        Log.e(TAG, "Notification Data : " + remoteMessage.getData().toString());
-
-        //  timestamp = Calendar.getInstance().getTime();
-
+        Log.i("PushNotification",remoteMessage.toString());
+        Log.i(TAG, "From: " + remoteMessage.getFrom());
+        Log.i(TAG, "Notification Data : " + remoteMessage.getData().toString());
         if (remoteMessage == null)
             return;
-
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.e(TAG, "Notification Body: " + remoteMessage.getNotification().getBody());
-            //handleNotification(remoteMessage.getNotification().getBody());
             try {
                 Map<String, String> s = remoteMessage.getData();
-                //String txn_id = s.get("");
                 Log.e(TAG, "string: " + s.toString());
                 JSONObject json = new JSONObject(s);
-                //JSONObject data = json.getJSONObject("message");
-                //showNotifications(data);
-                //Log.e("data123",data.toString());
-                //Log.e(TAG, "Data Payload: " + data.toString());
-                showNotifications("Seremo",json);
-                //handleDataMessage(data);
+                showNotifications(json);
             } catch (Exception e) {
                 Log.e(TAG, "Exception at Ini: " + e.getMessage());
                 e.printStackTrace();
             }
-
-
-        }
-
-        // Check if message contains a data payload.
-        /*if (remoteMessage.getData().size() > 0) {
-            Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
-
-            try {
-                JSONObject json = new JSONObject(remoteMessage.getData().toString());
-                JSONObject data = json.getJSONObject("message");
-                handleDataMessage(data);
-            } catch (Exception e) {
-                Log.e(TAG, "Exception at Ini: " + e.getMessage());
-            }
-        }*/
-    }
-
-    private void handleNotification(String message) {
-        if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
-            // app is in foreground, broadcast the push message
-            Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-            pushNotification.putExtra("message", message);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-            ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC,100);
-            toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,200);
-            // play notification sound
-            NotificationUtilsFcm notificationUtils = new NotificationUtilsFcm(getApplicationContext());
-            notificationUtils.playNotificationSound();
-            /*showNotifications("Seremo",message);
-            showNotifications();*/
-        }else{
-            // If the app is in background, firebase itself handles the notification
         }
     }
 
-    private void handleDataMessage(JSONObject json) {
-        Log.e(TAG, "push json: " + json.toString());
-
+    private void showNotifications(JSONObject json) {
         try {
-            //  JSONObject data = json.getJSONObject("data");
-
-            String course_id = json.getString("course_id");
-            String type = json.getString("type");
-            String message = json.getString("message");
-
-            String imageUrl = "";
-
-            timestamp = DateFormat.getDateTimeInstance().format(new Date());
-
-
-            Log.e(TAG, "course_id: " + course_id);
-            Log.e(TAG, "message: " + message);
-            Log.e(TAG, "type : " + type);
-
-
-            if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
-                // app is in foreground, broadcast the push message
-                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                pushNotification.putExtra("message", message);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-
-                // play notification sound
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC,100);
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,200);
-            } else {
-                // app is in background, show the notification in notification tray
-
-                Intent resultIntent = new Intent(getApplicationContext(), Notifications.class);
-
-                resultIntent.putExtra("message", message);
-                resultIntent.putExtra("course_id", course_id);
-                resultIntent.putExtra("type", type);
-
-                // check for image attachment
-                if (TextUtils.isEmpty(imageUrl)) {
-                    showNotificationMessage(getApplicationContext(), "Water Tanker", message, timestamp, resultIntent);
-                } else {
-                    // image is present, show notification with image
-                    showNotificationMessageWithBigImage(getApplicationContext(), course_id, message, timestamp, resultIntent, imageUrl);
-                }
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "Json Exception: " + e.getMessage());
-        } catch (Exception e) {
-            Log.e(TAG, "Exception: " + e.getMessage());
-        }
-    }
-
-    /*
-     * Showing notification with text only
-     */
-    private void showNotificationMessage(Context context, String title, String message, String timeStamp, Intent intent)
-    {
-        notificationUtils = new NotificationUtilsFcm(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent);
-    }
-
-    /*
-     * Showing notification with text and image
-     */
-
-    private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp
-            , Intent intent, String imageUrl) {
-        notificationUtils = new NotificationUtilsFcm(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent, imageUrl);
-    }
-
-    private void showNotifications(String title, JSONObject json) {
-        //Intent i = new Intent(this, FirstActivity.class);
-        //FirstActivity.newNotification();
-
-
-        try {
-            String txn_id = json.getString("transaction_id");
-            String not_id = json.getString("notification_id");
-            String message = json.getString("message");
-
+            String bk_id = json.getString("booking_id");
+            String message = json.getString("body");
+            String title = json.getString("title");
+            String notid = json.getString("notification_id");
             SharedPrefUtil.setPreferences(getApplicationContext(), Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_UPDATE_KEY, "yes");
-            if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
-                // app is in foreground, broadcast the push message
-                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                pushNotification.putExtra("message", message);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-            }
             timestamp = DateFormat.getDateTimeInstance().format(new Date());
-            //PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_CODE,
-            //      i, PendingIntent.FLAG_UPDATE_CURRENT);
             final Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            String NOTIFICATION_CHANNEL_ID = "101";
+            String NOTIFICATION_CHANNEL_ID = "tanker_channel_01";
             Intent intent = new Intent(this, RequestDetails.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             Bundle b = new Bundle();
-            b.putString("start_from", "notification");
-            b.putString("transaction_id", txn_id);
-            b.putString("notification_id", not_id);
+            b.putString("init_type", "notification");
+            b.putString("message",title);
+            //b.putString("transaction_id", txn_id);
+            b.putString("booking_id", bk_id);
             b.putString("ispush","1");
+            b.putString("notification_id",notid);
             intent.putExtras(b);
-            //PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_CODE, intent, 0);
-
+            if (!NotificationUtilsFcm.isAppIsInBackground(getApplicationContext())) {
+                // app is in foreground, broadcast the push message
+                Log.i("Push Notification","Broadcasting");
+                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
+                pushNotification.putExtra("message", message);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+            }
+            NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel mChannel;
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
             final PendingIntent resultPendingIntent =
                     PendingIntent.getActivity(
                             getApplicationContext(),
@@ -225,23 +110,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             intent,
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                CharSequence name = "Seremo";
-                String description = "Seremo Notifications";
+                CharSequence name = "Tanker";
+                String description = "Tanker Notifications";
                 int importance = NotificationManager.IMPORTANCE_HIGH;
-                NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-                channel.setDescription(description);
-                channel.setVibrationPattern(new long[]{0, 1000, 500});
-                channel.enableVibration(true);
-                channel.enableLights(true);
-                channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                // Register the channel with the system; you can't change the importance
-                // or other notification behaviors after this
-                NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                notificationManager.createNotificationChannel(channel);
+                mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+                mChannel.setDescription(description);
+                mChannel.setVibrationPattern(new long[]{0, 1000, 500});
+                mChannel.enableVibration(true);
+                mChannel.enableLights(true);
+                mChannel.setSound(alarmSound,audioAttributes);
+                mChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                 if(mNotificationManager!=null)
+                     mNotificationManager.createNotificationChannel(mChannel);
             }
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher_round)
                     .setContentTitle(title)
@@ -249,27 +131,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setColor(getResources().getColor(R.color.colorblack))
                     .setColorized(true)
-                    .setSound(alarmSound)
                     .setVibrate(new long[]{0, 1000, 500})
-                    //.setWhen(getTimeMilliSec(timestamp))
-                    // Set the intent that will fire when the user taps the notification
-                    .setContentIntent(resultPendingIntent)
+                    .setSound(alarmSound)
                     .setAutoCancel(true);
-            NotificationManagerCompat manager = NotificationManagerCompat.from(this);
-            manager.notify(NOTIFICATION_ID, builder.build());
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+            if (!SharedPrefUtil.hasKey(this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
+                builder.setContentIntent(resultPendingIntent);
+            }
+            Log.i("Push Notification","Notifying");
+            mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-    public static long getTimeMilliSec(String timeStamp) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            Date date = format.parse(timeStamp);
-            return date.getTime();
-        } catch (ParseException e) {
+        } catch (Exception e){
+            Log.e("Push Notification",e.toString());
             e.printStackTrace();
         }
-        return 0;
     }
 }

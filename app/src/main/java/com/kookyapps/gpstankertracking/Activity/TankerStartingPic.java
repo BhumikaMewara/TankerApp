@@ -6,12 +6,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -21,8 +25,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -48,6 +54,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.kookyapps.gpstankertracking.Modal.BookingListModal;
 import com.kookyapps.gpstankertracking.R;
+import com.kookyapps.gpstankertracking.Services.TankerLocationCallback;
+import com.kookyapps.gpstankertracking.Services.TankerLocationService;
 import com.kookyapps.gpstankertracking.Utils.Constants;
 import com.kookyapps.gpstankertracking.Utils.FetchDataListener;
 import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
@@ -75,24 +83,55 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-public class TankerStartingPic extends AppCompatActivity implements View.OnClickListener {
+
+public class TankerStartingPic extends AppCompatActivity implements View.OnClickListener, TankerLocationCallback {
     ImageView img_retake,picture ,calender,clock;
     ImageButton captureImgBtn ;
-    TextView txt_retake,date,time,lat,lon,apmm,day;
-    RelativeLayout latLongLayout,dateAndTime,imgInfoLayout;
-    LinearLayout retake;
+    TextView txt_retake,date,time,lat,lon,apmm,day,fetchinglocation;
+    RelativeLayout latLongLayout,dateAndTime,imgInfoLayout,progresslayout;
+    LinearLayout retake,datalayout;
     String imageencoded ,bkngid,init_type,tankerbookingid;
     boolean photo_taken,cameraAccepted=false,permissionGranted = false;
     BookingListModal blmod;
+    boolean tripStarted = false;
     Bitmap leftbit;
     ProgressBar progressBar;
     private LocationManager locationManager;
-    private LatLng currentlatlng=null;
-    public static final int PERMISSION_REQUEST_CODE = 200;
-    public static final int CALL_PERMISSION_REQUEST_CODE = 300;
+    //public static final int PERMISSION_REQUEST_CODE = 200;
     ArrayList<String> allpermissionsrequired;
-    GPSTracker gpsTracker;
+    private final String backgroundpermission= Manifest.permission.ACCESS_BACKGROUND_LOCATION;
+    private TankerLocationService mService = null;
+    private boolean mBound = false;
+    private final int LOC_REQUEST = 10101;
+    private final int BACKGROUND_LOCATION_REQUEST_CODE= 12010;
+    private Location currentLocation=null;
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            TankerLocationService.LocalBinder binder = (TankerLocationService.LocalBinder)iBinder;
+            mService = binder.getService();
+            mBound = true;
+            mService.setServiceCallback(TankerStartingPic.this);
+            currentLocation = mService.getCurrentLocation();
+            if(currentLocation!=null) {
+                hideFetchingLocation();
+                String lati = String.format("%.5f", currentLocation.getLatitude());
+                String longi = String.format("%.5f", currentLocation.getLongitude());
+                lat.setText(lati);
+                lon.setText(longi);
+            }else{
+                mService.requestCurrent();
+            }
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mService.setServiceCallback(null);
+            mService = null;
+            mBound = false;
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,72 +139,22 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         Intent i = getIntent();
         Bundle b = i.getExtras();
         leftbit =(Bitmap) b.get("Bitmap");
-        //leftbit=addStampToImage(leftbit);
         blmod = b.getParcelable("Bookingdata");
-        init_type=b.getString("init_type");
-        tankerbookingid=getIntent().getExtras().getString("tankerBookingId");
-        /*if(b.containsKey("snapped_path")) {
-            finalsnap = b.getString("snapped_path");
-            snappedDistance = b.getString("snapped_distance");
-        }*/
-        gpsTracker = new GPSTracker(this);
-        //leftbit = Utils.decodeBase64(imageencoded);
-       // addPermission();
+        if(i.hasExtra("init_type"))
+            init_type=b.getString("init_type");
+        tankerbookingid=b.getString("tankerBookingId");
         allpermissionsrequired = new ArrayList<>();
-        allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
         initView();
-
-
-
-        captureImgBtn.setOnClickListener(this);
-
-        if(!photo_taken) {
-//            proceed.setText("Capture Bill");
-            retake.setVisibility(View.GONE);
-
-        }else{
-//            proceed.setText("Proceed");
-            retake.setVisibility(View.VISIBLE);
-        }
-//        back.setOnClickListener(this);
-
-
-        /*Date timenow = Calendar.getInstance().getTime();*/
-        Calendar calendar = Calendar.getInstance();
-        String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
-        date.setText(currentDate);
-
-        String pattern = " HH:mm:ss";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String mytime = simpleDateFormat.format(new Date());
-        time.setText(mytime);
-
-
-
-//        if (gpsTracker.getIsGPSTrackingEnabled()){
-//
-//            String stringLatitude = String.valueOf(gpsTracker.latitude);
-//            lat.setText(stringLatitude);
-//
-//            String stringLongitude = String.valueOf(gpsTracker.longitude);
-//            lon.setText(stringLongitude);
-//
-//        }
-//        else
-//        {
-//            // can't get location
-//            // GPS or Network is not enabled
-//            // Ask user to enable GPS/network in settings
-//            gpsTracker.showSettingsAlert();
-//        }
-
     }
     public void initView(){
         img_retake =        (ImageView)findViewById(R.id.iv_tnkr_strt_retake);
         picture=            (ImageView)findViewById(R.id.iv_tankr_strt_image_clicked);
         picture.setImageBitmap(leftbit);
         captureImgBtn =     (ImageButton)findViewById(R.id.ib_tnkr_strt_capture);
+        captureImgBtn.setOnClickListener(this);
+        captureImgBtn.setClickable(false);
         txt_retake=         (TextView) findViewById(R.id.tv_tankr_strt_retakeTxt);
         calender=           (ImageView)findViewById(R.id.iv_tankr_strt_calender);
         clock=              (ImageView)findViewById(R.id.iv_tankr_strt_clock);
@@ -179,166 +168,101 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         retake=             (LinearLayout)findViewById(R.id.ll_tanker_starting_pic_retake);
         imgInfoLayout=      (RelativeLayout)findViewById(R.id.image_with_infoLayout);
         progressBar=        (ProgressBar)findViewById(R.id.tanker_starting_progressbar);
-        progressBar.setVisibility(View.GONE);
-        retake.setOnClickListener(this);
-
-
-        if (gpsTracker.getIsGPSTrackingEnabled()){
-
-
-            String stringLatitude = String.valueOf(gpsTracker.latitude);
-            lat.setText(stringLatitude);
-
-            String stringLongitude = String.valueOf(gpsTracker.longitude);
-            lon.setText(stringLongitude);
-
-        }
-        else
-        {
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gpsTracker.showSettingsAlert();
-        }
-
-    }
-
-
-
-
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-        if(resultCode!=0) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            imageencoded = Utils.encodeTobase64(bitmap);
-            picture.setImageBitmap(bitmap);
+        progresslayout=     (RelativeLayout)findViewById(R.id.rl_tanker_starting_progress);
+        fetchinglocation =  (TextView)findViewById(R.id.tv_tanker_starting_progress);
+        if(!photo_taken) {
+//            proceed.setText("Capture Bill");
+            retake.setVisibility(View.GONE);
+        }else{
+//            proceed.setText("Proceed");
             retake.setVisibility(View.VISIBLE);
-            photo_taken = true;
         }
-
+        Calendar calendar = Calendar.getInstance();
+        String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
+        date.setText(currentDate);
+        String pattern = "HH:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String mytime = simpleDateFormat.format(new Date());
+        time.setText(mytime);
+        showFetchingLocation();
+        retake.setOnClickListener(this);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //checkAndRequestPermissions(TankerStartingPic.this,allpermissionsrequired);
+        if(isLocationEnabled()){
+            if(!mBound)
+                bindService(new Intent(TankerStartingPic.this, TankerLocationService.class).putExtra("booking_id",blmod.getBookingid()),mServiceConnection, Context.BIND_AUTO_CREATE);
+        }else{
+            showAlert();
+        }
+    }
+    @Override
+    protected void onStop() {
+        if(mBound){
+            if(!(((Activity)TankerStartingPic.this).isFinishing()))
+                mService.setServiceCallback(null);
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+        super.onStop();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
+        switch (requestCode) {
+            case LOC_REQUEST:
+                if(isLocationEnabled()){
+                    if(!mBound)
+                        bindService(new Intent(TankerStartingPic.this, TankerLocationService.class).putExtra("booking_id",blmod.getBookingid()),mServiceConnection, Context.BIND_AUTO_CREATE);
+                }else{
+                    showAlert();
+                }
+                break;
+        }
         super.onActivityResult(requestCode, resultCode, data);
-    }*/
-
-
-
-    private Bitmap addStampToImage(Bitmap originalBitmap) {
-
-        int extraHeight = (int) (originalBitmap.getHeight() * 0.15);
-
-        Bitmap newBitmap = Bitmap.createBitmap(originalBitmap.getWidth(),
-                originalBitmap.getHeight() , Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(newBitmap);
-        canvas.drawBitmap(originalBitmap, 0, 0, null);
-
-        Resources resources = getResources();
-        float scale = resources.getDisplayMetrics().density;
-
-        String text = "Friday 3 march 2020";
-        String time = "10pm";
-        String lat = "27.00000";
-        String lon = "72.00000";
-        drawString(originalBitmap,canvas,0,originalBitmap.getHeight() - 30,text);
-        drawString(originalBitmap,canvas,0,originalBitmap.getHeight() - 15,time);
-
-        return newBitmap;
     }
-
-
-    private void drawString( Bitmap bitmap , Canvas canvas ,int x , int y,String text ){
-        //Paint pText = new Paint();
-        Paint pText = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-        pText.setColor(Color.WHITE);
-
-        pText.setAntiAlias(true);
-
-        setTextSizeForWidth(pText,(int) (bitmap.getWidth()),text);
-
-
-
-
-        Rect bounds = new Rect();
-        pText.getTextBounds(text, 0, text.length(), bounds);
-
-
-        Rect textHeightWidth = new Rect();
-        pText.getTextBounds(text, 0, text.length(), textHeightWidth);
-
-        canvas.drawText(text, 5, y, pText);
-
-    }
-
-    private void setTextSizeForWidth(Paint paint, float desiredHeight,
-                                     String text) {
-
-        // Pick a reasonably large value for the test. Larger values produce
-        // more accurate results, but may cause problems with hardware
-        // acceleration. But there are workarounds for that, too; refer to
-        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
-        final float testTextSize =10f;
-
-        // Get the bounds of the text, using our testTextSize.
-        paint.setTextSize(testTextSize);
-        Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-
-        // Calculate the desired size as a proportion of our testTextSize.
-        float desiredTextSize = testTextSize ;
-
-        // Set the paint for that size.
-        paint.setTextSize(desiredTextSize);
-    }
-
-
-
-
-
-
     @Override
     public void onClick(View view) {
         Intent i ;
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.ib_tnkr_strt_capture:
-                progressBar.setVisibility(View.VISIBLE);
+                showProgress();
+                captureImgBtn.setClickable(false);
                 leftbit = captureScreenShot();
-                //store(leftbit,blmod.getBookingid()+ ".png");
                 imageencoded=Utils.encodeTobase64(leftbit);
                 SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY,imageencoded);
-                captureImgBtn.setClickable(false);
                 if (init_type!=null){
-                i= new Intent(TankerStartingPic.this,EnterOTP.class);
-
-              //  i.putExtra("Bitmap",imageencoded);
-                i.putExtra("Bookingdata",blmod);
-                /*if(finalsnap!=null) {
-                    i.putExtra("snapped_path", finalsnap);
-                    i.putExtra("snapped_distance", snappedDistance);
-                }*/
-                    progressBar.setVisibility(View.GONE);
-                startActivity(i);
-                finish();
+                    i= new Intent(TankerStartingPic.this,EnterOTP.class);
+                    i.putExtra("Bookingdata",blmod);
+                    hideProgress();
+                    startActivity(i);
+                    finish();
+                } else{
+                    showProgress();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        checkBackgroundLocation(TankerStartingPic.this);
+                    else
+                        uploadBitmap();
                 }
-                else{
-                    progressBar.setVisibility(View.VISIBLE);
-                    uploadBitmap();
-                }
-                /*i = new Intent(this, RequestDetails.class);
-                startActivity(i);*/
                 break;
-
-           /*case R.id.ll_tanker_starting_pic_retake:
-                photo_taken = false;
-                retake.setVisibility(View.GONE);
+            case R.id.ll_tanker_starting_pic_retake:
                 picture.setImageResource(android.R.color.transparent);
-                captureImgBtn.performClick();
-                onResume();
-                break;*/
-
-
+                onBackPressed();
+                break;
         }
-
     }
-
+   private void checkBackgroundLocation(Context context) {
+       if (ContextCompat.checkSelfPermission(context, backgroundpermission) == PERMISSION_GRANTED) {
+           uploadBitmap();
+       } else {
+           if (ActivityCompat.shouldShowRequestPermissionRationale(TankerStartingPic.this,backgroundpermission)) {
+               showBackgroundEducationalUI(TankerStartingPic.this);
+           } else {
+               ActivityCompat.requestPermissions(TankerStartingPic.this,new String[]{backgroundpermission}, BACKGROUND_LOCATION_REQUEST_CODE);
+           }
+       }
+   }
     private Bitmap captureScreenShot() {
         imgInfoLayout.setDrawingCacheEnabled(true);
         imgInfoLayout.buildDrawingCache();
@@ -348,89 +272,45 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onBackPressed() {
-        photo_taken=false;
-        super.onBackPressed();
+        if(init_type!=null){
+            if(init_type.equals(Constants.TRIP_START_IMG)){
+                if(!tripStarted) {
+                    photo_taken = false;
+                    if (mService != null) {
+                        if (mBound)
+                            mService.stopService();
+                    }
+                    super.onBackPressed();
+                }
+            }else if(init_type.equals(Constants.TRIP_END_IMG)){
+                super.onBackPressed();
+            }
+        }else{
 
-
-
-
-    }
-    private boolean checkPermission(){
-        int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestPermission(){
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_REQUEST_CODE);
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
-            case PERMISSION_REQUEST_CODE:
+            case BACKGROUND_LOCATION_REQUEST_CODE:
                 if(grantResults.length>0){
-                    cameraAccepted = grantResults[0]==PackageManager.PERMISSION_GRANTED;
-                    if(cameraAccepted){
-                        cameraAccepted = true;
+                    if(grantResults[0]== PERMISSION_GRANTED){
+                        uploadBitmap();
                     }else{
-                        cameraAccepted = false;
+                        noBackgroundAlert(TankerStartingPic.this);
                     }
+                }else{
+                    noBackgroundAlert(TankerStartingPic.this);
                 }
                 break;
-            case Constants.MULTIPLE_PERMISSIONS_REQUEST_CODE:
-                if(grantResults.length>0){
-                    for(int i=0;i<grantResults.length;i++){
-                        permissionGranted = true;
-                        if(!(grantResults[i]==PackageManager.PERMISSION_GRANTED)){
-                            permissionGranted = false;
-                            break;
-                        }
-                    }
-                    if(permissionGranted){
-                        checkLocation();
-                        if (gpsTracker.getIsGPSTrackingEnabled()){
-                            String stringLatitude = String.valueOf(gpsTracker.latitude);
-                            lat.setText(stringLatitude);
-                            String stringLongitude = String.valueOf(gpsTracker.longitude);
-                            lon.setText(stringLongitude);
-                        }
-                        else
-                        {
-                            // can't get location
-                            // GPS or Network is not enabled
-                            // Ask user to enable GPS/network in settings
-                            gpsTracker.showSettingsAlert();
-                        }
-                       // buildGoogleApiClient();
-                        //createPickUpLocations();
-                    }else{
-                        checkAndRequestPermissions(TankerStartingPic.this,allpermissionsrequired);
-                    }
-                }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-
-
-
-
-
-
     private void uploadBitmap() {
-
         String url = URLs.BASE_URL + URLs.BOOKING_START+blmod.getBookingid();
-        //url = "http://13.233.54.144:8080/api/user/document";
-        //our custom volley request
-       /* JSONObject params = new JSONObject();
-        try {
-            params.put("id", blmod.getBookingid());
-            params.put("lat", currentlatlng.latitude);
-            params.put("lng",currentlatlng.longitude);
-        }catch (JSONException e){
-            e.printStackTrace();
-        }*/
-
+        Log.d("START_URL",url);
+        tripStarted = true;
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST,url
                 ,
                 new Response.Listener<NetworkResponse>() {
@@ -438,51 +318,53 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                     public void onResponse(NetworkResponse response) {
                         try {
                             JSONObject obj = new JSONObject(new String(response.data));
+                            Log.d("Booking start",obj.toString());
                             if(obj!=null){
                                 if(obj.getInt("error")==0){
-                                    //SessionManagement.setOngoingBooking(TankerStartingPic.this,blmod.getBookingid());
+                                    JSONObject data = obj.getJSONObject("data");
+                                    if(data.has("path")) {
+                                        String path = data.getString("path");
+                                        blmod.setPath(path);
+                                    }
                                     SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID,blmod.getBookingid());
                                     SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_DRIVER_ID,SessionManagement.getUserId(TankerStartingPic.this));
-                                    Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(TankerStartingPic.this,Map1.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     intent.putExtra("Bookingdata",blmod);
                                     Log.i("tankerBookingId",tankerbookingid.toString());
                                     intent.putExtra("tankerBookingId", tankerbookingid);
-                                    progressBar.setVisibility(View.GONE);
+                                    hideProgress();
                                     startActivity(intent);
                                     finish();
                                 }else{
                                     RequestQueueService.showAlert(obj.getString("message"), TankerStartingPic.this);
+                                    tripStarted = false;
                                     captureImgBtn.setClickable(true);
-                                    progressBar.setVisibility(View.GONE);
-                                    //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                                    hideProgress();
                                 }
                             }else{
                                 RequestQueueService.showAlert("Error! No data fetched", TankerStartingPic.this);
                                 captureImgBtn.setClickable(true);
-                                progressBar.setVisibility(View.GONE);
-                                //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                                hideProgress();
+                                tripStarted = false;
                             }
                         } catch (JSONException e) {
                             RequestQueueService.showAlert("Something went wrong", TankerStartingPic.this);
-
                             e.printStackTrace();
                             captureImgBtn.setClickable(true);
-                            progressBar.setVisibility(View.GONE);
-                            //requestLayout.setBackgroundResource(R.drawable.straight_corners);
+                            tripStarted = false;
+                            hideProgress();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         captureImgBtn.setClickable(true);
-                        progressBar.setVisibility(View.GONE);
-
-
+                        tripStarted = false;
+                        //progressBar.setVisibility(View.GONE);
+                        hideProgress();
                         NetworkResponse response = error.networkResponse;
                         if(response != null && response.data != null){
                             String errorString = new String(response.data);
@@ -493,26 +375,12 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                         }
                         else {
                             RequestQueueService.showAlert("Something went wrong ", TankerStartingPic.this);
                         }
-                        //requestLayout.setBackgroundResource(R.drawable.straight_corners);
                     }
                 }) {
-
-            /*
-             * If you want to add more parameters with the image
-             * you can do it here
-             * here we have only one parameter with the image
-             * which is tags
-             * */
-           /* @Override
-            protected java.util.Map1<String, String> getParams() throws AuthFailureError {
-                java.util.Map1<String, String> params = new HashMap<>();
-                return params;
-            }*/
 
             @Override
             public java.util.Map<String, String> getHeaders() throws AuthFailureError {
@@ -537,47 +405,22 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
             }
 
         };
-
         volleyMultipartRequest.setRetryPolicy(new DefaultRetryPolicy(
                 50000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
         //adding the request to volley
         Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
-
     public byte[] getFileDataFromDrawable(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
-
-  /*  @Override
-    public void onLocationChanged(Location location) {
-        currentlatlng = new LatLng(location.getLatitude(), location.getLongitude());
-
-    }*/
-
-
-
-    public void addPermission (){
-        allpermissionsrequired = new ArrayList<>();
-        allpermissionsrequired.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        allpermissionsrequired.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        checkAndRequestPermissions(this,allpermissionsrequired);
-    }
-
-
-
-
-
-
-
-    public void checkAndRequestPermissions(Activity activity, ArrayList<String> permissions) {
+    /*public void  checkAndRequestPermissions(Activity activity, ArrayList<String> permissions) {
         ArrayList<String> listPermissionsNeeded = new ArrayList<>();
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(activity, permission) != PERMISSION_GRANTED) {
                 listPermissionsNeeded.add(permission);
             }
         }
@@ -585,27 +428,20 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
             ActivityCompat.requestPermissions(activity, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), Constants.MULTIPLE_PERMISSIONS_REQUEST_CODE);
         }else{
             permissionGranted = true;
-            checkLocation();
-            gpsTracker.getLocation();
-            if (gpsTracker.getIsGPSTrackingEnabled()){
-                String stringLatitude = String.valueOf(gpsTracker.latitude);
-                lat.setText(stringLatitude);
-                String stringLongitude = String.valueOf(gpsTracker.longitude);
-                lon.setText(stringLongitude);
-            } else {
-                // can't get location
-                // GPS or Network is not enabled
-                // Ask user to enable GPS/network in settings
-                gpsTracker.showSettingsAlert();
+            if(isLocationEnabled()){
+                if(!mBound)
+                    bindService(new Intent(TankerStartingPic.this, TankerLocationService.class).putExtra("booking_id",blmod.getBookingid()),mServiceConnection, Context.BIND_AUTO_CREATE);
+            }else{
+                showAlert();
             }
+            //checkLocation();
         }
-    }
+    }*/
     private boolean checkLocation() {
         if (!isLocationEnabled())
             showAlert();
         return isLocationEnabled();
     }
-
     private void showAlert() {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Enable Location")
@@ -615,26 +451,174 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(myIntent);
+                        TankerStartingPic.this.startActivityForResult(myIntent,LOC_REQUEST);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-
+                        if(isLocationEnabled()){
+                            if(!mBound)
+                                bindService(new Intent(TankerStartingPic.this, TankerLocationService.class).putExtra("booking_id",blmod.getBookingid()),mServiceConnection, Context.BIND_AUTO_CREATE);
+                        }else{
+                            showAlert();
+                        }
+                        //checkLocation();
                     }
                 });
         dialog.show();
     }
-
     private boolean isLocationEnabled() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+    @Override
+    public void abortListener(int abortedBy) {
+        if(SharedPrefUtil.hasKey(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID))
+            SharedPrefUtil.deletePreference(TankerStartingPic.this,Constants.SHARED_PREF_ONGOING_TAG);
+        if (abortedBy==1)
+            Alert("This trip has been cancelled by admin",TankerStartingPic.this);
+        else if(abortedBy==-1)
+            Alert("This trip has been cancelled",TankerStartingPic.this);
+            else
+                Alert("This trip has been cancelled by controller",TankerStartingPic.this);
+    }
+    public void Alert(final String message, final FragmentActivity context) {
+        try {
+            new Thread()
+            {
+                public void run()
+                {
+                    TankerStartingPic.this.runOnUiThread(new Runnable()
+                    {
+                        public void run()
+                        {
+                            //Do your UI operations like dialog opening or Toast here
+                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                            builder.setTitle("Alert!");
+                            builder.setMessage(message);
+                            builder.setCancelable(false);
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(TankerStartingPic.this, FirstActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                            builder.show();
+                        }
+                    });
+                }
+            }.start();
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void newLocation(Location location) {
+        Log.i("TankerStartingPic","No Implementation for newLocation Method.");
+        currentLocation = location;
+        String lati = String.format("%.5f", currentLocation.getLatitude());
+        String longi = String.format("%.5f", currentLocation.getLongitude());
+        lat.setText(lati);
+        lon.setText(longi);
+        hideFetchingLocation();
+    }
+
+    @Override
+    public void geofenceEnter() {
+
+    }
+
+    @Override
+    public void geofenceExit() {
+
+    }
+
+    private void showProgress(){
+        progresslayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+    private void hideProgress(){
+        progresslayout.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
+    private void showFetchingLocation(){
+        progresslayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        fetchinglocation.setVisibility(View.VISIBLE);
+        captureImgBtn.setVisibility(View.GONE);
+        captureImgBtn.setClickable(false);
+    }
+    private void hideFetchingLocation(){
+        progresslayout.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+        fetchinglocation.setVisibility(View.GONE);
+        captureImgBtn.setVisibility(View.VISIBLE);
+        captureImgBtn.setClickable(true);
+    }
+    public void showBackgroundEducationalUI(final FragmentActivity context) {
+       final String message= "Your Location will be continously send to server so that your vehicle can be traced." +
+               "Do you want to grant Background location Access?";
+        try {
+            new Thread()
+            {
+                public void run()
+                {
+                    TankerStartingPic.this.runOnUiThread(new Runnable()
+                    {
+                        public void run()
+                        {
+                            //Do your UI operations like dialog opening or Toast here
+                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                            builder.setTitle("Alert!");
+                            builder.setMessage(message);
+                            builder.setCancelable(false);
+                            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        requestPermissions(new String[]{backgroundpermission}, BACKGROUND_LOCATION_REQUEST_CODE);
+                                    }else{
+                                        ActivityCompat.requestPermissions(TankerStartingPic.this,new String[]{backgroundpermission},BACKGROUND_LOCATION_REQUEST_CODE);
+                                    }
+                                }
+                            });
+                            builder.setNegativeButton("No Thanks", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    noBackgroundAlert(TankerStartingPic.this);
+                                }
+                            });
+                            builder.show();
+                        }
+                    });
+                }
+            }.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void noBackgroundAlert(final Activity activity){
+        new AlertDialog.Builder(activity)
+                .setTitle("Permission Not Granted")
+                .setMessage("Sorry, booking can't be started without Allow all the time permission")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        captureImgBtn.setClickable(true);
+                    }
+                })
+                .create()
+                .show();
     }
 }

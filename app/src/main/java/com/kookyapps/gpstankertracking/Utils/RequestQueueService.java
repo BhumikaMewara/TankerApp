@@ -26,6 +26,7 @@ public class RequestQueueService {
     private RequestQueue mRequestQueue;
     private static Context mCtx;
     private static Dialog mProgressDialog;
+    private final int TIME_OUT=5000;
 
     private RequestQueueService(Context context) {
         mCtx = context;
@@ -49,7 +50,7 @@ public class RequestQueueService {
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
-        req.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        req.setRetryPolicy(new DefaultRetryPolicy(TIME_OUT, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         getRequestQueue().add(req);
     }
@@ -102,7 +103,6 @@ public class RequestQueueService {
                 if (mProgressDialog != null) {
                     if (mProgressDialog.isShowing() == true) cancelProgressDialog();
                 }
-
                 mProgressDialog = new Dialog(activity);
                 mProgressDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                 mProgressDialog.setContentView(R.layout.progress_indicator);

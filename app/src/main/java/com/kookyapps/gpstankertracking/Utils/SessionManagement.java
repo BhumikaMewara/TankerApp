@@ -21,6 +21,7 @@ public class SessionManagement {
     private static final String SHARED_NOTIFICATION_COUNT_KEY = "notification_count";
     private static final String LANGUAGE_PATH = "languagePath";
     private static final String IS_ONLINE = "is_online";
+    private static final String IS_VALID="is_valid";
 
 
     public static boolean checkSignIn(Context con) {
@@ -31,7 +32,7 @@ public class SessionManagement {
         }
     }
 
-    public static void createLoginSession(Context con, Boolean islogin, String user_id, String phcode, String phoneno, String username, String token, String language, String location, String status, String noticount) {
+    public static void createLoginSession(Context con, Boolean islogin, String user_id, String phcode, String phoneno, String username, String token, String language, String location, String status, String noticount,boolean isvalid) {
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, IS_LOGGEDIN, islogin);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, USER_ID, user_id);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, PHONE_CODE, phcode);
@@ -41,6 +42,7 @@ public class SessionManagement {
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, LANGUAGE, language);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, LOCATION, location);
         SharedPrefUtil.setPreferences(con, SHARED_PREF_LOGIN_TAG, IS_ONLINE, status);
+        SharedPrefUtil.setPreferences(con,SHARED_PREF_LOGIN_TAG,IS_VALID,isvalid);
         SharedPrefUtil.setPreferences(con, Constants.SHARED_PREF_NOTICATION_TAG, SHARED_NOTIFICATION_COUNT_KEY, noticount);
     }
 
@@ -112,12 +114,6 @@ public class SessionManagement {
         return SharedPrefUtil.getStringPreferences(con, Constants.SHARED_PREF_LOGIN_TAG, LOCATION);
     }
 
-    /*public static String getLocation(Context con){
-        if (SharedPrefUtil.hasKey(con,SHARED_PREF_LOGIN_TAG,USER_ID)) {
-            return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG, USER_ID);
-        }
-        return "0";
-    }*/
     public static String getUserStatus(Context con) {
         return SharedPrefUtil.getStringPreferences(con, SHARED_PREF_LOGIN_TAG, IS_ONLINE);
     }
@@ -129,4 +125,6 @@ public class SessionManagement {
     public static void setNotificationCount(Context con, String count) {
         SharedPrefUtil.setPreferences(con, Constants.SHARED_PREF_NOTICATION_TAG, Constants.SHARED_NOTIFICATION_COUNT_KEY, count);
     }
+    public static void setValidity(Context con,boolean isvalid){SharedPrefUtil.setPreferences(con,SHARED_PREF_LOGIN_TAG,IS_VALID,isvalid);}
+    public static boolean getValidity(Context con){return SharedPrefUtil.getBooleanPreferences(con,SHARED_PREF_LOGIN_TAG,IS_VALID);}
 }

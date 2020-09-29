@@ -12,32 +12,24 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/include_bookingdetails"
-    >
-
-
+    android:background="@color/colorGreyLight"
+    android:layout_below="@+id/include_bookingdetails">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/sv_request_details"
+        android:fillViewport="true"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/rl_requestDetail_map"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/gradient_background_main">
-
-
+        android:layout_marginTop="5dp">
         <RelativeLayout
             android:id="@+id/rl_bookingdetail_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@color/colorwhite">
-
-
-
-
             <ImageView
                 android:id="@+id/iv_bookingdetail_bookingid_call"
                 android:layout_width="25dp"
@@ -280,19 +272,43 @@
                 android:layout_centerInParent="true"
                 android:visibility="visible"
                 ></ProgressBar>
-
-
-
         </RelativeLayout>
     </ScrollView>
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="35dp"
+        android:background="@color/colorwhite"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:id="@+id/rl_request_detail_showmap"
+        android:layout_below="@+id/sv_request_details">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_request_detail_showmap"
+            android:layout_marginLeft="15dp"
+            android:layout_alignParentLeft="true"
+            android:text="Show Map"
+            android:textSize="14dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/colorblack"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_plus"
+            android:id="@+id/iv_request_detail_showmap"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="3dp"
         android:visibility="gone"
         android:id="@+id/rl_requestDetail_map"
-        android:layout_above="@+id/rl_result_details_bottomLayout">
+        android:layout_above="@+id/rl_result_details_bottomLayout"
+        android:layout_below="@+id/rl_request_detail_showmap">
         <fragment
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -300,19 +316,17 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             />
     </RelativeLayout>
-
     <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
+        android:visibility="gone"
     android:id="@+id/rl_result_details_bottomLayout">
-
         <RelativeLayout
         android:id="@+id/rl_result_details_bottomLayout_text"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/greenLight"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent">
             <TextView
             android:id="@+id/tv_result_details_bottomlayout_text"
@@ -323,7 +337,6 @@
             android:textColor="@color/colorwhite"
             android:textSize="13dp"
             android:gravity="center"/>
-
             <RelativeLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -340,6 +353,4 @@
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>
-
-
 </RelativeLayout>

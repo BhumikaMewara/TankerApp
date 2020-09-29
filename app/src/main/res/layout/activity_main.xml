@@ -6,32 +6,18 @@
     android:layout_height="match_parent"
     android:background="@color/colorGreyLight"
     tools:context=".Activity.MainActivity">
-
-
-
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/lv_main_mainLayout"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/lh_main_signIn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:background="@color/grey">
-
-
-
-
-
-
-
-
+        app:layout_constraintTop_toTopOf="parent">
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorGreyLight">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <RelativeLayout
                 android:layout_width="180dp"
                 android:layout_height="50dp"
@@ -46,183 +32,176 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tv_main_signInTitle"
+                    android:id="@+id/tv_login_login_title"
                     android:text="SIGN IN"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/greenLight"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="30dp"/>
             </RelativeLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/lv_main_mainLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:paddingTop="40dp"
-        android:paddingBottom="40dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="16dp"
-        android:background="@color/colorwhite">
-
-        <LinearLayout
-            android:id="@+id/lv_main_username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:padding="20dp"
-            >
-            <LinearLayout
-                android:id="@+id/lh_main_username"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="5dp">
+                android:layout_height="match_parent"
+                android:paddingBottom="45dp"
+                android:background="@color/colorwhite"
+                app:layout_constraintTop_toBottomOf="@+id/rl_login_login_title"
+                app:layout_constraintStart_toStartOf="@+id/rl_login_login_title">
+                <RelativeLayout
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:id="@+id/rl_login_username_icon"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="45dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/iv_login_username"
+                        android:src="@drawable/username_login"/>
+                </RelativeLayout>
 
-                <ImageView
-                    android:id="@+id/iv_main_usernameImg"
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/user_copy" />
                 <TextView
-                    android:id="@+id/tv_main_username"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingLeft="5dp"
+                    android:id="@+id/tv_login_username_title"
                     android:text="User Name"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorblack"/>
-            </LinearLayout>
-            <EditText
-                android:id="@+id/et_main_username"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
-                android:singleLine="true"
-                android:paddingTop="5dp"
-                android:maxLines="1"
-                android:maxLength="20"
-                android:textSize="12sp"
-                android:hint="xyz@gmail.com"
-                android:layout_marginRight="25dp"/>
-
-
-        </LinearLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-            <ProgressBar
-                android:id="@+id/main_progressBar"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerInParent="true"
-                ></ProgressBar>
-        </RelativeLayout>
-        <LinearLayout
-            android:id="@+id/lv_main_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:padding="20dp"
-            >
-
-            <LinearLayout
-                android:id="@+id/lh_main_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="5dp">
-                <ImageView
-                    android:id="@+id/iv_main_passwordImg"
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/lock_copy"/>
-                <TextView
-                    android:id="@+id/tv_main_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@color/colorblack"
+                    android:textSize="18sp"
+                    android:gravity="center_vertical"
+                    android:foregroundGravity="center_vertical"
                     android:layout_marginLeft="5dp"
-                    android:paddingLeft="5dp"
+                    android:layout_marginRight="20dp"
+                    app:layout_constraintStart_toEndOf="@id/rl_login_username_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/rl_login_username_icon"
+                    app:layout_constraintBottom_toBottomOf="@id/rl_login_username_icon"/>
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/et_main_username"
+                    android:hint="abcedefg.com"
+                    app:layout_constraintStart_toStartOf="@+id/rl_login_username_icon"
+                    app:layout_constraintEnd_toStartOf="@+id/rl_login_showpwwd"
+                    app:layout_constraintTop_toBottomOf="@id/rl_login_username_icon"
+                    android:paddingLeft="33dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:layout_marginTop="10dp"/>
+
+
+                <RelativeLayout
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:id="@+id/rl_login_pwd_icon"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/et_main_username">
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/iv_login_pwd"
+                        android:src="@drawable/lock_copy"/>
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_login_pwd_title"
                     android:text="Password"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorblack"/>
-            </LinearLayout>
-            <EditText
-                android:id="@+id/et_main_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
-                android:paddingTop="5dp"
-                android:textSize="12sp"
-                android:maxLines="1"
-                android:maxLength="20"
-                android:hint="Enter Password"
-                android:inputType="textWebPassword"
-                android:layout_marginRight="25dp"/>
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@color/colorblack"
+                    android:textSize="18sp"
+                    android:gravity="center_vertical"
+                    android:foregroundGravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="20dp"
+                    app:layout_constraintStart_toEndOf="@id/rl_login_pwd_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/rl_login_pwd_icon"
+                    app:layout_constraintBottom_toBottomOf="@id/rl_login_pwd_icon"/>
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/et_main_password"
+                    android:hint="Enter Password"
+                    android:inputType="textPassword"
+                    app:layout_constraintStart_toStartOf="@+id/rl_login_pwd_icon"
+                    app:layout_constraintEnd_toStartOf="@+id/rl_login_showpwwd"
+                    app:layout_constraintTop_toBottomOf="@id/rl_login_pwd_icon"
+                    android:paddingLeft="33dp"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1"
+                    android:layout_marginTop="10dp" />
+                <RelativeLayout
+                    android:layout_width="35dp"
+                    android:layout_height="0dp"
+                    android:id="@+id/rl_login_showpwwd"
+                    app:layout_constraintTop_toTopOf="@+id/et_main_password"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_login_username_title"
+                    app:layout_constraintBottom_toBottomOf="@+id/et_main_password">
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:id="@+id/iv_login_eye"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_eye"
+                        />
+                </RelativeLayout>
+                <ProgressBar
+                    android:id="@+id/main_progressBar"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:visibility="gone"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 
-        </LinearLayout>
-    </LinearLayout>
-    
-    <LinearLayout
-        android:id="@+id/lh_main_signIn"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal"
+        android:id="@+id/lh_main_signIn"
         android:background="@color/greenLight"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:weightSum="1">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
-            android:id="@+id/tv_main_signInText"
+            android:id="@+id/tv_login_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".90"
+            android:fontFamily="@font/roboto"
             android:text="SIGN IN"
-            android:textSize="16sp"
             android:textColor="@color/colorwhite"
-            android:gravity="center"
-            android:layout_gravity="center"
-            >
-
-        </TextView>
-       <LinearLayout
-           android:layout_width="wrap_content"
-           android:layout_height="match_parent"
-           android:layout_gravity="center"
-           android:paddingLeft="10dp"
-           android:paddingRight="10dp"
-           android:layout_alignParentRight="true"
-           android:layout_weight=".10"
-           android:gravity="center"
-           android:background="@color/greenDark">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:src="@drawable/forward_arrow1"
-            >
-
-        </ImageView>
-       </LinearLayout>
-    </LinearLayout>
-    
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/rl_login_loginarrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <RelativeLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/rl_login_loginarrow"
+            android:background="@color/greenDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:layout_centerInParent="true"
+                android:id="@+id/iv_login_loginarrow"
+                android:src="@drawable/forwordarrow" />
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

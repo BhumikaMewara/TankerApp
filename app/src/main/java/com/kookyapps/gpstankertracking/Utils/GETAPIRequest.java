@@ -22,12 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GETAPIRequest {
-
     public void request(final Context context, final FetchDataListener listener, final String ApiURL, HeadersUtil headparam, JsonObject jsonBodyObj) throws JSONException {
         if (listener != null) {
             listener.onFetchStart();
         }
-
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, ApiURL,
                 new Response.Listener<JSONObject>() {
                     @Override

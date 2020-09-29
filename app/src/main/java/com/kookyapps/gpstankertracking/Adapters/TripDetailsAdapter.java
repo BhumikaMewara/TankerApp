@@ -30,10 +30,6 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int ITEM=0;
     private static final int LOADING=1;
     private boolean isLoadingAdded = false;
-
-
-
-
     public TripDetailsAdapter(Context context, TripDetails activity,String init_type) {
         this.context = context;
         this.activity = activity;
@@ -136,9 +132,6 @@ public class TripDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
         switch (getItemViewType(position)){
-
-
-
             case ITEM:
                 final TripDetViewHolder mVH = (TripDetViewHolder) holder;
                 //mVH.bookingid.setText(tripList.get(position).getBookingid());
