@@ -64,28 +64,21 @@
                         <LinearLayout
                             android:id="@+id/lv_white_bg"
                             android:layout_width="match_parent"
-                            android:layout_height="150dp"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_marginTop="20dp"
                             android:layout_marginBottom="30dp"
                             android:layout_marginLeft="40dp"
                             android:layout_marginRight="40dp"
+                            android:paddingBottom="10dp"
                             android:layout_gravity="center"
                             android:background="@drawable/bg_rect_round_corners">
-                            <!--<EditText
-                                android:id="@+id/ed_enterOtp_otp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:hint="dasdasdasd"
-                                android:gravity="center"
-                                android:layout_gravity="center"
-                                android:layout_marginTop="10dp"/>
-                            -->
 
                             <ProgressBar
                                 android:id="@+id/enterotp_progressbar"
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
+                                android:visibility="invisible"
                                 android:layout_gravity="center"/>
 
                             <LinearLayout
@@ -149,14 +142,6 @@
                                     android:gravity="center" />
                             </LinearLayout>
 
-
-
-
-
-
-
-
-
                             <LinearLayout
                                 android:id="@+id/lh_enterOtp_verify"
                                 android:layout_width="200dp"
@@ -185,6 +170,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
+                            android:visibility="gone"
                             android:layout_marginRight="40dp"
                             >
                             <TextView

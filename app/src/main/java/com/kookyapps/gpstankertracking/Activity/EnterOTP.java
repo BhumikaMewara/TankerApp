@@ -223,7 +223,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         msg_icon = (ImageView) findViewById(R.id.iv_enterOtp_message);
         otpcode = (EditText) findViewById(R.id.ed_enterOtp_otp);
         progressBar=(ProgressBar)findViewById(R.id.enterotp_progressbar);
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.INVISIBLE);
         verifyLayout = (LinearLayout) findViewById(R.id.lh_enterOtp_verify);
         resend = (TextView) findViewById(R.id.tv_enterOtp_resendText);
         verifyLayout.setOnClickListener(this);
@@ -362,7 +362,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                 if (blmod.getBookingid().equals(SharedPrefUtil.getStringPreferences(EnterOTP.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID))) {
                     uploadBitmap();
                 } else {
-                    progressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.INVISIBLE);
                     verifyLayout.setClickable(true);
                 }
                 break;
@@ -427,24 +427,24 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                                     if(SharedPrefUtil.hasKey(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY)){
                                         SharedPrefUtil.removePreferenceKey(EnterOTP.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY);
                                     }
-                                    progressBar.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.INVISIBLE);
                                     startActivity(intent);
                                     finish();
                                 }else{
                                     RequestQueueService.showAlert(obj.getString("message"), EnterOTP.this);
                                     verifyLayout.setClickable(true);
-                                    progressBar.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.INVISIBLE);
                                 }
                             }else{
                                 RequestQueueService.showAlert("Error! No data fetched", EnterOTP.this);
                                 verifyLayout.setClickable(true);
-                                progressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.INVISIBLE);
                             }
                         } catch (JSONException e) {
                             RequestQueueService.showAlert("Something went wrong", EnterOTP.this);
                             e.printStackTrace();
                             verifyLayout.setClickable(true);
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.INVISIBLE);
                         }
                     }
                 },
@@ -453,7 +453,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         verifyLayout.setClickable(true);
-                        progressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.INVISIBLE);
                         NetworkResponse response = error.networkResponse;
                         if(response != null && response.data != null){
                             String errorString = new String(response.data);
