@@ -385,7 +385,9 @@ public class RequestDetails extends AppCompatActivity implements View.OnClickLis
                         //finish();
                     }
                 }else{
-                    Toast.makeText(RequestDetails.this,"Image not captured successfully",Toast.LENGTH_LONG).show();
+                    Toast.makeText(RequestDetails.this,"Image not captured successfully",Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    bottom.setClickable(true);
                 }
                 break;
         }
