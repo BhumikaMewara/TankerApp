@@ -20,18 +20,5 @@ public class URLs {
     public static final String UPDATE_LOCATION="update-location";
     public static final String CHECK_VALIDITY="check-validity";
     public static final String LOW_BATTERY="notification/battery";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public static final String RESEND_OTP="booking/resend-otp/";
 }

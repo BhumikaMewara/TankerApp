@@ -233,17 +233,19 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                 imageencoded=Utils.encodeTobase64(leftbit);
                 SharedPrefUtil.setPreferences(TankerStartingPic.this,Constants.SHARED_PREF_IMAGE_TAG,Constants.SHARED_END_IMAGE_KEY,imageencoded);
                 if (init_type!=null){
-                    i= new Intent(TankerStartingPic.this,EnterOTP.class);
-                    i.putExtra("Bookingdata",blmod);
-                    hideProgress();
-                    startActivity(i);
-                    finish();
-                } else{
-                    showProgress();
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                        checkBackgroundLocation(TankerStartingPic.this);
-                    else
-                        uploadBitmap();
+                    if(init_type.equals(Constants.TRIP_END_IMG)) {
+                        i = new Intent(TankerStartingPic.this, EnterOTP.class);
+                        i.putExtra("Bookingdata", blmod);
+                        hideProgress();
+                        startActivity(i);
+                        finish();
+                    }else{
+                        showProgress();
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            checkBackgroundLocation(TankerStartingPic.this);
+                        else
+                            uploadBitmap();
+                    }
                 }
                 break;
             case R.id.ll_tanker_starting_pic_retake:

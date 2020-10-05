@@ -22,7 +22,6 @@
     <string name="nonotificatiocation">No Notifications Found</string>
 
 
-
     <!-- Page Titles-->
     <string name="trip_complete">Trip Complete</string>
     <string name="trip_details">Trip Details</string>
@@ -42,8 +41,6 @@
     <string name="to">To</string>
 
 
-
-
     <string name="enter_code">Enter Code</string>
     <string name="otpscreen_msg">Please ask the customer to provide 6 digit verification code</string>
     <string name="verify_txt">Verify</string>
@@ -59,7 +56,6 @@
     <string name="start">START</string>
     <string name="request_accepted">Request Accepted</string>
     <string name="booking_started">Booking Started</string>
-    
 
 
     <!--notification single item-->

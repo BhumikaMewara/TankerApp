@@ -226,6 +226,7 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
         progressBar.setVisibility(View.INVISIBLE);
         verifyLayout = (LinearLayout) findViewById(R.id.lh_enterOtp_verify);
         resend = (TextView) findViewById(R.id.tv_enterOtp_resendText);
+        resend.setOnClickListener(this);
         verifyLayout.setOnClickListener(this);
         editText_one   = (EditText) findViewById(R.id.editText_one);
         editText_two   = (EditText) findViewById(R.id.editText_two);
@@ -366,6 +367,10 @@ public class EnterOTP extends AppCompatActivity implements View.OnClickListener,
                     verifyLayout.setClickable(true);
                 }
                 break;
+            case R.id.tv_enterOtp_resendText:
+                Intent intent = new Intent(EnterOTP.this,ResendOtp.class);
+                intent.putExtra("booking_id",blmod.getBookingid());
+                startActivity(intent);
         }
     }
 

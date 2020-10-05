@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kookyapps.gpstankertracking">
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:configChanges="locale|orientation"
@@ -21,14 +24,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Activity.ResendOtp"
+            android:theme="@style/UserDialog"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"/>
         <service
             android:name=".Services.TankerLocationService"
             android:enabled="true"
-            android:exported="true"></service>
-
-        <activity android:name=".Activity.TankerTripEndPic"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|keyboardHidden"/>
+            android:exported="true" />
+        <activity
+            android:name=".Activity.TankerTripEndPic"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -37,66 +45,77 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <activity android:name=".Activity.Map1"
+        <activity
+            android:name=".Activity.Map1"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.SplashActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.SplashActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.TripDetails"
+        <activity
+            android:name=".Activity.TripDetails"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.TripComplete"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.TripComplete"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.EnterOTP"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.EnterOTP"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.TankerStartingPic"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.TankerStartingPic"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.RequestDetails"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.RequestDetails"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
-                <action android:name=".Activity.RequestDetails"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name=".Activity.RequestDetails" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.Notifications"
+        <activity
+            android:name=".Activity.Notifications"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.FirstActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.FirstActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".Activity.MainActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|keyboardHidden"/>
-        <service
-            android:name=".fcm.MyFirebaseMessagingService">
+            android:windowSoftInputMode="stateHidden" />
+        <service android:name=".fcm.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
