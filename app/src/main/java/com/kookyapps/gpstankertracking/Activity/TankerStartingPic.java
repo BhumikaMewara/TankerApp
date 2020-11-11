@@ -167,7 +167,7 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
         latLongLayout=      (RelativeLayout)findViewById(R.id.rl_tankr_strt_latLon);
         retake=             (LinearLayout)findViewById(R.id.ll_tanker_starting_pic_retake);
         imgInfoLayout=      (RelativeLayout)findViewById(R.id.image_with_infoLayout);
-        progressBar=        (ProgressBar)findViewById(R.id.tanker_starting_progressbar);
+        /*progressBar=        (ProgressBar)findViewById(R.id.tanker_starting_progressbar);*/
         progresslayout=     (RelativeLayout)findViewById(R.id.rl_tanker_starting_progress);
         fetchinglocation =  (TextView)findViewById(R.id.tv_tanker_starting_progress);
         if(!photo_taken) {
@@ -240,12 +240,13 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
                         startActivity(i);
                         finish();
                     }else{
-                        showProgress();
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                             checkBackgroundLocation(TankerStartingPic.this);
                         else
                             uploadBitmap();
                     }
+                }else{
+                    hideProgress();
                 }
                 break;
             case R.id.ll_tanker_starting_pic_retake:
@@ -548,22 +549,18 @@ public class TankerStartingPic extends AppCompatActivity implements View.OnClick
 
     private void showProgress(){
         progresslayout.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
     }
     private void hideProgress(){
         progresslayout.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
     }
     private void showFetchingLocation(){
         progresslayout.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
         fetchinglocation.setVisibility(View.VISIBLE);
         captureImgBtn.setVisibility(View.GONE);
         captureImgBtn.setClickable(false);
     }
     private void hideFetchingLocation(){
         progresslayout.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
         fetchinglocation.setVisibility(View.GONE);
         captureImgBtn.setVisibility(View.VISIBLE);
         captureImgBtn.setClickable(true);

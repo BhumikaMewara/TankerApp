@@ -34,7 +34,12 @@ public class POSTAPIRequest {
                     if (response.getInt("error") == 0) {
                         listener.onFetchComplete(response);
                     } else {
-                        listener.onFetchFailure(response.getString("message"));
+                        if(response.has("message"))
+                            listener.onFetchFailure(response.getString("message"));
+                        else{
+                            String msg = response.getJSONObject("errors").getJSONObject("password").getString("msg");
+                            listener.onFetchFailure(msg);
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -100,7 +105,12 @@ public class POSTAPIRequest {
                     if (response.getInt("error") == 0) {
                         listener.onFetchComplete(response);
                     } else {
-                        listener.onFetchFailure(response.getString("message"));
+                        if(response.has("message"))
+                            listener.onFetchFailure(response.getString("message"));
+                        else{
+                            String msg = response.getJSONObject("errors").getJSONObject("password").getString("msg");
+                            listener.onFetchFailure(msg);
+                        }
                     }
 
                 } catch (JSONException e) {
