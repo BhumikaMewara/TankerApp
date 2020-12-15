@@ -85,8 +85,8 @@ public class SplashActivity extends AppCompatActivity {
         NotificationManager nm = (NotificationManager)getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
         nm.cancelAll();
         if(SharedPrefUtil.hasKey(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)) {
-            URLs.BASE_URL = "http://"+SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"/api/tanker/";
-            URLs.SOCKET_URL="http://"+SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"?token=";
+            URLs.BASE_URL = SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"/api/tanker/";
+            URLs.SOCKET_URL=SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"?token=";
             if (SessionManagement.checkSignIn(this)) {
                 if (SharedPrefUtil.hasKey(SplashActivity.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID)) {
                     bookingByIdApiCalling();
