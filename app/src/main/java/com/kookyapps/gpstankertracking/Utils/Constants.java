@@ -15,7 +15,6 @@ public class Constants {
     public static ArrayList<LatLng> travelled_path = null;
     public static ArrayList<Location> travelled_path1 = null;
 
-
     public static final String REQUEST_INIT= "request_init";
     public static final String NOTIFICATION_INIT= "notification_init";
     public static final String SPLASH_INIT= "splash_init";
@@ -24,13 +23,11 @@ public class Constants {
     public static final String BOOKING_INIT= "booking_init";
     public static final String COMPLETED_TRIP = "completed";
     public static final String CANCELLED_TRIP = "cancelled";
-
-
-
+    public static final String SERVER_IP="server_ip";
 
     //public static final String SHARED_PREF_CAPTURE_IMAGE_BEFORE = "pref_capture_before";
     public static final String SHARED_PREF_LOGIN_TAG="login_pref";
-  /*  public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
+    /*public static final String SHARED_PREF_BOOKING_TAG="booking_pref";
     public static final String SHARED_PREF_TRIP_TAG="trip_pref";*/
     public static final String SHARED_PREF_ONGOING_TAG="ongoing_pref";
     public static final String SHARED_PREF_IMAGE_TAG="image_tag";

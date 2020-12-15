@@ -24,15 +24,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.ResendOtp"
-            android:theme="@style/UserDialog"
+        <activity android:name=".Activity.SelectServer"></activity>
+        <activity
+            android:name=".Activity.ResendOtp"
             android:configChanges="orientation"
+            android:excludeFromRecents="true"
             android:screenOrientation="portrait"
-            android:excludeFromRecents="true"/>
+            android:theme="@style/UserDialog" />
+
         <service
             android:name=".Services.TankerLocationService"
             android:enabled="true"
             android:exported="true" />
+
         <activity
             android:name=".Activity.TankerTripEndPic"
             android:configChanges="orientation|keyboardHidden"
@@ -107,11 +111,13 @@
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
+
         <service android:name=".fcm.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />

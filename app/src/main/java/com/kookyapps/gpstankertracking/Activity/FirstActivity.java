@@ -435,7 +435,7 @@ public class FirstActivity extends AppCompatActivity implements View.OnClickList
                    if (data.getInt("error") == 0) {
                        FirebaseAuth.getInstance().signOut();
                        SessionManagement.logout(logoutListner, FirstActivity.this);
-                       Intent i = new Intent(FirstActivity.this, MainActivity.class);
+                       Intent i = new Intent(FirstActivity.this, SelectServer.class);
                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                        startActivity(i);
                        Toast.makeText(FirstActivity.this, "You are now logout", Toast.LENGTH_SHORT).show();

@@ -84,22 +84,35 @@ public class SplashActivity extends AppCompatActivity {
         });
         NotificationManager nm = (NotificationManager)getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
         nm.cancelAll();
-        if (SessionManagement.checkSignIn(this)) {
-            if (SharedPrefUtil.hasKey(SplashActivity.this,Constants.SHARED_PREF_ONGOING_TAG,Constants.SHARED_ONGOING_BOOKING_ID)){
-                bookingByIdApiCalling();
-            }else{
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getNotificationCount();
+        if(SharedPrefUtil.hasKey(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)) {
+            URLs.BASE_URL = "http://"+SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"/api/tanker/";
+            URLs.SOCKET_URL="http://"+SharedPrefUtil.getStringPreferences(this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP)+"?token=";
+            if (SessionManagement.checkSignIn(this)) {
+                if (SharedPrefUtil.hasKey(SplashActivity.this, Constants.SHARED_PREF_ONGOING_TAG, Constants.SHARED_ONGOING_BOOKING_ID)) {
+                    bookingByIdApiCalling();
+                } else {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getNotificationCount();
+                        }
+                    }, SPLASH_TIME_OUT);
                 }
-            }, SPLASH_TIME_OUT);
+            } else {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                }, SPLASH_TIME_OUT);
             }
-        } else {
+        }else{
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent i = new Intent(SplashActivity.this, SelectServer.class);
                     startActivity(i);
                     finish();
                 }

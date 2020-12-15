@@ -23,7 +23,6 @@ public class SessionManagement {
     private static final String IS_ONLINE = "is_online";
     private static final String IS_VALID="is_valid";
 
-
     public static boolean checkSignIn(Context con) {
         if (SharedPrefUtil.hasKey(con, SHARED_PREF_LOGIN_TAG, IS_LOGGEDIN)) {
             return SharedPrefUtil.getBooleanPreferences(con, Constants.SHARED_PREF_LOGIN_TAG, IS_LOGGEDIN);

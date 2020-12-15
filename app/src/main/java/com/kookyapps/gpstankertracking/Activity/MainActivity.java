@@ -23,6 +23,7 @@ import com.kookyapps.gpstankertracking.Utils.HeadersUtil;
 import com.kookyapps.gpstankertracking.Utils.POSTAPIRequest;
 import com.kookyapps.gpstankertracking.Utils.RequestQueueService;
 import com.kookyapps.gpstankertracking.Utils.SessionManagement;
+import com.kookyapps.gpstankertracking.Utils.SharedPrefUtil;
 import com.kookyapps.gpstankertracking.Utils.URLs;
 //import com.kookyapps.gpstankertracking.iid.FirebaseInstanceId;
 
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-
+        if(SharedPrefUtil.hasKey(MainActivity.this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP))
+            SharedPrefUtil.removePreferenceKey(MainActivity.this,Constants.SHARED_PREF_LOGIN_TAG,Constants.SERVER_IP);
         super.onBackPressed();
     }
     private boolean validate(){
